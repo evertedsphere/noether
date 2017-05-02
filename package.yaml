@@ -1,0 +1,93 @@
+name: noether
+synopsis: Math in Haskell.
+version: '0.0.0'
+
+maintainer: Soham Chowdhury
+github: mrkgnao/noether
+
+category: Math
+license: MIT
+description: TODO
+
+ghc-options:
+  - "-Wall"
+  - "-fwarn-implicit-prelude"
+default-extensions:
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - FlexibleContexts
+  - FlexibleInstances
+  - MultiParamTypeClasses
+  - TypeFamilies
+  - RankNTypes
+  - GADTs
+  - LiberalTypeSynonyms
+  - TypeSynonymInstances
+
+library:
+  dependencies:
+  - base
+  - array
+  - ghc-prim
+  - async
+  - deepseq
+  - containers
+  - hashable
+  - transformers
+  - text
+  - stm
+  - bytestring
+  - mtl
+  - mtl-compat
+  - safe
+
+  - reflection
+  source-dirs:
+  - library
+
+executables:
+  noether:
+    dependencies:
+    - base
+    - noether
+    ghc-options:
+    - "-rtsopts"
+    - "-threaded"
+    - "-with-rtsopts=-N"
+    main: Main.hs
+    source-dirs: executable
+
+# Other stuff
+
+benchmarks:
+  noether-benchmarks:
+    dependencies:
+    - base
+    - noether
+    - criterion
+    ghc-options:
+    - "-rtsopts"
+    - "-threaded"
+    - "-with-rtsopts=-N"
+    main: Main.hs
+    source-dirs: benchmark
+
+tests:
+  noether-test-suite:
+    dependencies:
+    - base
+    - noether
+    - hedgehog
+    ghc-options:
+    - "-rtsopts"
+    - "-threaded"
+    - "-with-rtsopts=-N"
+    main: Main.hs
+    source-dirs: test-suite
+
+extra-source-files:
+- CHANGELOG.md
+- LICENSE.md
+- package.yaml
+- README.md
+- stack.yaml
