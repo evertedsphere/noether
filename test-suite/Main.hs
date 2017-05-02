@@ -7,7 +7,7 @@ import           EllipticCurve
 import           Lemmata        hiding (negate, one, zero, (*), (+), (-), (/))
 
 genInt :: (Monad m, Num a) => Gen m a
-genInt = map fromIntegral $ Gen.integral (Range.linearFrom 0 (-10000) 10000)
+genInt = map fromIntegral $ Gen.integral (Range.linearFrom 0 (-100) 100)
 
 genIntNonzero :: (Monad m, Eq a, Num a) => Gen m a
 genIntNonzero = Gen.filter (/=0) genInt
@@ -35,19 +35,20 @@ scale lambda (P1 a b) = P1 (lambda * a) (lambda * b)
 genP2 :: Monad m => Gen m (P2 Rational)
 genP2 = Gen.filter nonsingular $ P2 <$> genRational <*> genRational <*> genRational
   where
-    nonsingular (P2 a b c) = a /= 0 && b /= 0 && c /= 0
+    nonsingular (P2 a b c) = a /= 0 || b /= 0 || c /= 0
 
 testP2 :: Monad m => Test m (P2 Rational)
 testP2 = forAll genP2
 
-genEC :: Monad m => Gen m (P2 Rational)
-genEC = Gen.filter nonsingular $ P2 <$> genRational <*> genRational <*> genRational
+genEC :: Monad m => WM Rational -> Gen m (P2 Rational)
+genEC wm =
+  Gen.filter (\p -> nonsingular p && onCurve wm p) $
+  P2 <$> genRational <*> genRational <*> genRational
   where
-    nonsingular (P2 a _ c) = a /= 0 && c /= 0
+    nonsingular (P2 a b c) = (a /= 0 && c /= 0) || (a == 0 && c == 0 && b /= 0)
 
-testEC :: Monad m => Test m (P2 Rational)
-testEC = forAll genEC
-
+testEC :: Monad m => WM Rational -> Test m (P2 Rational)
+testEC wm = forAll (genEC wm)
 
 -- genCurvePt
 --   :: (Typeable s, Monad m)
@@ -126,11 +127,14 @@ prop_rp2_eq_3 =
     lambda <- testNonzero
     P2 a 0 b === P2 (lambda * a) 0 (lambda * b)
 
+ellipticCurveProperty :: Test IO () -> Property
+ellipticCurveProperty = withTests 20 . withDiscards 10000 . property
+
 prop_ec_plus_id_left :: Property
 prop_ec_plus_id_left =
-  property $ do
+  ellipticCurveProperty $ do
     k <- testCurve
-    a' <- testP2
+    a' <- testEC k
     let a, z :: CurvePt Rational s
         a = liftEC a'
         z = liftEC inf
@@ -140,9 +144,9 @@ prop_ec_plus_id_left =
 
 prop_ec_plus_id_right :: Property
 prop_ec_plus_id_right =
-  property $ do
+  ellipticCurveProperty $ do
     k <- testCurve
-    a' <- testEC
+    a' <- testEC k
     let a, z :: CurvePt Rational s
         a = liftEC a'
         z = liftEC inf
@@ -152,9 +156,9 @@ prop_ec_plus_id_right =
 
 prop_ec_plus_inverses :: Property
 prop_ec_plus_inverses =
-  property $ do
+  ellipticCurveProperty $ do
     k <- testCurve
-    p <- testEC
+    p <- testEC k
     let a, z :: CurvePt Rational s
         a = liftEC p
         z = liftEC inf
@@ -164,10 +168,10 @@ prop_ec_plus_inverses =
 
 prop_ec_plus_sym :: Property
 prop_ec_plus_sym =
-  property $ do
+  ellipticCurveProperty $ do
     k <- testCurve
-    a' <- testEC
-    b' <- testEC
+    a' <- testEC k
+    b' <- testEC k
     let a, b :: CurvePt Rational s
         a = liftEC a'
         b = liftEC b'
@@ -177,10 +181,10 @@ prop_ec_plus_sym =
 
 prop_ec_plus_regression_1 :: Property
 prop_ec_plus_regression_1 =
-  property $ do
+  ellipticCurveProperty $ do
     k <- testCurve
-    a' <- testEC
-    b' <- testEC
+    a' <- testEC k
+    b' <- testEC k
     let a, b :: CurvePt Rational s
         a = liftEC a'
         b = liftEC b'
@@ -190,11 +194,11 @@ prop_ec_plus_regression_1 =
 
 prop_ec_plus_assoc :: Property
 prop_ec_plus_assoc =
-  property $ do
+  ellipticCurveProperty $ do
     k <- testCurve
-    a' <- testEC
-    b' <- testEC
-    c' <- testEC
+    a' <- testEC k
+    b' <- testEC k
+    c' <- testEC k
     let a, b, c :: CurvePt Rational s
         a = liftEC a'
         b = liftEC b'
@@ -207,7 +211,7 @@ tests :: IO ()
 tests = do
   putText "\n -> Projective spaces\n"
 
-  checkSequential' $
+  checkParallel' $
     Group
       "Real projective space : order 2 : equality"
       [ ("[x : y] == [ x :  y]", prop_rp1_eq_refl)
@@ -216,7 +220,7 @@ tests = do
       , ("[0 : a] == [ 0 :  b]", prop_rp1_eq_3)
       , ("[a : b] /= [ c :  0]", prop_rp1_eq_4)
       ]
-  checkSequential' $
+  checkParallel' $
     Group
       "Real projective space : order 3 : equality"
       [ ("[x : y : 0] == [ax : ay :  0]", prop_rp2_eq_1)
@@ -226,26 +230,22 @@ tests = do
 
   putText "\n -> Elliptic curves\n"
 
-  checkSequential' $
-    Group
-      "Elliptic curves : group law : identity"
-      [ ("P + 0 = P (right identity)", prop_ec_plus_id_right)
-      , ("0 + P = P", prop_ec_plus_id_left)
-      ]
-  checkSequential' $
+  checkParallel' $
     Group
       "Elliptic curves : group law : axioms"
-      [ ("P + (-P)    =  0         ", prop_ec_plus_inverses)
+      [ ("P + 0 = P", prop_ec_plus_id_right)
+      , ("0 + P = P", prop_ec_plus_id_left)
+      , ("P + (-P)    =  0         ", prop_ec_plus_inverses)
       , ("P +  Q      =  Q + P     ", prop_ec_plus_sym)
       , ("P + (Q + R) = (P + Q) + R", prop_ec_plus_assoc)
       ]
-  checkSequential' $
+  checkParallel' $
     Group
       "Elliptic curves : group law : regression tests"
       [("(P + Q) - P = P + (Q - P)", prop_ec_plus_regression_1)]
 
   where
-    checkSequential' = void . checkSequential
+    checkParallel' = void . checkParallel
 
 main :: IO ()
 main = tests
