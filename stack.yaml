@@ -2,9 +2,7 @@ resolver: lts-8.12
 
 packages:
   - location: .
-  - location:
-      git: https://github.com/hedgehogqa/haskell-hedgehog
-      commit: 675780808c2e094cd4906a1d68c1c4203b2cfe15
+  - location: '../haskell-hedgehog'
     extra-dep: true
     subdirs:
       - hedgehog

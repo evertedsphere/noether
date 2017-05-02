@@ -4,93 +4,248 @@ import qualified Hedgehog.Range as Range
 
 import           Algebra
 import           EllipticCurve
-import           Lemmata        hiding (one, zero, (*), (+), (/))
+import           Lemmata        hiding (negate, one, zero, (*), (+), (-), (/))
 
-getRational :: (Monad m) => Test m Rational
-getRational = forAll $ Gen.realFrac_ $ Range.linearFrac 1.0 100.0
+genInt :: (Monad m, Num a) => Gen m a
+genInt = map fromIntegral $ Gen.integral (Range.linearFrom 0 (-10000) 10000)
 
-prop_rp2_eq_refl :: Property
-prop_rp2_eq_refl =
+genIntNonzero :: (Monad m, Eq a, Num a) => Gen m a
+genIntNonzero = Gen.filter (/=0) genInt
+
+genRational :: (Monad m) => Gen m Rational
+genRational = (/) <$> genInt <*> genIntNonzero
+
+genNonzero :: (Monad m) => Gen m Rational
+genNonzero = (/) <$> genIntNonzero <*> genIntNonzero
+
+testNonzero :: (Monad m) => Test m Rational
+testNonzero = forAll genNonzero
+
+genP1 :: Monad m => Gen m (P1 Rational)
+genP1 = Gen.filter nonsingular $ P1 <$> genRational <*> genRational
+  where
+    nonsingular (P1 a b) = a /= 0 && b /= 0
+
+testP1 :: Monad m => Test m (P1 Rational)
+testP1 = forAll genP1
+
+scale :: Rg r => r -> P1 r -> P1 r
+scale lambda (P1 a b) = P1 (lambda * a) (lambda * b)
+
+genP2 :: Monad m => Gen m (P2 Rational)
+genP2 = Gen.filter nonsingular $ P2 <$> genRational <*> genRational <*> genRational
+  where
+    nonsingular (P2 a b c) = a /= 0 && b /= 0 && c /= 0
+
+testP2 :: Monad m => Test m (P2 Rational)
+testP2 = forAll genP2
+
+genEC :: Monad m => Gen m (P2 Rational)
+genEC = Gen.filter nonsingular $ P2 <$> genRational <*> genRational <*> genRational
+  where
+    nonsingular (P2 a _ c) = a /= 0 && c /= 0
+
+testEC :: Monad m => Test m (P2 Rational)
+testEC = forAll genEC
+
+
+-- genCurvePt
+--   :: (Typeable s, Monad m)
+--   => Gen m (CurvePt Rational s)
+-- genCurvePt = pt <$> genNonzero <*> genNonzero <*> genNonzero
+
+-- testCurvePt
+--   :: (Typeable s, Monad m)
+--   => Test m (CurvePt Rational s)
+-- testCurvePt = forAll genCurvePt
+
+genCurve :: Monad m => Gen m (WM Rational)
+genCurve = Gen.filter nonsingular (WM <$> genNonzero <*> genNonzero)
+  where
+    nonsingular (WM a b) = (4 * a ^ 3 + 27 * b ^ 2) /= 0
+
+testCurve :: Monad m => Test m (WM Rational)
+testCurve = forAll genCurve
+
+prop_rp1_eq_refl :: Property
+prop_rp1_eq_refl =
   property $ do
-    a <- getRational
-    b <- getRational
-    P2 a b === P2 a b
+    a <- testP1
+    a === a
+
+prop_rp1_eq_1 :: Property
+prop_rp1_eq_1 =
+  property $ do
+    p <- testP1
+    lambda <- testNonzero
+    p === scale lambda p
+
+prop_rp1_eq_2 :: Property
+prop_rp1_eq_2 =
+  property $ do
+    a <- testNonzero
+    b <- testNonzero
+    P1 a 0 === P1 b 0
+
+prop_rp1_eq_3 :: Property
+prop_rp1_eq_3 =
+  property $ do
+    a <- testNonzero
+    b <- testNonzero
+    P1 0 a === P1 0 b
+
+prop_rp1_eq_4 :: Property
+prop_rp1_eq_4 =
+  property $ do
+    a <- testNonzero
+    b <- testNonzero
+    c <- testNonzero
+    assert $ P1 a c /= P1 b 0
 
 prop_rp2_eq_1 :: Property
 prop_rp2_eq_1 =
   property $ do
-    a <- getRational
-    b <- getRational
-    lambda <- getRational
-    P2 a b === P2 (lambda * a) (lambda * b)
+    a <- testNonzero
+    b <- testNonzero
+    lambda <- testNonzero
+    P2 a b 0 === P2 (lambda * a) (lambda * b) 0
 
 prop_rp2_eq_2 :: Property
 prop_rp2_eq_2 =
   property $ do
-    a <- getRational
-    b <- getRational
-    P2 a 0 === P2 b 0
+    a <- testNonzero
+    b <- testNonzero
+    lambda <- testNonzero
+    P2 0 a b === P2 0 (lambda * a) (lambda * b)
 
 prop_rp2_eq_3 :: Property
 prop_rp2_eq_3 =
   property $ do
-    a <- getRational
-    b <- getRational
-    P2 0 a === P2 0 b
+    a <- testNonzero
+    b <- testNonzero
+    lambda <- testNonzero
+    P2 a 0 b === P2 (lambda * a) 0 (lambda * b)
 
-prop_rp2_eq_4 :: Property
-prop_rp2_eq_4 =
+prop_ec_plus_id_left :: Property
+prop_ec_plus_id_left =
   property $ do
-    a <- getRational
-    b <- getRational
-    c <- getRational
-    assert $ P2 a c /= P2 b 0
+    k <- testCurve
+    a' <- testP2
+    let a, z :: CurvePt Rational s
+        a = liftEC a'
+        z = liftEC inf
+        lhs = computeOver k $ a + z
+        rhs = computeOver k a
+    lhs === rhs
 
-prop_rp3_eq_1 :: Property
-prop_rp3_eq_1 =
+prop_ec_plus_id_right :: Property
+prop_ec_plus_id_right =
   property $ do
-    a <- getRational
-    b <- getRational
-    lambda <- getRational
-    P3 a b 0 === P3 (lambda * a) (lambda * b) 0
+    k <- testCurve
+    a' <- testEC
+    let a, z :: CurvePt Rational s
+        a = liftEC a'
+        z = liftEC inf
+        lhs = computeOver k $ z + a
+        rhs = computeOver k a
+    lhs === rhs
 
-prop_rp3_eq_2 :: Property
-prop_rp3_eq_2 =
+prop_ec_plus_inverses :: Property
+prop_ec_plus_inverses =
   property $ do
-    a <- getRational
-    b <- getRational
-    lambda <- getRational
-    P3 0 a b === P3 0 (lambda * a) (lambda * b)
+    k <- testCurve
+    p <- testEC
+    let a, z :: CurvePt Rational s
+        a = liftEC p
+        z = liftEC inf
+        lhs = computeOver k $ a + (negate a)
+        rhs = computeOver k z
+    lhs === rhs
 
-prop_rp3_eq_3 :: Property
-prop_rp3_eq_3 =
+prop_ec_plus_sym :: Property
+prop_ec_plus_sym =
   property $ do
-    a <- getRational
-    b <- getRational
-    lambda <- getRational
-    P3 a 0 b === P3 (lambda * a) 0 (lambda * b)
+    k <- testCurve
+    a' <- testEC
+    b' <- testEC
+    let a, b :: CurvePt Rational s
+        a = liftEC a'
+        b = liftEC b'
+        lhs = computeOver k $ a + b
+        rhs = computeOver k $ b + a
+    lhs === rhs
+
+prop_ec_plus_regression_1 :: Property
+prop_ec_plus_regression_1 =
+  property $ do
+    k <- testCurve
+    a' <- testEC
+    b' <- testEC
+    let a, b :: CurvePt Rational s
+        a = liftEC a'
+        b = liftEC b'
+        lhs = computeOver k $ a + (b - a)
+        rhs = computeOver k $ (a + b) - a
+    lhs === rhs
+
+prop_ec_plus_assoc :: Property
+prop_ec_plus_assoc =
+  property $ do
+    k <- testCurve
+    a' <- testEC
+    b' <- testEC
+    c' <- testEC
+    let a, b, c :: CurvePt Rational s
+        a = liftEC a'
+        b = liftEC b'
+        c = liftEC c'
+        lhs = computeOver k $ a + (b + c)
+        rhs = computeOver k $ (a + b) + c
+    lhs === rhs
 
 tests :: IO ()
 tests = do
-  checkParallel' $
+  putText "\n -> Projective spaces\n"
+
+  checkSequential' $
     Group
       "Real projective space : order 2 : equality"
-      [ ("[x : y] == [ x :  y]", prop_rp2_eq_refl)
-      , ("[x : y] == [ax : ay]", prop_rp2_eq_1)
-      , ("[a : 0] == [ b :  0]", prop_rp2_eq_2)
-      , ("[0 : a] == [ 0 :  b]", prop_rp2_eq_3)
-      , ("[a : b] /= [ c :  0]", prop_rp2_eq_4)
+      [ ("[x : y] == [ x :  y]", prop_rp1_eq_refl)
+      , ("[x : y] == [ax : ay]", prop_rp1_eq_1)
+      , ("[a : 0] == [ b :  0]", prop_rp1_eq_2)
+      , ("[0 : a] == [ 0 :  b]", prop_rp1_eq_3)
+      , ("[a : b] /= [ c :  0]", prop_rp1_eq_4)
       ]
-  putText ""
-  checkParallel' $
+  checkSequential' $
     Group
       "Real projective space : order 3 : equality"
-      [ ("[x : y : 0] == [ax : ay :  0]", prop_rp3_eq_1)
-      , ("[0 : y : z] == [ 0 : ay : az]", prop_rp3_eq_2)
-      , ("[x : 0 : z] == [ax :  0 : az]", prop_rp3_eq_3)
+      [ ("[x : y : 0] == [ax : ay :  0]", prop_rp2_eq_1)
+      , ("[0 : y : z] == [ 0 : ay : az]", prop_rp2_eq_2)
+      , ("[x : 0 : z] == [ax :  0 : az]", prop_rp2_eq_3)
       ]
+
+  putText "\n -> Elliptic curves\n"
+
+  checkSequential' $
+    Group
+      "Elliptic curves : group law : identity"
+      [ ("P + 0 = P (right identity)", prop_ec_plus_id_right)
+      , ("0 + P = P", prop_ec_plus_id_left)
+      ]
+  checkSequential' $
+    Group
+      "Elliptic curves : group law : axioms"
+      [ ("P + (-P)    =  0         ", prop_ec_plus_inverses)
+      , ("P +  Q      =  Q + P     ", prop_ec_plus_sym)
+      , ("P + (Q + R) = (P + Q) + R", prop_ec_plus_assoc)
+      ]
+  checkSequential' $
+    Group
+      "Elliptic curves : group law : regression tests"
+      [("(P + Q) - P = P + (Q - P)", prop_ec_plus_regression_1)]
+
   where
-    checkParallel' = void . checkParallel
+    checkSequential' = void . checkSequential
 
 main :: IO ()
 main = tests
