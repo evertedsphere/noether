@@ -104,6 +104,9 @@ ellipticPlus (WM a _) p q
                          y = yp + s * (x - xp)
                      in ecNegate (P2 x y one)
 
+discriminant :: (Field k, Num k) => WM k -> k
+discriminant (WM a b) = -16 * (4 * a ^ 3 + 27 * b ^ 2)
+
 onCurve :: (Show k, Field k, Eq k, Num k) => WM k -> P2 k -> Bool
 onCurve (WM a b) p
   | p == inf = True
@@ -179,3 +182,10 @@ slowPow p n
 
 slowPow' :: (Field k, Eq k, Num k) => WM k -> P2 k -> Int -> P2 k
 slowPow' curve p n = computeOver curve (slowPow (liftEC p) n)
+
+canonicalize (P2 (xn :% xd) (yn :% yd) (zn :% zd)) =
+  canonicalize' (P2 (xn * yd * zd) (yn * xd * zd) (zn * xd * yd))
+
+canonicalize' (P2 x y z) =
+  let g = gcd x (gcd y z)
+  in P2 (x `div` g) (y `div` g) (z `div` g)

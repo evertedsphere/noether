@@ -61,9 +61,7 @@ testEC wm = forAll (genEC wm)
 -- testCurvePt = forAll genCurvePt
 
 genCurve :: Monad m => Gen m (WM Rational)
-genCurve = Gen.filter nonsingular (WM <$> genNonzero <*> genNonzero)
-  where
-    nonsingular (WM a b) = (4 * a ^ 3 + 27 * b ^ 2) /= 0
+genCurve = Gen.filter ((/= 0) . discriminant) (WM <$> genNonzero <*> genNonzero)
 
 testCurve :: Monad m => Test m (WM Rational)
 testCurve = forAll genCurve

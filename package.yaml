@@ -42,6 +42,7 @@ library:
   - safe
 
   - reflection
+  - template-haskell
   source-dirs:
   - library
 
