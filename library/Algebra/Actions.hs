@@ -88,6 +88,11 @@ class ( Bimodule tag add mul r tag add mul r vadd v
       ) =>
       VectorSpace tag add mul r vadd v
 
+instance ( Bimodule tag add mul r tag add mul r vadd v
+         , Field add mul r
+         ) =>
+         VectorSpace tag add mul r vadd v
+
 type VectorSpace' tag r v = VectorSpace tag Add Mul r Add v
 
 -- | Default instances
@@ -202,6 +207,15 @@ r <# v = leftAct' (undefined :: Proxy (Scalar Add)) r v
   :: LeftActs (Self Mul) r r
   => r -> r -> r
 r <! v = leftAct' (undefined :: Proxy (Self Mul)) r v
+
+invertedScale
+  :: (VectorSpace' (Scalar Add) r v)
+  => r -> v -> v
+invertedScale r v = reciprocal r <# v
+
+lerp :: (VectorSpace' (Scalar Add) r v)
+  => r -> v -> v -> v
+lerp by v w = by <# v `plus` (one `plus` negate by <# w)
 
 -- instance ( AbelianGroup op a
 --          , Semigroup op Integer
