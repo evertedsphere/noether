@@ -1547,3 +1547,140 @@
 -- mkMutable [t| forall a. Maybe' a |]
 -- mkMutable [t| forall a b. Labeled' a b |]
 -- -}
+
+-- instance ( AbelianGroup op a
+--          , Semigroup op Integer
+--          , add ~ Add
+--          , mul ~ Mul
+--          , tag ~ Scalar op
+--          ) =>
+--          RightModule tag add mul Integer op a
+
+-- instance (CommutativeRing add mul r, LeftModule (Scalar op) add mul r op a) =>
+--          RightModule (Scalar op) add mul r op a
+
+-- instance ( AbelianGroup op a
+--          , rtag ~ Scalar op
+--          , stag ~ Scalar op
+--          , radd ~ Add
+--          , rmul ~ Mul
+--          , sadd ~ Add
+--          , smul ~ Mul
+--          ) =>
+--          Bimodule rtag radd rmul Integer stag sadd smul Integer op a
+
+-- type Bimodule_ rtag r stag s add mul v = Bimodule rtag add mul r stag add mul s Add v
+
+-- instance (Ring add mul r, r ~ s, s ~ t, r ~ t, ltag ~ Self mul, rtag ~ Self mul) =>
+--          Bimodule_ ltag r rtag s add mul t
+
+-- a_
+--   :: Bimodule_ (Self Mul) r (Self Mul) s Add Mul v
+--   => r -> s -> v -> v
+-- a_ r s v = leftAct p r $ rightAct p v s
+--   where
+--     p = (undefined :: Proxy (Self Mul))
+
+-- val :: Double
+-- val = 2 <! 3
+
+-- -- :t f
+-- -- f :: (Commutative 'Mul a, Commutative 'Add a,
+-- --       DistributesOver 'Add 'Mul a, Neutral 'Mul a, Neutral 'Add a,
+-- --       Semigroup 'Mul a, Semigroup 'Add a) =>
+-- --      a -> a -> a
+
+-- f :: CommutativeSemiring Add Mul a => a -> a -> a
+-- f a b = a `plus` (b `plus` zero)
+
+-- instance
+
+-- type Bimodule' r s = Bimodule Add Mul r Add Mul s
+
+-- info :: Q Info
+-- d :: Type
+-- d = lookupTypeName "Double"
+
+-- instance Semiring Add Mul Double
+-- instance ( Neutral add a
+--          , Magma add a
+--          , Neutral mul a
+--          , Magma mul a
+--          ) =>
+--          Semiring add mul a
+
+
+
+-- class Ring a where
+
+-- class Ring a => Module a b | b -> a where
+
+-- instance Ring a => Module a (Ring a) where
+
+-- instance Module a b => Ring b where
+
+-- a :: Double
+-- a = zero `plus` zero
+
+-- ooh
+-- zero = b `plus` b
+--   where b = neutral (undefined :: Proxy Add)
+
+-- instance Ring Add Mul r => LeftModule (Self Mul) Add Mul r Mul r where
+
+-- instance (Ring add mul r, AbelianGroup vadd v, LeftActs r ltag v) =>
+--          LeftModule ltag add mul r vadd v
+
+
+-- a :: Double
+-- a =
+--   zero `plus` (one `plus` one `plus` reciprocal one) `times`
+--   (negate (one `plus` one `plus` one))
+
+-- instance (AbelianGroup op a) =>
+--          RightActs (Scalar op) Integer a where
+--   rightAct = flip . leftAct
+
+-- class (Semigroup op a) => LeftActs op a tag b where
+--   leftAct :: Proxy tag -> Proxy op -> a -> b -> b
+
+-- class (Semigroup op a) => RightActs op a tag b where
+--   rightAct :: Proxy tag -> Proxy op -> b -> a -> b
+
+-- -- instance (CommutativeSemigroup op a, RightActs tag a b, tag ~ Scalar op) =>
+-- --          LeftActs tag a b where
+-- --   leftAct = flip . rightAct
+
+-- instance {-# OVERLAPPING #-}
+--   (CommutativeSemigroup op a, LeftActs op a tag b, tag ~ Scalar op) =>
+--          RightActs op a tag b where
+--   rightAct p q = flip (leftAct p q)
+
+-- -- | Abelian groups are Z-(bi)modules.
+-- instance  (AbelianGroup op a) =>
+--          LeftActs am Integer (Scalar op) a where
+--   leftAct sproxy n' a =
+--     let proxy = (undefined :: Proxy op)
+--     in case n' of
+--       0 -> neutral proxy
+--       1 -> a
+--       n -> {- FIXME slow! -} binaryOp proxy a (leftAct sproxy (n P.- 1) a)
+
+-- -- instance (AbelianGroup op a) =>
+-- --          RightActs (Scalar op) Integer a where
+-- --   rightAct = flip . leftAct
+
+-- -- | FIXME: tons of distributivity implied hereafter in the actions
+
+-- class (LeftActs lop a ltag b, RightActs rop a rtag b) =>
+--       Acts lop rop ltag rtag a b
+
+-- instance (CommutativeSemigroup op a, RightActs tag a b, tag ~ Scalar op) =>
+--          LeftActs tag a b where
+--   leftAct = flip . rightAct
+
+-- instance ( Commutative mul r
+--          , LeftModule ltag add mul r vadd v
+--          , RightActs ltag r v
+--          ) =>
+--          RightModule ltag add mul r vadd v

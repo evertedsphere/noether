@@ -1,3 +1,4 @@
+{-# LANGUAGE AllowAmbiguousTypes    #-}
 {-# LANGUAGE ConstraintKinds        #-}
 {-# LANGUAGE DataKinds              #-}
 {-# LANGUAGE FlexibleContexts       #-}
@@ -6,6 +7,7 @@
 {-# LANGUAGE GADTs                  #-}
 {-# LANGUAGE KindSignatures         #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE RebindableSyntax       #-}
 {-# LANGUAGE ScopedTypeVariables    #-}
 {-# LANGUAGE TemplateHaskell        #-}
 {-# LANGUAGE TemplateHaskellQuotes  #-}
@@ -148,11 +150,15 @@ type Field' = Field Add Mul
 -- instance (DivisionRing add mul a, Commutative mul a) => Field add mul a
 -- works too
 
-plus :: Semigroup Add a => a -> a -> a
-plus = binaryOp (undefined :: Proxy Add)
+infixl 6 +
 
-times :: Semigroup Mul a => a -> a -> a
-times = binaryOp (undefined :: Proxy Mul)
+(+) :: Semigroup Add a => a -> a -> a
+(+) = binaryOp (undefined :: Proxy Add)
+
+infixl 7 *
+
+(*) :: Semigroup Mul a => a -> a -> a
+(*) = binaryOp (undefined :: Proxy Mul)
 
 -- :t zero
 -- zero :: (Neutral 'Add a, Associative 'Add a) => a
@@ -172,6 +178,14 @@ negate = invert (undefined :: Proxy Add)
 reciprocal :: Group Mul a => a -> a
 reciprocal = invert (undefined :: Proxy Mul)
 
-reciprocal' :: Field' a => a -> a
-reciprocal' = reciprocal
+infixl 6 -
 
+(-) :: AbelianGroup Add a => a -> a -> a
+a - b = a + (negate b)
+
+infixl 7 /
+(/) :: Group Mul a => a -> a -> a
+a / b = a * (reciprocal b)
+
+reciprocal' :: Field add Mul a => a -> a
+reciprocal' = reciprocal
