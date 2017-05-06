@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeFamilyDependencies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE ConstraintKinds        #-}
 {-# LANGUAGE DataKinds              #-}
 {-# LANGUAGE FlexibleContexts       #-}
@@ -6,6 +8,7 @@
 {-# LANGUAGE GADTs                  #-}
 {-# LANGUAGE KindSignatures         #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE PatternSynonyms        #-}
 {-# LANGUAGE RebindableSyntax       #-}
 {-# LANGUAGE ScopedTypeVariables    #-}
 {-# LANGUAGE TemplateHaskell        #-}
@@ -14,24 +17,80 @@
 {-# LANGUAGE TypeFamilies           #-}
 {-# LANGUAGE TypeInType             #-}
 {-# LANGUAGE UndecidableInstances   #-}
+{-# LANGUAGE ViewPatterns           #-}
 {-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
 
 module Algebra.Basics where
 
--- import           Data.Kind  (Type)
+import           Data.Kind  (type (*))
 import           Data.Proxy
 -- import           GHC.TypeLits (Symbol)
-import           Language.Haskell.TH
-import           Language.Haskell.TH.Quote
-import           Prelude                   hiding (Monoid, negate, recip, (*),
-                                            (+), (-), (/))
-import qualified Prelude                   as P
+-- import           Language.Haskell.TH
+-- import           Language.Haskell.TH.Quote
+import           GHC.Exts
+import Data.Type.Equality
+import           GHC.TypeLits hiding (type (*))
+import Prelude
+       hiding (Monoid, negate, recip, (*), (+), (-), (/), fromInteger)
+import qualified Prelude      as P
+import Unsafe.Coerce (unsafeCoerce)
 
 data UnaryTag = Neg
   deriving Show
 
 data BinaryTag = Add | Mul
   deriving Show
+
+pattern AddP :: Proxy Add
+pattern AddP = Proxy
+
+pattern MulP :: Proxy Mul
+pattern MulP = Proxy
+
+type family NumericLit (n :: Nat) = (c :: * -> Constraint) where
+  NumericLit 0 = Neutral Add
+  NumericLit 1 = Neutral Mul
+  -- NumericLit 2 = Field Add Mul
+  -- NumericLit n = NumericLit (n - 1)
+  NumericLit n = Ring Add Mul
+
+zero'
+  :: (NumericLit n a)
+  => (n ~ 0 => a)
+zero' = neutral AddP
+
+one'
+  :: (NumericLit n a)
+  => (n ~ 1 => a)
+one' = neutral MulP
+
+fromIntegerP :: forall n a. (KnownNat n, NumericLit n a) => Proxy n -> a
+fromIntegerP p =
+  case (sameNat p (Proxy :: Proxy 0)) of
+    Just prf -> gcastWith prf zero'
+    Nothing -> case sameNat p (Proxy :: Proxy 1) of
+      Just prf -> gcastWith prf one'
+      Nothing -> undefined -- unsafeCoerce (val (Proxy :: Proxy a))
+        -- where
+        --   val :: (Field Add Mul b) => Proxy b -> b
+        --   val _ = one + undefined -- fromIntegerP (Proxy :: Proxy (n - 1))
+
+fromInteger :: Num a => Integer -> a
+fromInteger = P.fromInteger
+
+-- mkLit
+--   :: (NumericLit n a)
+--   => ((2 <= n) => a)
+-- mkLit = one'
+
+-- mkLit'
+--   :: (NumericLit (n - 1) a)
+--   => (KnownNat n => a)
+-- mkLit' = one'
+
+-- fi' :: Integer -> a
+-- fi' n = case someNatVal n of
+--   Just p -> Just
 
 class UnaryNeutral (op :: UnaryTag) a where
   unaryNeutral :: Proxy op -> a
@@ -52,29 +111,29 @@ class (Magma add a, Magma mul a) => DistributesOver add mul a
 
 -- | Instances for Double
 
-instance Neutral Add Double where neutral _ = 0
+instance Neutral Add Double where neutral _ = fromInteger 0
 instance Magma Add Double where binaryOp _ = (P.+)
 instance Invertible Add Double where invert _ = P.negate
 instance Commutative Add Double
 instance Semigroup Add Double
 instance DistributesOver Add Mul Double
 
-instance Neutral Mul Double where neutral _ = 1
+instance Neutral Mul Double where neutral _ = fromInteger 1
 instance Magma Mul Double where binaryOp _ = (P.*)
-instance Invertible Mul Double where invert _ = (P./ 1)
+instance Invertible Mul Double where invert _ = (P./ fromInteger 1)
 instance Commutative Mul Double
 instance Semigroup Mul Double
 
 -- | Instances for Integer
 
-instance Neutral Add Integer where neutral _ = 0
+instance Neutral Add Integer where neutral _ = fromInteger 0
 instance Magma Add Integer where binaryOp _ = (P.+)
 instance Invertible Add Integer where invert _ = P.negate
 instance Commutative Add Integer
 instance Semigroup Add Integer
 instance DistributesOver Add Mul Integer
 
-instance Neutral Mul Integer where neutral _ = 1
+instance Neutral Mul Integer where neutral _ = fromInteger 1
 instance Magma Mul Integer where binaryOp _ = (P.*)
 instance Commutative Mul Integer
 instance Semigroup Mul Integer

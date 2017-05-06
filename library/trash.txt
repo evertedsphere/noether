@@ -1684,3 +1684,16 @@
 --          , RightActs ltag r v
 --          ) =>
 --          RightModule ltag add mul r vadd v
+
+-- -- | Default instances
+
+-- -- | Every magma both left and right-acts on itself.
+-- -- | (Not that anyone cares.)
+
+-- instance Magma op a =>
+--          LeftActs' op a a where
+--   leftAct' _ = binaryOp (undefined :: Proxy op)
+
+-- -- instance {-# OVERLAPPABLE #-} Magma op a =>
+-- --          RightActs' op a a where
+-- --   rightAct' _ = binaryOp (undefined :: Proxy op)

@@ -20,21 +20,19 @@ module Algebra.Modules where
 
 import           Algebra.Actions
 import           Algebra.Basics
+import           Prelude         hiding (Monoid, negate, recip, (*), (+), (-),
+                                  (/))
+-- import qualified Prelude                   as P
 -- import           Data.Kind  (Type)
-import           Data.Proxy
+-- import           Data.Proxy
 -- import           GHC.TypeLits (Symbol)
-import           Language.Haskell.TH
-import           Language.Haskell.TH.Quote
-import           Prelude                   hiding (Monoid, negate, recip, (*),
-                                            (+), (-), (/))
-import qualified Prelude                   as P
+-- import           Language.Haskell.TH
+-- import           Language.Haskell.TH.Quote
 
 -- | A left module over the ring (add, mul, r) with action tagged by ltag.
 class ( Ring add mul r
       , AbelianGroup vadd v
-      , AssocLeftActs add r vadd v mul
       , LeftLinear add r vadd v mul
-      , AssocLeftActs mul r vadd v mul
       , LeftCompatible mul r vadd v mul
       ) => LeftModule add mul r vadd v
 
@@ -42,9 +40,7 @@ type LeftModule' r v = LeftModule Add Mul r Add v
 
 class ( Ring add mul r
       , AbelianGroup vadd v
-      , AssocRightActs add r vadd v mul
       , RightLinear add r vadd v mul
-      , AssocRightActs mul r vadd v mul
       , RightCompatible mul r vadd v mul
       ) => RightModule add mul r vadd v
 
@@ -70,19 +66,6 @@ instance ( Bimodule add mul r add mul r vadd v
 
 type VectorSpace' r v = VectorSpace Add Mul r Add v
 
--- -- | Default instances
-
--- -- | Every magma both left and right-acts on itself.
--- -- | (Not that anyone cares.)
-
--- instance Magma op a =>
---          LeftActs' op a a where
---   leftAct' _ = binaryOp (undefined :: Proxy op)
-
--- -- instance {-# OVERLAPPABLE #-} Magma op a =>
--- --          RightActs' op a a where
--- --   rightAct' _ = binaryOp (undefined :: Proxy op)
-
 -- -- | A left semigroup action can be turned into a right action
 -- -- if the semigroup is commutative.
 
@@ -99,26 +82,21 @@ type VectorSpace' r v = VectorSpace Add Mul r Add v
 -- --          AssocRightActs op a tag b where
 -- --   rightAct p _ = rightAct' p
 
--- -- | Abelian groups are Z-(bi)modules.
+-- | (The additive group of) every ring is both a left and a right module over itself.
 
--- instance {-# OVERLAPPABLE #-} (AbelianGroup op a) =>
---          AssocLeftActs Mul Integer op a Mul where
---   leftAct _ _ n' a =
---     let
---       mulProxy = Proxy :: Proxy Mul
---       opProxy = Proxy :: Proxy op
---     in case n' of
---          0 -> neutral opProxy
---          1 -> a
---          n -> binaryOp opProxy a (leftAct opProxy mulProxy (n P.- 1) a) {- FIXME slow! -}
+-- | {_R}R
+instance ( Ring add mul r
+         , add ~ Add
+         , mul ~ Mul
+         ) =>
+         LeftModule add mul r add r
 
--- -- | (The additive group of) every ring is both a left and a right module over itself.
-
--- -- | {_R}R
--- instance ( Ring add mul r
---          , add' ~ add
---          ) =>
---          LeftModule add mul r add' r
+-- | {_R}R
+instance ( Ring add mul r
+         , add ~ Add
+         , mul ~ Mul
+         ) =>
+         RightModule add mul r add r
 
 -- -- | {_R}R
 -- instance ( Ring add mul r
@@ -136,30 +114,23 @@ leftAnnihilates r a = r <# a == zero
 (<#)
   :: AssocLeftActs Add r Add v Mul
   => r -> v -> v
-r <# v = leftAct pa pa pm r v
-  where
-    pa = Proxy :: Proxy Add
-    pm = Proxy :: Proxy Mul
+r <# v = leftAct AddP AddP MulP r v
 
--- -- (#>)
--- --   :: AssocRightActs Add r Add v Mul
--- --   => r -> v -> v
--- -- r #> v = rightAct p p v r
--- --   where p = Proxy :: Proxy Add
+(#>)
+  :: AssocRightActs Add r Add v Mul
+  => r -> v -> v
+r #> v = rightAct AddP AddP MulP v r
 
--- -- (<!)
--- --   :: LeftActs' Mul r r
--- --   => r -> r -> r
--- -- r <! v = leftAct' (undefined :: Proxy Mul) r v
+invertedScale
+  :: (VectorSpace' r v)
+  => r -> v -> v
+invertedScale r v = reciprocal r <# v
 
--- -- invertedScale
--- --   :: (VectorSpace' r v)
--- --   => r -> v -> v
--- -- invertedScale r v = reciprocal r <# v
+lerp
+  :: (VectorSpace' r v)
+  => r -> v -> v -> v
+lerp lambda v w = lambda <# v + (one - lambda) <# w
 
--- -- lerp :: (VectorSpace' r v)
--- --   => r -> v -> v -> v
--- -- lerp by v w = by <# v + (one - by) <# w
 
 -- -- -- | A left module over a commutative ring is "equivalent" to a right module.
 -- -- instance
