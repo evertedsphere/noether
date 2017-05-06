@@ -24,16 +24,16 @@ module Algebra.Basics where
 
 import           Data.Kind  (type (*))
 import           Data.Proxy
--- import           GHC.TypeLits (Symbol)
--- import           Language.Haskell.TH
--- import           Language.Haskell.TH.Quote
 import           GHC.Exts
 import Data.Type.Equality
 import           GHC.TypeLits hiding (type (*))
 import Prelude
        hiding (Monoid, negate, recip, (*), (+), (-), (/), fromInteger)
 import qualified Prelude      as P
-import Unsafe.Coerce (unsafeCoerce)
+-- import           GHC.TypeLits (Symbol)
+-- import           Language.Haskell.TH
+-- import           Language.Haskell.TH.Quote
+-- import Unsafe.Coerce (unsafeCoerce)
 
 data UnaryTag = Neg
   deriving Show

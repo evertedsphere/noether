@@ -1697,3 +1697,65 @@
 -- -- instance {-# OVERLAPPABLE #-} Magma op a =>
 -- --          RightActs' op a a where
 -- --   rightAct' _ = binaryOp (undefined :: Proxy op)
+
+-- -- | A left semigroup action can be turned into a right action
+-- -- if the semigroup is commutative.
+
+-- -- instance {-# OVERLAPPABLE #-}
+-- --   (Commutative op a, AssocLeftActs op a tag b) =>
+-- --          AssocRightActs op a tag b where
+-- --   rightAct = flip leftAct'
+
+-- -- instance {-# OVERLAPPING #-} (Semigroup op a, LeftActs' tag a b) =>
+-- --          AssocLeftActs op a tag b where
+-- --   leftAct p _ = leftAct' p
+
+-- -- instance {-# OVERLAPPING #-} (Semigroup op a, RightActs' tag a b) =>
+-- --          AssocRightActs op a tag b where
+-- --   rightAct p _ = rightAct' p
+
+-- data ActionTag = Self BinaryTag | Scalar BinaryTag
+
+-- class LeftActs' (tag :: BinaryTag) a b where
+--   leftAct' :: Proxy tag -> a -> b -> b
+
+-- class RightActs' (tag :: BinaryTag) a b where
+--   rightAct' :: Proxy tag -> b -> a -> b
+
+-- class (LeftActs' ltag a b, RightActs' rtag a b) =>
+--       Acts ltag rtag a b
+
+
+-- -- -- | A left module over a commutative ring is "equivalent" to a right module.
+-- -- instance
+-- --   ( CommutativeRing add mul r
+-- --   , CommutativeSemigroup op r -- FIXME why?
+-- --   , LeftModule op add mul r op a
+-- --   , add ~ Add
+-- --   , mul ~ Mul
+-- --   ) =>
+-- --   RightModule op add mul r op a
+
+-- -- -- | By associativity, those two actions are compatible:
+
+-- -- instance ( Ring radd rmul r
+-- --          , radd ~ Add
+-- --          , rmul ~ Mul
+-- --          , sadd ~ Add
+-- --          , smul ~ Mul
+-- --          , r ~ s
+-- --          , r ~ t
+-- --          , s ~ t -- is this needed?
+-- --          , vtag ~ Add
+-- --          , rmul' ~ rmul
+-- --          , smul' ~ smul
+-- --          ) =>
+-- --          Bimodule rmul' radd rmul r smul' sadd smul s vtag t
+
+-- -- -- | Abelian groups are Z-(bi)modules.
+-- -- instance ( AbelianGroup op a
+-- --          , add ~ Add
+-- --          , mul ~ Mul
+-- --          , op' ~ op
+-- --          ) =>
+-- --          LeftModule op' add mul Integer op a

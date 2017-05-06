@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE ConstraintKinds        #-}
 {-# LANGUAGE DataKinds              #-}
 {-# LANGUAGE FlexibleContexts       #-}
@@ -20,8 +21,9 @@ module Algebra.Modules where
 
 import           Algebra.Actions
 import           Algebra.Basics
-import           Prelude         hiding (Monoid, negate, recip, (*), (+), (-),
-                                  (/))
+import           Prelude         hiding (Monoid, fromInteger, negate, recip,
+                                  (*), (+), (-), (/))
+
 -- import qualified Prelude                   as P
 -- import           Data.Kind  (Type)
 -- import           Data.Proxy
@@ -29,139 +31,109 @@ import           Prelude         hiding (Monoid, negate, recip, (*), (+), (-),
 -- import           Language.Haskell.TH
 -- import           Language.Haskell.TH.Quote
 
--- | A left module over the ring (add, mul, r) with action tagged by ltag.
-class ( Ring add mul r
-      , AbelianGroup vadd v
-      , LeftLinear add r vadd v mul
-      , LeftCompatible mul r vadd v mul
-      ) => LeftModule add mul r vadd v
+-- | A left module (v, va) over the ring (r, p, m).
 
-type LeftModule' r v = LeftModule Add Mul r Add v
+class ( Ring p m r
+      , AbelianGroup va v
+      , LeftLinear p r va v m
+      , LeftCompatible m r va v m
+      ) => LeftModule p m r va v
 
-class ( Ring add mul r
-      , AbelianGroup vadd v
-      , RightLinear add r vadd v mul
-      , RightCompatible mul r vadd v mul
-      ) => RightModule add mul r vadd v
+type RightModule' r = RightModule Add Mul r Add
 
-type RightModule' r v = RightModule Add Mul r Add v
+class ( Ring p m r
+      , AbelianGroup va v
+      , RightLinear p r va v m
+      , RightCompatible m r va v m
+      ) => RightModule p m r va v
+
+type LeftModule' r = LeftModule Add Mul r Add
 
 -- | R,S-bimodules.
 
-class ( LeftModule radd rmul r vadd v
-      , RightModule sadd smul s vadd v
-      ) => Bimodule radd rmul r sadd smul s vadd v
+class ( LeftModule ra rm r va v
+      , RightModule sa sm s va v
+      ) => Bimodule ra rm r sa sm s va v
 
 type Bimodule' r s = Bimodule Add Mul r Add Mul s Add
 
 type Bimodule_ r = Bimodule' r r
 
-class ( Bimodule add mul r add mul r vadd v
-      , Field add mul r
-      ) => VectorSpace add mul r vadd v
+-- | An R,R-bimodule for commutative R is just called an R-module.
+class ( Bimodule p m r p m r va v
+      , CommutativeRing p m r
+      ) => Module p m r va v
 
-instance ( Bimodule add mul r add mul r vadd v
-         , Field add mul r
-         ) => VectorSpace add mul r vadd v
+instance ( Bimodule p m r p m r va v
+         , CommutativeRing p m r
+         ) => Module p m r va v
 
-type VectorSpace' r v = VectorSpace Add Mul r Add v
+type Module' r = Module Add Mul r Add
 
--- -- | A left semigroup action can be turned into a right action
--- -- if the semigroup is commutative.
+class FreeModule p m r va v
 
--- -- instance {-# OVERLAPPABLE #-}
--- --   (Commutative op a, AssocLeftActs op a tag b) =>
--- --          AssocRightActs op a tag b where
--- --   rightAct = flip leftAct'
+-- | A vector space over the ring (r,p,m).
+class ( Module p m r va v
+      , Field p m r
+      ) => VectorSpace p m r va v
 
--- -- instance {-# OVERLAPPING #-} (Semigroup op a, LeftActs' tag a b) =>
--- --          AssocLeftActs op a tag b where
--- --   leftAct p _ = leftAct' p
+instance ( Module p m r va v
+         , Field p m r
+         ) => VectorSpace p m r va v
 
--- -- instance {-# OVERLAPPING #-} (Semigroup op a, RightActs' tag a b) =>
--- --          AssocRightActs op a tag b where
--- --   rightAct p _ = rightAct' p
+type VectorSpace' r = VectorSpace Add Mul r Add
 
 -- | (The additive group of) every ring is both a left and a right module over itself.
 
 -- | {_R}R
-instance ( Ring add mul r
-         , add ~ Add
-         , mul ~ Mul
+instance ( Ring p m r
+         , p ~ Add
+         , m ~ Mul
          ) =>
-         LeftModule add mul r add r
+         LeftModule p m r Add r
 
 -- | {_R}R
-instance ( Ring add mul r
-         , add ~ Add
-         , mul ~ Mul
+instance ( Ring p m r
+         , p ~ Add
+         , m ~ Mul
          ) =>
-         RightModule add mul r add r
+         RightModule p m r Add r
 
--- -- | {_R}R
--- instance ( Ring add mul r
---          , add' ~ add
---          ) =>
---          RightModule add mul r add' r
+instance ( Ring p m r
+         , p ~ Add
+         , m ~ Mul
+         , q ~ Add
+         , n ~ Mul
+         ) =>
+         Bimodule p m r q n r Add r
 
 leftAnnihilates
   :: ( Eq a
      , Monoid Add a
-     , LeftModule' r a
+     , Bimodule' r r a
      ) => r -> a -> Bool
-leftAnnihilates r a = r <# a == zero
+leftAnnihilates r a = r <% a == zero
 
-(<#)
-  :: AssocLeftActs Add r Add v Mul
+(<%)
+  :: LeftActs Add r Add v Mul
   => r -> v -> v
-r <# v = leftAct AddP AddP MulP r v
+r <% v = leftAct AddP AddP MulP r v
 
-(#>)
-  :: AssocRightActs Add r Add v Mul
+(%>)
+  :: RightActs Add r Add v Mul
   => r -> v -> v
-r #> v = rightAct AddP AddP MulP v r
+r %> v = rightAct AddP AddP MulP v r
 
 invertedScale
-  :: (VectorSpace' r v)
+  :: VectorSpace' r v
   => r -> v -> v
-invertedScale r v = reciprocal r <# v
+invertedScale r v = reciprocal r <% v
 
 lerp
-  :: (VectorSpace' r v)
+  :: VectorSpace' r v
   => r -> v -> v -> v
-lerp lambda v w = lambda <# v + (one - lambda) <# w
+lerp lambda v w = lambda <% v + (one - lambda) %> w -- for variety
 
+-- data (+>) a b where
 
--- -- -- | A left module over a commutative ring is "equivalent" to a right module.
--- -- instance
--- --   ( CommutativeRing add mul r
--- --   , CommutativeSemigroup op r -- FIXME why?
--- --   , LeftModule op add mul r op a
--- --   , add ~ Add
--- --   , mul ~ Mul
--- --   ) =>
--- --   RightModule op add mul r op a
-
--- -- -- | By associativity, those two actions are compatible:
-
--- -- instance ( Ring radd rmul r
--- --          , radd ~ Add
--- --          , rmul ~ Mul
--- --          , sadd ~ Add
--- --          , smul ~ Mul
--- --          , r ~ s
--- --          , r ~ t
--- --          , s ~ t -- is this needed?
--- --          , vtag ~ Add
--- --          , rmul' ~ rmul
--- --          , smul' ~ smul
--- --          ) =>
--- --          Bimodule rmul' radd rmul r smul' sadd smul s vtag t
-
--- -- -- | Abelian groups are Z-(bi)modules.
--- -- instance ( AbelianGroup op a
--- --          , add ~ Add
--- --          , mul ~ Mul
--- --          , op' ~ op
--- --          ) =>
--- --          LeftModule op' add mul Integer op a
+data Vector (n :: k) p v where
