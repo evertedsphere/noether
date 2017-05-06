@@ -1,4 +1,3 @@
-{-# LANGUAGE AllowAmbiguousTypes    #-}
 {-# LANGUAGE ConstraintKinds        #-}
 {-# LANGUAGE DataKinds              #-}
 {-# LANGUAGE FlexibleContexts       #-}
@@ -186,6 +185,3 @@ a - b = a + (negate b)
 infixl 7 /
 (/) :: Group Mul a => a -> a -> a
 a / b = a * (reciprocal b)
-
-reciprocal' :: Field add Mul a => a -> a
-reciprocal' = reciprocal
