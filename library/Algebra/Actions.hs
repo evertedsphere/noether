@@ -1,4 +1,3 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ConstraintKinds        #-}
 {-# LANGUAGE DataKinds              #-}
 {-# LANGUAGE DefaultSignatures      #-}
@@ -44,6 +43,9 @@ class
        (ao :: BinaryTag) (a :: *)
        (bo :: BinaryTag) (b :: *)
        (action :: BinaryTag)
+       (linear :: IsLinear)
+       (compatible :: IsCompatible)
+  | ao a bo b action -> linear compatible
   where
 
   leftAct :: Proxy ao -> Proxy bo -> Proxy action -> a -> b -> b
@@ -53,34 +55,6 @@ class
     => Proxy ao -> Proxy bo -> Proxy action -> a -> b -> b
   leftAct _ _ actionProxy = binaryOp actionProxy
 
-  -- | (a ao a') `leftAct` b = (a `leftAct` b) bo (a' `leftAct` b)
-  type IsLeftActorLinear ao a bo b action :: IsLinear
-  type IsLeftActorLinear ao a bo b action = NotLinear
-
-  -- | a `leftAct` (b bo b') = (a `leftAct` b) bo (a `leftAct` b')
-  type IsLeftActedLinear ao a bo b action :: IsLinear
-  type IsLeftActedLinear ao a bo b action = NotLinear
-
-  -- | (a ao a') `leftAct` b = a `leftAct` (a' `leftAct` b)
-  type IsLeftCompatible ao a bo b action :: IsCompatible
-  type IsLeftCompatible ao a bo b action = NotCompatible
-
-type LeftActorLinear ao a bo b action = IsLeftActorLinear ao a bo b action ~ YesLinear
-type LeftActedLinear ao a bo b action = IsLeftActedLinear ao a bo b action ~ YesLinear
-
-type LeftLinear ao a bo b action =
-  ( LeftActs ao a bo b action
-  , LeftActorLinear ao a bo b action
-  , LeftActedLinear ao a bo b action
-  )
-
-type LeftCompatible  ao a bo b action =
-  ( LeftActs     ao a bo b action
-  , IsLeftCompatible  ao a bo b action ~ YesCompatible
-  )
-
--- | The structure of 'b' is tagged by 'tag'.
-
 class
   ( Semigroup ao a
   , Semigroup bo b
@@ -88,67 +62,40 @@ class
        (ao :: BinaryTag) (a :: *)
        (bo :: BinaryTag) (b :: *)
        (action :: BinaryTag)
+       (linear :: IsLinear)
+       (compatible :: IsCompatible)
+  | ao a bo b action -> linear compatible
   where
 
-  rightAct :: Proxy ao -> Proxy bo -> Proxy action -> b -> a -> b
+  rightAct :: Proxy ao -> Proxy bo -> Proxy action -> a -> b -> b
 
   default rightAct
     :: (a ~ b, Semigroup action a)
-    => Proxy ao -> Proxy bo -> Proxy action -> b -> a -> b
+    => Proxy ao -> Proxy bo -> Proxy action -> a -> b -> b
   rightAct _ _ actionProxy = binaryOp actionProxy
 
-  -- | These are with a flipped 'rightAct'
-  -- | (a ao a') `rightAct` b = (a `rightAct` b) bo (a' `rightAct` b)
-  type IsRightActorLinear ao a bo b action :: IsLinear
-  type IsRightActorLinear ao a bo b action = NotLinear
+type LeftLinear       ao a bo b t = LeftActs  ao a bo b t YesLinear NotCompatible
+type RightLinear      ao a bo b t = RightActs ao a bo b t YesLinear NotCompatible
 
-  -- | a `rightAct` (b bo b') = (a `rightAct` b) bo (a `rightAct` b')
-  type IsRightActedLinear ao a bo b action :: IsLinear
-  type IsRightActedLinear ao a bo b action = NotLinear -- or equal to prev?
+type LeftCompatible   ao a bo b t = LeftActs  ao a bo b t NotLinear YesCompatible
+type RightCompatible  ao a bo b t = RightActs ao a bo b t NotLinear YesCompatible
 
-  -- | (a ao a') `rightAct` b = a `rightAct` (a' `rightAct` b)
-  type IsRightCompatible ao a bo b action :: IsCompatible
-  type IsRightCompatible ao a bo b action = NotCompatible
+instance (Ring Add m a) => LeftActs  Add a Add a m   YesLinear NotCompatible
+instance (Ring Add m a) => RightActs Add a Add a m   YesLinear NotCompatible
 
-type RightActorLinear ao a bo b action = IsRightActorLinear ao a bo b action ~ YesLinear
-type RightActedLinear ao a bo b action = IsRightActedLinear ao a bo b action ~ YesLinear
+instance (Ring p Mul a) => LeftActs  Mul a p   a Mul NotLinear YesCompatible
+instance (Ring p Mul a) => RightActs Mul a p   a Mul NotLinear YesCompatible
 
-type RightLinear ao a bo b action =
-  ( RightActs ao a bo b action
-  , RightActorLinear ao a bo b action
-  , RightActedLinear ao a bo b action
-  )
+instance (Ring Add m a) => LeftActs  Add a Add (a, a) m YesLinear NotCompatible where
+  leftAct p1 p2 p3 s (t, t') = (leftAct p1 p2 p3 s t, leftAct p1 p2 p3 s t')
+instance (Ring Add m a) => RightActs Add a Add (a, a) m YesLinear NotCompatible where
+  rightAct = leftAct
 
-type RightCompatible  ao a bo b action =
-  ( RightActs     ao a bo b action
-  , IsRightCompatible  ao a bo b action ~ YesCompatible
-  )
+instance (Ring p Mul a) => LeftActs  Mul a p (a, a) Mul NotLinear YesCompatible where
+  leftAct p1 p2 p3 s (t, t') = (leftAct p1 p2 p3 s t, leftAct p1 p2 p3 s t')
+instance (Ring p Mul a) => RightActs Mul a p (a, a) Mul NotLinear YesCompatible where
+  rightAct = leftAct
 
--- | FIXME: tons of distributivity implied hereafter in the actions, no?
-
--- class (LeftActs op a ltag b, RightActs op a rtag b) =>
---       AssocActs op a ltag rtag b
-
--- class (Group op a, LeftActs op a ltag b) => GSet op a ltag b
-
--- instance (Group op a) => LeftActs op a op a where
---   leftAct _ _ = binaryOp (Proxy :: Proxy op)
-
-instance (Ring Add mul a) => LeftActs Add a Add a mul where
-  type IsLeftActorLinear Add a Add a mul = YesLinear
-  type IsLeftActedLinear Add a Add a mul = YesLinear
-
-instance (Ring add Mul a) => LeftActs Mul a add a Mul where
-  type IsLeftCompatible  Mul a add a Mul = YesCompatible
-
-instance (Ring Add mul a) => RightActs Add a Add a mul where
-  type IsRightActorLinear Add a Add a mul = YesLinear
-  type IsRightActedLinear Add a Add a mul = YesLinear
-
-instance (Ring add Mul a) => RightActs Mul a add a Mul where
-  type IsRightCompatible  Mul a add a Mul = YesCompatible
-
--- | Abelian groups are Z-(bi)modules.
 abelianIntegerAction
   :: (AbelianGroup op a)
   => Proxy add -> Proxy op -> Proxy mul -> Integer -> a -> a
@@ -157,13 +104,12 @@ abelianIntegerAction _ _ _ 1 a = a
 abelianIntegerAction addProxy opProxy mulProxy n a =
   binaryOp opProxy a (abelianIntegerAction addProxy opProxy mulProxy (n P.- 1) a)
 
-instance (AbelianGroup op a) =>
-         LeftActs Add Integer op a Mul where
-  leftAct = abelianIntegerAction
-  type IsLeftActorLinear Add Integer op a Mul = YesLinear
-  type IsLeftActedLinear Add Integer op a Mul = YesLinear
+instance (AbelianGroup op a) => LeftActs  Add Integer op a Mul YesLinear NotCompatible where
+  leftAct  = abelianIntegerAction
+instance (AbelianGroup op a) => RightActs Add Integer op a Mul YesLinear NotCompatible where
+  rightAct = abelianIntegerAction
 
-instance (AbelianGroup op a) =>
-         LeftActs Mul Integer op a Mul where
-  leftAct = abelianIntegerAction
-  type IsLeftCompatible Mul Integer op a Mul = YesCompatible
+instance (AbelianGroup op a) => LeftActs  Mul Integer op a Mul NotLinear YesCompatible where
+  leftAct  = abelianIntegerAction
+instance (AbelianGroup op a) => RightActs Mul Integer op a Mul NotLinear YesCompatible where
+  rightAct = abelianIntegerAction

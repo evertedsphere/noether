@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE ConstraintKinds        #-}
 {-# LANGUAGE DataKinds              #-}
 {-# LANGUAGE FlexibleContexts       #-}
@@ -7,6 +6,7 @@
 {-# LANGUAGE GADTs                  #-}
 {-# LANGUAGE KindSignatures         #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE PatternSynonyms        #-}
 {-# LANGUAGE RebindableSyntax       #-}
 {-# LANGUAGE ScopedTypeVariables    #-}
 {-# LANGUAGE TemplateHaskell        #-}
@@ -14,6 +14,7 @@
 {-# LANGUAGE TypeApplications       #-}
 {-# LANGUAGE TypeFamilies           #-}
 {-# LANGUAGE TypeInType             #-}
+{-# LANGUAGE TypeOperators          #-}
 {-# LANGUAGE UndecidableInstances   #-}
 {-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
 
@@ -21,6 +22,7 @@ module Algebra.Modules where
 
 import           Algebra.Actions
 import           Algebra.Basics
+import           Data.Proxy
 import           Prelude         hiding (Monoid, fromInteger, negate, recip,
                                   (*), (+), (-), (/))
 
@@ -31,109 +33,176 @@ import           Prelude         hiding (Monoid, fromInteger, negate, recip,
 -- import           Language.Haskell.TH
 -- import           Language.Haskell.TH.Quote
 
--- | A left module (v, va) over the ring (r, p, m).
-
+-- | A left module (v, a) over the ring (r, p, m).
 class ( Ring p m r
-      , AbelianGroup va v
-      , LeftLinear p r va v m
-      , LeftCompatible m r va v m
-      ) => LeftModule p m r va v
+      , AbelianGroup a v
+      , LeftLinear p r a v m
+      , LeftCompatible m r a v m
+      ) => LeftModule p m r a v
 
-type RightModule' r = RightModule Add Mul r Add
-
+-- | A right module (v, a) over the ring (r, p, m).
 class ( Ring p m r
-      , AbelianGroup va v
-      , RightLinear p r va v m
-      , RightCompatible m r va v m
-      ) => RightModule p m r va v
-
-type LeftModule' r = LeftModule Add Mul r Add
+      , AbelianGroup a v
+      , RightLinear p r a v m
+      , RightCompatible m r a v m
+      ) => RightModule p m r a v
 
 -- | R,S-bimodules.
-
-class ( LeftModule ra rm r va v
-      , RightModule sa sm s va v
-      ) => Bimodule ra rm r sa sm s va v
-
-type Bimodule' r s = Bimodule Add Mul r Add Mul s Add
-
-type Bimodule_ r = Bimodule' r r
+class ( LeftModule p m r a v
+      , RightModule q n s a v
+      ) => Bimodule p m r q n s a v
 
 -- | An R,R-bimodule for commutative R is just called an R-module.
-class ( Bimodule p m r p m r va v
+-- | TODO type synonym?
+class ( Bimodule p m r p m r a v
       , CommutativeRing p m r
-      ) => Module p m r va v
+      ) => Module p m r a v
 
-instance ( Bimodule p m r p m r va v
-         , CommutativeRing p m r
-         ) => Module p m r va v
-
-type Module' r = Module Add Mul r Add
-
-class FreeModule p m r va v
+-- class FreeModule p m r a v
 
 -- | A vector space over the ring (r,p,m).
-class ( Module p m r va v
-      , Field p m r
-      ) => VectorSpace p m r va v
+class ( Module p m k a v
+      , Field p m k
+      ) => VectorSpace p m k a v
 
-instance ( Module p m r va v
+data InnerProductTag = DotProduct
+
+pattern DotProductP :: Proxy DotProduct
+pattern DotProductP = Proxy
+
+class (VectorSpace p m k a v) =>
+      InnerProductSpace (ip :: InnerProductTag) p m k a v where
+  innerProductP :: proxy p -> proxy m -> proxy a -> Proxy ip -> v -> v -> k
+
+----------------------------------------------------------------------------------
+--- Convenience synonyms
+----------------------------------------------------------------------------------
+
+type RightModule'          r = RightModule Add Mul r Add
+type LeftModule'           r = LeftModule  Add Mul r Add
+
+type Bimodule'           r s = Bimodule  Add Mul r Add Mul s Add
+type Bimodule_             r = Bimodule' r r
+type Module'               r = Module    Add Mul r Add
+
+type VectorSpace'          k = VectorSpace        Add Mul k Add
+type InnerProductSpace' ip k = InnerProductSpace  ip Add Mul k Add
+type DotProductSpace'      k = InnerProductSpace' DotProduct k
+
+----------------------------------------------------------------------------------
+--- "Derived" instances. Possibly too general?
+----------------------------------------------------------------------------------
+
+-- instance Module p m r a v => Module p m r a (i -> v)
+
+instance ( Bimodule p m r p m r a v
+         , CommutativeRing p m r
+         ) => Module p m r a v
+
+instance ( Module p m r a v
          , Field p m r
-         ) => VectorSpace p m r va v
+         ) => VectorSpace p m r a v
 
-type VectorSpace' r = VectorSpace Add Mul r Add
+-- (The additive group of) every ring is both a left and a right module over itself.
 
--- | (The additive group of) every ring is both a left and a right module over itself.
-
--- | {_R}R
+-- | (R,p) is a module in the category R-Mod.
 instance ( Ring p m r
          , p ~ Add
          , m ~ Mul
-         ) =>
-         LeftModule p m r Add r
+         ) => LeftModule p m r Add r
 
--- | {_R}R
+-- | (R,p) is a module in the category Mod-R.
 instance ( Ring p m r
          , p ~ Add
          , m ~ Mul
-         ) =>
-         RightModule p m r Add r
+         ) => RightModule p m r Add r
+
+-- | By associativity, the actions are commutative, giving (R, p) an
+-- | R,R-bimodule (aka "R-bimodule") structure.
+instance ( Ring p m r
+         , p ~ Add
+         , m ~ Mul
+         , q ~ p
+         , n ~ m
+         ) => Bimodule p m r q n r Add r
+
+-- | Every field is an inner product space over itself.
+instance ( Field p m k
+         , p ~ Add
+         , m ~ Mul
+         ) => InnerProductSpace DotProduct p m k Add k where
+  innerProductP _ _ _ _ = (*)
+
+-- | 2-vectors
+instance ( Ring p m r
+         , p ~ Add
+         , m ~ Mul
+         ) => LeftModule p m r Add (r, r)
 
 instance ( Ring p m r
          , p ~ Add
          , m ~ Mul
-         , q ~ Add
-         , n ~ Mul
-         ) =>
-         Bimodule p m r q n r Add r
+         ) => RightModule p m r Add (r, r)
+
+instance ( Ring p m r
+         , p ~ Add
+         , m ~ Mul
+         , q ~ p
+         , n ~ m
+         ) => Bimodule p m r q n r Add (r, r)
+
+instance ( Field p m k
+         , p ~ Add
+         , m ~ Mul
+         ) => InnerProductSpace DotProduct p m k Add (k, k) where
+  innerProductP _ _ _ _ (a,b) (c,d) = a * c + b * d
 
 leftAnnihilates
   :: ( Eq a
      , Monoid Add a
-     , Bimodule' r r a
+     , Bimodule_ r a
      ) => r -> a -> Bool
-leftAnnihilates r a = r <% a == zero
+leftAnnihilates r a = r %< a == zero
 
-(<%)
-  :: LeftActs Add r Add v Mul
+(%<)
+  :: LeftModule' r v
   => r -> v -> v
-r <% v = leftAct AddP AddP MulP r v
+r %< v = leftAct AddP AddP MulP r v
 
-(%>)
-  :: RightActs Add r Add v Mul
-  => r -> v -> v
-r %> v = rightAct AddP AddP MulP v r
+(>%)
+  :: RightModule' r v
+  => v -> r -> v
+v >% r = rightAct AddP AddP MulP r v
 
 invertedScale
   :: VectorSpace' r v
   => r -> v -> v
-invertedScale r v = reciprocal r <% v
+invertedScale r v = reciprocal r %< v
 
+-- | Linear interpolation.
+-- lerp λ v w = λv + (1 - λ)w
 lerp
   :: VectorSpace' r v
   => r -> v -> v -> v
-lerp lambda v w = lambda <% v + (one - lambda) %> w -- for variety
+lerp lambda v w = lambda %< v + w >% (one - lambda)
 
--- data (+>) a b where
+lol :: (Double, Double)
+lol = (1, 3) * lerp lambda (3, 3) (4, 5) + (1, 0) >% (dot @Double v w)
+  where
+    lambda :: Double
+    lambda = 0.3
 
-data Vector (n :: k) p v where
+    v, w :: (Double, Double)
+    v = (3, 3)
+    w = (2, 7)
+
+lol' :: (Double, Double)
+lol' = lerp @Double 0.3 (3, 3) (4, 5)
+
+dot :: DotProductSpace' r v => v -> v -> r
+dot = innerProductP AddP MulP AddP (Proxy :: Proxy DotProduct)
+
+-- data Vector (n :: k) p v where
+
+data a ~> b where
+  Dot :: a ~> b

@@ -109,7 +109,77 @@ class (Neutral op a) => Invertible op a where
 
 class (Magma add a, Magma mul a) => DistributesOver add mul a
 
--- | Instances for Double
+-- | Classes
+
+-- | Single associative binary operation
+
+-- FIXME: any dependencies?
+class (Magma op a) => Commutative op a
+class (Magma op a) => Semigroup op a
+
+-- class    (Semigroup op a, Invertible op a) => CancellativeSemigroup op a
+
+class (Semigroup op a, Commutative op a) => CommutativeSemigroup op a
+
+class (Semigroup op a, Neutral op a)     => Monoid op a
+class (Monoid op a,    Commutative op a) => CommutativeMonoid op a
+
+class (Monoid op a,    Invertible op a)  => Group op a
+class (Group op a,     Commutative op a) => AbelianGroup op a
+
+-- | Two binary operations
+
+-- | Semirings, aka "rigs"
+class ( CommutativeMonoid add a
+      , Monoid mul a
+      , DistributesOver add mul a
+      ) => Semiring add mul a
+class (Semiring add mul a, Commutative mul a) => CommutativeSemiring add mul a
+
+class ( AbelianGroup add a
+      , Monoid mul a
+      , DistributesOver add mul a
+      ) => Ring add mul a
+class (Ring add mul a, Commutative mul a) => CommutativeRing add mul a
+
+class (Ring add mul a, Invertible mul a) => DivisionRing add mul a
+class (Ring add mul a, AbelianGroup mul a) => Field add mul a
+
+-- Convenience synonyms
+
+type Semiring'            = Semiring            Add Mul
+type CommutativeSemiring' = CommutativeSemiring Add Mul
+type Ring'                = Ring                Add Mul
+type CommutativeRing'     = CommutativeRing     Add Mul
+type DivisionRing'        = DivisionRing        Add Mul
+type Field'               = Field               Add Mul
+
+-- | Instances
+
+instance (Semigroup op a, Commutative op a) => CommutativeSemigroup op a
+
+instance (Semigroup op a, Neutral op a) => Monoid op a
+instance (Monoid op a, Commutative op a) => CommutativeMonoid op a
+
+instance (Monoid op a, Invertible op a) => Group op a
+instance (Group op a, Commutative op a) => AbelianGroup op a
+
+instance ( CommutativeMonoid add a
+         , Monoid mul a
+         , DistributesOver add mul a
+         ) => Semiring add mul a
+
+instance (Semiring add mul a, Commutative mul a) => CommutativeSemiring add mul a
+
+instance ( AbelianGroup add a
+         , Monoid mul a
+         , DistributesOver add mul a
+         ) => Ring add mul a
+
+instance (Ring add mul a, Commutative mul a) => CommutativeRing add mul a
+
+instance (Ring add mul a, Invertible mul a) => DivisionRing add mul a
+instance (Ring add mul a, AbelianGroup mul a) => Field add mul a
 
 instance Neutral Add Double where neutral _ = fromInteger 0
 instance Magma Add Double where binaryOp _ = (P.+)
@@ -124,8 +194,6 @@ instance Invertible Mul Double where invert _ = (P./ fromInteger 1)
 instance Commutative Mul Double
 instance Semigroup Mul Double
 
--- | Instances for Integer
-
 instance Neutral Add Integer where neutral _ = fromInteger 0
 instance Magma Add Integer where binaryOp _ = (P.+)
 instance Invertible Add Integer where invert _ = P.negate
@@ -138,103 +206,72 @@ instance Magma Mul Integer where binaryOp _ = (P.*)
 instance Commutative Mul Integer
 instance Semigroup Mul Integer
 
--- | Classes
+instance Neutral o a =>
+         Neutral o (i -> a) where
+  neutral proxy _ = neutral proxy
 
--- | Single binary operation
+instance Magma o a =>
+         Magma o (i -> a) where
+  binaryOp proxy f g = \x -> binaryOp proxy (f x) (g x)
 
--- FIXME: any dependencies?
-class (Magma op a) => Commutative op a
+instance Invertible o a =>
+         Invertible o (i -> a) where
+  invert proxy f = \x -> invert proxy (f x)
 
-class (Magma op a) => Semigroup op a
+instance Semigroup o a =>
+         Semigroup o (i -> a)
+
+instance Commutative o a =>
+         Commutative o (i -> a)
+
+instance DistributesOver p m a =>
+         DistributesOver p m (i -> a)
+
+instance Neutral o a =>
+         Neutral o (a, a) where
+  neutral = \p -> (neutral p, neutral p)
+
+instance Magma o a =>
+         Magma o (a, a) where
+  binaryOp proxy (a, b) (a', b') = (binaryOp proxy a a', binaryOp proxy b b')
+
+instance Invertible o a =>
+         Invertible o (a, a) where
+  invert proxy (a, b) = (invert proxy a, invert proxy b)
+
+instance Semigroup o a =>
+         Semigroup o (a, a)
+
+instance Commutative o a =>
+         Commutative o (a, a)
+
+instance DistributesOver p m a =>
+         DistributesOver p m (a, a)
 
 
-class    (Semigroup op a, Commutative op a) => CommutativeSemigroup op a
-instance (Semigroup op a, Commutative op a) => CommutativeSemigroup op a
-
-class    (Semigroup op a, Neutral op a) => Monoid op a
-instance (Semigroup op a, Neutral op a) => Monoid op a
-
-class    (Monoid op a, Commutative op a) => CommutativeMonoid op a
-instance (Monoid op a, Commutative op a) => CommutativeMonoid op a
-
-class    (Monoid op a, Invertible op a) => Group op a
-instance (Monoid op a, Invertible op a) => Group op a
-
-class    (Group op a, Commutative op a) => AbelianGroup op a
-instance (Group op a, Commutative op a) => AbelianGroup op a
-
--- | Two binary operations
-
--- | Semirings, aka "rigs"
-class ( CommutativeMonoid add a
-      , Monoid mul a
-      , DistributesOver add mul a
-      ) =>
-      Semiring add mul a
-instance ( CommutativeMonoid add a
-         , Monoid mul a
-         , DistributesOver add mul a
-         ) =>
-         Semiring add mul a
-type Semiring' = Semiring Add Mul
-
-class    (Semiring add mul a, Commutative mul a) => CommutativeSemiring add mul a
-instance (Semiring add mul a, Commutative mul a) => CommutativeSemiring add mul a
-type CommutativeSemiring' = CommutativeSemiring Add Mul
-
-class ( AbelianGroup add a
-      , Monoid mul a
-      , DistributesOver add mul a
-      ) => Ring add mul a
-
-instance ( AbelianGroup add a
-         , Monoid mul a
-         , DistributesOver add mul a
-         ) => Ring add mul a
-type Ring' = Ring Add Mul
-
-class    (Ring add mul a, Commutative mul a) => CommutativeRing add mul a
-instance (Ring add mul a, Commutative mul a) => CommutativeRing add mul a
-type CommutativeRing' = CommutativeRing Add Mul
-
-class    (Ring add mul a, Invertible mul a) => DivisionRing add mul a
-instance (Ring add mul a, Invertible mul a) => DivisionRing add mul a
-type DivisionRing' = DivisionRing Add Mul
-
-class    (Ring add mul a, AbelianGroup mul a) => Field add mul a
-instance (Ring add mul a, AbelianGroup mul a) => Field add mul a
-type Field' = Field Add Mul
-
--- instance (DivisionRing add mul a, Commutative mul a) => Field add mul a
--- works too
+-- instance Group o a => Group o (i -> a)
 
 infixl 6 +
 
 (+) :: Semigroup Add a => a -> a -> a
-(+) = binaryOp (undefined :: Proxy Add)
+(+) = binaryOp AddP
 
 infixl 7 *
 
 (*) :: Semigroup Mul a => a -> a -> a
-(*) = binaryOp (undefined :: Proxy Mul)
-
--- :t zero
--- zero :: (Neutral 'Add a, Associative 'Add a) => a
--- why? ;)
-
--- tagProxy :: Tag -> Proxy
+(*) = binaryOp MulP
 
 zero :: Monoid Add a => a
-zero = neutral (undefined :: Proxy Add)
+zero = neutral AddP
 
 one :: Monoid Mul a => a
-one = neutral (undefined :: Proxy Mul)
+one = neutral MulP
 
 negate :: AbelianGroup Add a => a -> a
-negate = invert (undefined :: Proxy Add)
+negate = invert AddP
 
 reciprocal :: Group Mul a => a -> a
-reciprocal = invert (undefined :: Proxy Mul)
+reciprocal = invert MulP
 
 infixl 6 -
 
