@@ -41,7 +41,21 @@ lol =
     w = (2, 7)
 ```
 
-A preliminary implementation of linear maps between (what should be) free modules is being developed after the design in Conal Elliott's "Reimagining matrices". Some sample function signatures:
+A preliminary implementation of linear maps between (what should be) free modules is being developed after the design in Conal Elliott's "Reimagining matrices". The added polymorphism and lack of fixed `Scalar a`-esque base fields is an interesting challenge, and Conal's basic GADT decomposition of linear maps changes in my case to
+
+```haskell
+data (\>) :: (* -> * -> *) where
+```
+
+where the first "slot" is for the base field. With a nice `~>` type operator (which is basically `$`), a linear map between two *k*-vector space types `a` and `b` has the type 
+
+```haskell
+func :: k \> a ~> b
+```
+
+paving the way for the representation of _k_**-Vect** as `(\>) k :: (\* -> \* -> \*)`.
+
+Some sample function signatures:
 
 ```haskell
 
