@@ -26,6 +26,8 @@ import           Data.Proxy
 import           Prelude         hiding (Monoid, fromInteger, negate, recip,
                                   (*), (+), (-), (/))
 
+import           Data.Complex
+
 -- import qualified Prelude                   as P
 -- import           Data.Kind  (Type)
 -- import           Data.Proxy
@@ -53,9 +55,9 @@ class ( LeftModule p m r a v
       ) => Bimodule p m r q n s a v
 
 -- | An R,R-bimodule for commutative R is just called an R-module.
--- | TODO type synonym?
+-- TODO type synonym?
 class ( Bimodule p m r p m r a v
-      , CommutativeRing p m r
+      , CommRing p m r
       ) => Module p m r a v
 
 -- class FreeModule p m r a v
@@ -96,22 +98,27 @@ type DotProductSpace'      k = InnerProductSpace' DotProduct k
 -- instance Module p m r a v => Module p m r a (i -> v)
 
 instance ( Bimodule p m r p m r a v
-         , CommutativeRing p m r
+         , CommRing p m r
          ) => Module p m r a v
 
 instance ( Module p m r a v
          , Field p m r
          ) => VectorSpace p m r a v
 
--- (The additive group of) every ring is both a left and a right module over itself.
+----------------------------------------------------------------
+-- Rings are modules
+---
+-- (The additive group of) every ring is both a left and a right
+-- module over itself.
+----------------------------------------------------------------
 
--- | (R,p) is a module in the category R-Mod.
+-- | (R,p,m) is a module in the category R-Mod.
 instance ( Ring p m r
          , p ~ Add
          , m ~ Mul
          ) => LeftModule p m r Add r
 
--- | (R,p) is a module in the category Mod-R.
+-- | (R,p,m) is a module in the category Mod-R.
 instance ( Ring p m r
          , p ~ Add
          , m ~ Mul
@@ -125,6 +132,18 @@ instance ( Ring p m r
          , q ~ p
          , n ~ m
          ) => Bimodule p m r q n r Add r
+
+--------------------------------------------------------------------
+-- C is a vector space over R
+--------------------------------------------------------------------
+
+instance LeftModule'  Double (Complex Double)
+instance RightModule' Double (Complex Double)
+instance Bimodule_    Double (Complex Double)
+
+--------------------------------------------------------------------
+-- Vector spaces
+--------------------------------------------------------------------
 
 -- | Every field is an inner product space over itself.
 instance ( Field p m k
@@ -160,23 +179,24 @@ instance ( Field p m k
 leftAnnihilates
   :: ( Eq a
      , Monoid Add a
-     , Bimodule_ r a
+     , LeftModule' r a
      ) => r -> a -> Bool
 leftAnnihilates r a = r %< a == zero
 
-(%<)
-  :: LeftModule' r v
-  => r -> v -> v
+actionCommutes
+  :: ( Eq a
+     , Monoid Add a
+     , Bimodule_ r a
+     ) => r -> a -> Bool
+actionCommutes r a = r %< a == a >% r
+
+(%<) :: LeftModule' r v => r -> v -> v
 r %< v = leftAct AddP AddP MulP r v
 
-(>%)
-  :: RightModule' r v
-  => v -> r -> v
+(>%) :: RightModule' r v => v -> r -> v
 v >% r = rightAct AddP AddP MulP r v
 
-invertedScale
-  :: VectorSpace' r v
-  => r -> v -> v
+invertedScale :: VectorSpace' r v => r -> v -> v
 invertedScale r v = reciprocal r %< v
 
 -- | Linear interpolation.
@@ -186,13 +206,15 @@ lerp
   => r -> v -> v -> v
 lerp lambda v w = lambda %< v + w >% (one - lambda)
 
-lol :: (Double, Double)
-lol = (1, 3) * lerp lambda (3, 3) (4, 5) + (1, 0) >% (dot @Double v w)
-  where
-    lambda :: Double
-    lambda = 0.3
+lol :: (Complex Double, Complex Double)
+lol =
+  (1, 3) * lerp lambda (3, 3) (4, 5) + (1, 0) >% lambda + v + lambda %< w +
+  (lambda, -lambda)
 
-    v, w :: (Double, Double)
+  where
+    lambda :: Complex Double
+    lambda = 0.3 :+ 1
+
     v = (3, 3)
     w = (2, 7)
 
@@ -200,7 +222,7 @@ lol' :: (Double, Double)
 lol' = lerp @Double 0.3 (3, 3) (4, 5)
 
 dot :: DotProductSpace' r v => v -> v -> r
-dot = innerProductP AddP MulP AddP (Proxy :: Proxy DotProduct)
+dot = innerProductP AddP MulP AddP DotProductP
 
 -- data Vector (n :: k) p v where
 

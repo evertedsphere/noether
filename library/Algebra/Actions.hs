@@ -9,9 +9,7 @@
 {-# LANGUAGE MultiParamTypeClasses  #-}
 {-# LANGUAGE RebindableSyntax       #-}
 {-# LANGUAGE ScopedTypeVariables    #-}
-{-# LANGUAGE TemplateHaskell        #-}
 {-# LANGUAGE TemplateHaskellQuotes  #-}
-{-# LANGUAGE TypeApplications       #-}
 {-# LANGUAGE TypeFamilies           #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE TypeInType             #-}
@@ -23,12 +21,10 @@ module Algebra.Actions where
 import           Algebra.Basics
 import           Data.Kind (type (*))
 import           Data.Proxy
--- import           GHC.TypeLits (Symbol)
--- import           Language.Haskell.TH
--- import           Language.Haskell.TH.Quote
 import           Prelude        hiding (Monoid, negate, recip, (*), (+), (-),
                                  (/), fromInteger)
 import qualified Prelude        as P
+import Data.Complex
 
 -- I could see this turning into a (type|data) family
 data IsLinear     = YesLinear     | NotLinear
@@ -53,7 +49,7 @@ class
   default leftAct
     :: (a ~ b, Semigroup action a)
     => Proxy ao -> Proxy bo -> Proxy action -> a -> b -> b
-  leftAct _ _ actionProxy = binaryOp actionProxy
+  leftAct _ _ = binaryOp
 
 class
   ( Semigroup ao a
@@ -72,7 +68,7 @@ class
   default rightAct
     :: (a ~ b, Semigroup action a)
     => Proxy ao -> Proxy bo -> Proxy action -> a -> b -> b
-  rightAct _ _ actionProxy = binaryOp actionProxy
+  rightAct _ _ = binaryOp
 
 type LeftLinear       ao a bo b t = LeftActs  ao a bo b t YesLinear NotCompatible
 type RightLinear      ao a bo b t = RightActs ao a bo b t YesLinear NotCompatible
@@ -86,15 +82,47 @@ instance (Ring Add m a) => RightActs Add a Add a m   YesLinear NotCompatible
 instance (Ring p Mul a) => LeftActs  Mul a p   a Mul NotLinear YesCompatible
 instance (Ring p Mul a) => RightActs Mul a p   a Mul NotLinear YesCompatible
 
-instance (Ring Add m a) => LeftActs  Add a Add (a, a) m YesLinear NotCompatible where
-  leftAct p1 p2 p3 s (t, t') = (leftAct p1 p2 p3 s t, leftAct p1 p2 p3 s t')
-instance (Ring Add m a) => RightActs Add a Add (a, a) m YesLinear NotCompatible where
-  rightAct = leftAct
+scale :: Double -> Complex Double -> Complex Double
+scale d (a :+ b) = (d * a) :+ (d * b)
 
-instance (Ring p Mul a) => LeftActs  Mul a p (a, a) Mul NotLinear YesCompatible where
+instance LeftActs  Add Double Add (Complex Double) Mul YesLinear NotCompatible where
+  leftAct _ _ _ = scale
+instance RightActs Add Double Add (Complex Double) Mul YesLinear NotCompatible where
+  rightAct _ _ _ = scale
+
+instance LeftActs  Mul Double Add (Complex Double) Mul NotLinear YesCompatible where
+  leftAct _ _ _ = scale
+instance RightActs Mul Double Add (Complex Double) Mul NotLinear YesCompatible where
+  rightAct _ _ _ = scale
+
+-- instance ( LeftActs Add k Add a m YesLinear NotCompatible
+--          , LeftActs Add k Add b m YesLinear NotCompatible) =>
+--          LeftActs Add k Add (a, b) m YesLinear NotCompatible where
+--   leftAct p1 p2 p3 s (t, t') = (leftAct p1 p2 p3 s t, leftAct p1 p2 p3 s t')
+
+instance ( LeftActs Add a Add b m YesLinear NotCompatible
+         , LeftActs Add a Add c m YesLinear NotCompatible
+         ) =>
+         LeftActs Add a Add (b, c) m YesLinear NotCompatible where
   leftAct p1 p2 p3 s (t, t') = (leftAct p1 p2 p3 s t, leftAct p1 p2 p3 s t')
-instance (Ring p Mul a) => RightActs Mul a p (a, a) Mul NotLinear YesCompatible where
-  rightAct = leftAct
+
+instance ( RightActs Add a Add b m YesLinear NotCompatible
+         , RightActs Add a Add c m YesLinear NotCompatible
+         ) =>
+         RightActs Add a Add (b, c) m YesLinear NotCompatible where
+  rightAct p1 p2 p3 s (t, t') = (rightAct p1 p2 p3 s t, rightAct p1 p2 p3 s t')
+
+instance ( LeftActs Mul a p b Mul NotLinear YesCompatible
+         , LeftActs Mul a p c Mul NotLinear YesCompatible
+         ) =>
+         LeftActs Mul a p (b, c) Mul NotLinear YesCompatible where
+  leftAct p1 p2 p3 s (t, t') = (leftAct p1 p2 p3 s t, leftAct p1 p2 p3 s t')
+
+instance ( RightActs Mul a p b Mul NotLinear YesCompatible
+         , RightActs Mul a p c Mul NotLinear YesCompatible
+         ) =>
+         RightActs Mul a p (b, c) Mul NotLinear YesCompatible where
+  rightAct p1 p2 p3 s (t, t') = (rightAct p1 p2 p3 s t, rightAct p1 p2 p3 s t')
 
 abelianIntegerAction
   :: (AbelianGroup op a)
