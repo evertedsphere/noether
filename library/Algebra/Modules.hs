@@ -27,6 +27,7 @@ import           Prelude         hiding (Monoid, fromInteger, negate, recip,
                                   (*), (+), (-), (/))
 
 import           Data.Complex
+import Data.Kind (type (*))
 
 -- import qualified Prelude                   as P
 -- import           Data.Kind  (Type)
@@ -153,28 +154,35 @@ instance ( Field p m k
   innerProductP _ _ _ _ = (*)
 
 -- | 2-vectors
-instance ( Ring p m r
+instance ( LeftModule' r a
+         , LeftModule' r b
          , p ~ Add
          , m ~ Mul
-         ) => LeftModule p m r Add (r, r)
+         ) => LeftModule p m r Add (a, b)
 
-instance ( Ring p m r
+instance ( RightModule' r a
+         , RightModule' r b
          , p ~ Add
          , m ~ Mul
-         ) => RightModule p m r Add (r, r)
+         ) => RightModule p m r Add (a, b)
 
-instance ( Ring p m r
+instance {-# INCOHERENT #-}
+         ( Bimodule_ r a
+         , Bimodule_ r b
          , p ~ Add
          , m ~ Mul
          , q ~ p
          , n ~ m
-         ) => Bimodule p m r q n r Add (r, r)
+         ) => Bimodule p m r q n r Add (a, b)
 
-instance ( Field p m k
+instance {-# INCOHERENT #-}
+         ( DotProductSpace' k v
+         , DotProductSpace' k w
          , p ~ Add
          , m ~ Mul
-         ) => InnerProductSpace DotProduct p m k Add (k, k) where
-  innerProductP _ _ _ _ (a,b) (c,d) = a * c + b * d
+         ) => InnerProductSpace DotProduct p m k Add (v, w) where
+  innerProductP p1 p2 p3 dp (a,b) (c,d) =
+    innerProductP p1 p2 p3 dp a c + innerProductP p1 p2 p3 dp b d
 
 leftAnnihilates
   :: ( Eq a
@@ -224,7 +232,3 @@ lol' = lerp @Double 0.3 (3, 3) (4, 5)
 dot :: DotProductSpace' r v => v -> v -> r
 dot = innerProductP AddP MulP AddP DotProductP
 
--- data Vector (n :: k) p v where
-
-data a ~> b where
-  Dot :: a ~> b

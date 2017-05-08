@@ -13,15 +13,17 @@ ghc-options:
   - "-Wall"
   - "-fwarn-implicit-prelude"
 default-extensions:
-  - NoImplicitPrelude
-  - OverloadedStrings
   - FlexibleContexts
   - FlexibleInstances
-  - MultiParamTypeClasses
-  - TypeFamilies
-  - RankNTypes
   - GADTs
   - LiberalTypeSynonyms
+  - MultiParamTypeClasses
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - RankNTypes
+  - ScopedTypeVariables
+  - TypeFamilies
+  - TypeOperators
   - TypeSynonymInstances
 
 library:
