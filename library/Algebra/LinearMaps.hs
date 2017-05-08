@@ -54,11 +54,6 @@ data (\>) :: (* -> * -> * -> *) where
        -> k \> a ~>     c
        -> k \> a ~> (b, c)
 
--- | Converts a linear map into a function.
-apply :: k \> a ~> b -> a -> b
-apply (Dot b)   = dot b
-apply (f :&& g) = \v -> (apply f v, apply g v)
-
 -- A couple exercises of the syntax:
 
 -- | A π/2 counterclockwise rotation in R^2.
@@ -71,6 +66,17 @@ rotate :: Double -> Double \> (Double, Double) ~> (Double, Double)
 rotate phi = Dot ( cos phi, -sin phi)
          :&& Dot ( sin phi,  cos phi)
 
+------------------------------------------------------------------------------------
+-- Primitive operations on linear maps
+------------------------------------------------------------------------------------
+
+-- | Converts a linear map into a function.
+apply
+  :: k \> a ~> b
+  -> a -> b
+apply (Dot b)   = dot b
+apply (f :&& g) = \v -> (apply f v, apply g v)
+
 -- | For the monoid etc. instances
 addLinearMap
   :: k \> a ~> b
@@ -82,7 +88,10 @@ addLinearMap (x :&& w) (y :&& z) =
 addLinearMap _ _ = error "Unexpected args"
 
 -- | For the vector space instances
-scaleLMap :: k -> k \> a ~> b -> k \> a ~> b
+scaleLMap
+  :: k
+  -> k \> a ~> b
+  -> k \> a ~> b
 scaleLMap lambda (Dot x)   = Dot (lambda %< x)
 scaleLMap lambda (f :&& g) = scaleLMap lambda f :&& scaleLMap lambda g
 
@@ -96,6 +105,8 @@ compose (f :&& g) (Dot (a, b)) =
   compose f (Dot a) `addLinearMap` compose g (Dot b)
 compose x@(Dot _)   (f :&& g) = compose x f :&& compose x g
 compose x@(_ :&& _) (f :&& g) = compose x f :&& compose x g
+
+-- Constrained arrow-like functions
 
 compFst
   :: ( VectorSpace'     k a
