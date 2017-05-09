@@ -11,6 +11,7 @@ module Algebra.Basics where
 import           Data.Proxy
 import           GHC.Exts
 
+import qualified Data.String  as S
 import           Prelude      hiding (Monoid, fromInteger, negate, recip, (*),
                                (+), (-), (/))
 import qualified Prelude      as P
@@ -31,6 +32,9 @@ pattern MulP = Proxy
 
 fromInteger :: Num a => Integer -> a
 fromInteger = P.fromInteger
+
+fromString :: IsString a => String -> a
+fromString = S.fromString
 
 class UnaryNeutral (op :: UnaryTag) a where
   unaryNeutral :: Proxy op -> a

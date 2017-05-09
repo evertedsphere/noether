@@ -1,6 +1,9 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskellQuotes #-}
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE StandaloneDeriving    #-}
+{-# LANGUAGE RebindableSyntax #-}
 {-# LANGUAGE TypeInType            #-}
 {-# LANGUAGE UndecidableInstances  #-}
 {-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
@@ -12,10 +15,13 @@ import           Algebra.Modules
 import           Prelude         hiding (Monoid, fromInteger, negate, recip,
                                   (*), (+), (-), (/))
 
-import           Control.Arrow   ((&&&))
 import           Data.Complex
 import           Data.Proxy
 import           Data.Kind       (type (*))
+import Debug.Trace (trace)
+
+import Language.Haskell.TH
+import Language.Haskell.TH.Quote
 
 ---------------------------------------------------------------------------
 -- Linear maps in the style of Conal Elliott,
@@ -28,6 +34,7 @@ import           Data.Kind       (type (*))
 infixr 1 \>
 infixr 0 ~>
 
+type (&) a b = (a, b)
 -- | Postfix "over" operator, akin to ($)
 type (~>) a b = a b
 
@@ -40,6 +47,7 @@ type (~>) a b = a b
 -- The reason relaxing the constraints in the (:&&) constructor to `VectorSpace'`
 -- doesn't work is because we are doing something coordinate-wise in some sense,
 -- I believe.
+
 data (\>) :: (* -> * -> * -> *) where
   Dot
     :: DotProductSpace' k a
@@ -50,14 +58,14 @@ data (\>) :: (* -> * -> * -> *) where
      ( VectorSpace' k a
      , DotProductSpace' k b
      , DotProductSpace' k c
-     ) => k \> a ~>  b
+     ) => k \> a ~> b
        -> k \> a ~>     c
-       -> k \> a ~> (b, c)
+       -> k \> a ~> b & c
 
 -- A couple exercises of the syntax:
 
 -- | A π/2 counterclockwise rotation in R^2.
-rotate90 :: Double \> (Double, Double) ~> (Double, Double)
+rotate90 :: Double \> Double & Double ~> Double & Double
 rotate90 = Dot (0, -1)
        :&& Dot (1,  0)
 
@@ -112,8 +120,8 @@ compFst
   :: ( VectorSpace'     k a
      , DotProductSpace' k b
      , DotProductSpace' k c
-     ) => k \>  a     ~> c
-       -> k \> (a, b) ~> c
+     ) => k \> a     ~> c
+       -> k \> a & b ~> c
 compFst (Dot a)   = Dot (a, zero)
 compFst (f :&& g) = compFst f :&& compFst g
 
@@ -131,9 +139,9 @@ tensorProductLinear
      , DotProductSpace' k b
      , DotProductSpace' k c
      , DotProductSpace' k d
-     ) => k \>  a     ~>  b
-       -> k \>     c  ~>     d
-       -> k \> (a, c) ~> (b, d)
+     ) => k \> a     ~> b
+       -> k \>     c ~>     d
+       -> k \> a & c ~> b & d
 tensorProductLinear f g = compFst f :&& compSnd g
 
 ------------------------------------------------------------------------------
@@ -146,21 +154,25 @@ instance (Show a) => Show (k \> a ~> k) where
   show (Dot a) = show a
   show _ = error "impossible"
 
--- "like, maybe polymorphically recursively many, my dude"
+-- "like, maybe polymorphically recursively* many, my dude"
 instance ( Show (k \> a ~> b)
          , Show (k \> a ~> c)
          , Show a
          ) => Show (k \> a ~> (b, c)) where
   show (Dot a) = show a
-  show (f :&& g) = show f ++ "+\n" ++ show g
+  show (f :&& g) = show f ++ "\n" ++ show g
+
+-- *maybe not exactly
 
 ----------------------------------------------------------------------
 -- Algebraic structures on linear map types
 ----------------------------------------------------------------------
 
 ----------------------------------------------------------------------
--- Additive and multiplicative operations and identity elements
+-- Operations and identity elements
 ----------------------------------------------------------------------
+
+-- Addition
 
 -- | Linear maps between the same pair of spaces can always be added.
 instance Magma Add (k \> a ~> b) where
@@ -172,13 +184,16 @@ instance (Monoid Add a, DotProductSpace' k a) =>
   neutral _ = Dot zero
 
 -- | Additive neutral element, recursive step
-instance ( Neutral Add (k \> a ~> b)
+instance {-# INCOHERENT #-}
+         ( Neutral Add (k \> a ~> b)
          , Neutral Add (k \> a ~> c)
          , VectorSpace' k a
          , DotProductSpace' k b
          , DotProductSpace' k c
-         ) => Neutral Add (k \> a ~> (b, c)) where
+         ) => Neutral Add (k \> a ~> b & c) where
   neutral p = neutral p :&& neutral p
+
+-- Multiplication
 
 -- | Only "square matrices" have a "monomorphic" (in some sense) multiplication.
 instance Magma Mul (k \> a ~> a) where
@@ -190,47 +205,46 @@ instance (Monoid Mul a, DotProductSpace' k a) =>
   neutral _ = Dot one
 
 -- | Multiplicative neutral element, recursive step
-instance ( Monoid Add (k \> a ~> b)
-         , Monoid Add (k \> a ~> c)
-         , Monoid Mul (k \> a ~> b)
-         , Monoid Mul (k \> a ~> c)
-         , Monoid Add (k \> a ~> (b, c))
-         , VectorSpace' k a
+instance {-# INCOHERENT #-}
+         ( Neutral Mul (k \> a ~> a)
+         , Neutral Mul (k \> b ~> b)
+         , DotProductSpace' k a
          , DotProductSpace' k b
-         , DotProductSpace' k c
          ) =>
-         Neutral Mul (k \> a ~> (b, c)) where
-  neutral _ = neutral MulP :&& neutral AddP
-            + neutral AddP :&& neutral MulP
+         Neutral Mul (k \> a & b ~> a & b) where
+  neutral _ = tensorProductLinear (neutral MulP) (neutral MulP)
 
 -----------------------------------------------------------------
--- Semigroup and monoid structures
+-- Algebraic structures structures
 -----------------------------------------------------------------
 
--- | Trivial additive semigroup structure from `Monoid` and `Neutral`
--- instances
-instance Semigroup Add (k \> a ~> b)
+-- | Trivial commutative additive semigroup structure
+instance Semigroup   Add (k \> a ~> b)
+instance Commutative Add (k \> a ~> b)
 
--- | Additive monoid, base case
-instance ( DotProductSpace' k a
-         ) => Monoid Add (k \> a ~> k)
+-- | Trivial multiplicative semigroup structure
+instance Semigroup Mul (k \> a ~> a)
 
--- | Additive monoid, recursive step
-instance ( VectorSpace' k a
-         , DotProductSpace' k b
-         , DotProductSpace' k c
-         , Monoid Add (k \> a ~> b)
-         , Monoid Add (k \> a ~> c)
-         ) => Monoid Add (k \> a ~> (b, c))
+instance DistributesOver Add Mul (k \> a ~> a)
 
--- instance Semigroup Mul (k \> a ~> a)
+-- | Additive neutral element, base case
+instance ( Neutral Add (k \> a ~> b)
+         , Field' k
+         ) => Invertible Add (k \> a ~> b) where
+  invert _ = scaleLMap (-one)
 
--- instance (Monoid Mul a, DotProductSpace' k a) =>
---          Monoid Mul (k \> a ~> a)
+-- Monoid structures come for free
 
--- instance ( Monoid Add (a ~> b /> k)
---          , Monoid Mul (a ~> c /> k)
---          , VectorSpace' k a
---          , DotProductSpace' k b
---          , DotProductSpace' k c
---          ) => Monoid Mul (a ~> (b, c) /> k) where
+f' :: Ring' a => a -> a
+f' x = x
+
+g'
+  :: Field' k
+  => k \>
+       k & (k & k) ~> k & (k & k)
+  -> k \>
+       k & (k & k) ~> k & (k & k)
+g' = f'
+
+ringTest :: Double \> Double & Double ~> Double & Double
+ringTest = zero + rotate90 * rotate90
