@@ -1,4 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskellQuotes #-}
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -11,6 +13,7 @@
 module Algebra.LinearMaps where
 
 import           Algebra.Basics
+import           Algebra.Actions
 import           Algebra.Modules
 import           Prelude         hiding (Monoid, fromInteger, negate, recip,
                                   (*), (+), (-), (/))
@@ -235,6 +238,38 @@ instance ( Neutral Add (k \> a ~> b)
 
 -- Monoid structures come for free
 
+------------------------------------------------------------------
+-- Almost-inner product spaces
+-- These classes really need to be fixed.
+------------------------------------------------------------------
+
+instance (Field' k) =>
+         LeftActs Add k  Add (k \> a ~> b) Mul YesLinear NotCompatible where
+  leftAct _ _ _ = scaleLMap
+
+instance (Field' k) =>
+         RightActs Add k Add (k \> a ~> b) Mul YesLinear NotCompatible where
+  rightAct _ _ _ = scaleLMap
+
+instance (Field' k) =>
+         LeftActs Mul k  Add (k \> a ~> b) Mul NotLinear YesCompatible where
+  leftAct _ _ _ = scaleLMap
+
+instance (Field' k) =>
+         RightActs Mul k Add (k \> a ~> b) Mul NotLinear YesCompatible where
+  rightAct _ _ _ = scaleLMap
+
+instance (Field' k, Neutral Add (k \> a ~> b)) =>
+         LeftModule' k (k \> a ~> b)
+
+instance (Field' k, Neutral Add (k \> a ~> b)) =>
+         RightModule' k (k \> a ~> b)
+
+instance (Field' k, Neutral Add (k \> a ~> b)) =>
+         Bimodule_ k (k \> a ~> b)
+
+-- More exercises of the syntax
+
 f' :: Ring' a => a -> a
 f' x = x
 
@@ -248,3 +283,35 @@ g' = f'
 
 ringTest :: Double \> Double & Double ~> Double & Double
 ringTest = zero + rotate90 * rotate90
+
+actionTest :: Double \> Double & Double ~> Double & Double
+actionTest = (lambda %< rotate90) >% (dot @Double (lambda,lambda) (lambda, zero))
+  where lambda :: Double
+        lambda = 0.3
+
+-- (-1.1102230246251565e-16,-1.1102230246251565e-16)
+-- (1.1102230246251565e-16,-1.1102230246251565e-16)
+-- mat :: (Double \> (Double, Double)) ~> (Double, Double)
+mat = rotate (pi / 2) * rotate (-pi / 4) - rotate (pi / 4)
+
+det
+  :: forall v k.
+     Field' k
+  => k \> v ~> v
+  -> k
+
+det (Dot a) = a
+
+det (Dot a :&& Dot b) = dot a b
+
+det (Dot (a, b) :&& Dot (c, d) :&& Dot (e, f))
+  = b * det (Dot c :&& Dot e)
+  - d * det (Dot a :&& Dot e)
+  + f * det (Dot a :&& Dot c)
+
+det ((f :&& g) :&& Dot ((al, ar), b)) = undefined
+
+det ((Dot (a, b) :&& Dot (c, d)) :&& (Dot (e, f) :&& Dot (g, h)))
+    = det $
+        Dot (det (Dot a :&& Dot c), det (Dot e :&& Dot g))
+    :&& Dot (det (Dot f :&& Dot h), det (Dot b :&& Dot d))
