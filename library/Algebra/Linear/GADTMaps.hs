@@ -10,7 +10,7 @@
 {-# LANGUAGE UndecidableInstances  #-}
 {-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
 
-module Algebra.LinearMaps where
+module Algebra.Linear.GADTMaps where
 
 import           Algebra.Basics
 import           Algebra.Actions
@@ -18,19 +18,13 @@ import           Algebra.Modules
 import           Prelude         hiding (Monoid, fromInteger, negate, recip,
                                   (*), (+), (-), (/))
 
-import           Data.Complex
-import           Data.Proxy
 import           Data.Kind       (type (*))
-import Debug.Trace (trace)
-
-import Language.Haskell.TH
-import Language.Haskell.TH.Quote
 
 ---------------------------------------------------------------------------
--- Linear maps in the style of Conal Elliott,
--- adapted for compatibility with All The Polymorphism™
--- from <http://conal.net/blog/posts/reimagining-matrices>
--- Likely not performant, but definitely pretty and a good place
+-- Linear maps in the style of Conal Elliott
+-- from <http://conal.net/blog/posts/reimagining-matrices>,
+-- adapted for compatibility with All The Polymorphism™.
+-- Likely extremely nonperformant, but definitely pretty and a good place
 -- to test the abstractions developed so far.
 ---------------------------------------------------------------------------
 
@@ -304,14 +298,18 @@ det (Dot a) = a
 
 det (Dot a :&& Dot b) = dot a b
 
+-- det (f :&& g) = undefined
+
 det (Dot (a, b) :&& Dot (c, d) :&& Dot (e, f))
   = b * det (Dot c :&& Dot e)
   - d * det (Dot a :&& Dot e)
   + f * det (Dot a :&& Dot c)
 
-det ((f :&& g) :&& Dot ((al, ar), b)) = undefined
+-- det ((f :&& g) :&& Dot ((al, ar), b)) = det f
 
 det ((Dot (a, b) :&& Dot (c, d)) :&& (Dot (e, f) :&& Dot (g, h)))
     = det $
         Dot (det (Dot a :&& Dot c), det (Dot e :&& Dot g))
     :&& Dot (det (Dot f :&& Dot h), det (Dot b :&& Dot d))
+
+-- det ((f :&& g) :&& (h :&& i)) =
