@@ -215,7 +215,7 @@ instance {-# INCOHERENT #-}
   neutral _ = tensorProductLinear (neutral MulP) (neutral MulP)
 
 -----------------------------------------------------------------
--- Algebraic structures structures
+-- Algebraic structures
 -----------------------------------------------------------------
 
 -- | Trivial commutative additive semigroup structure
