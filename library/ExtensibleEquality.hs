@@ -27,6 +27,9 @@ import           Prelude
 -- are compared inside the core library and putting a catch-all case to handle
 -- everything else isn't attractive.
 
+-- I think the same approach can be used to handle inference of algebraic structures
+-- on types without the incoherent nonsense in place currently.
+
 data Numeric
 data Approximate
 data Explicit
