@@ -23,9 +23,10 @@ import           Prelude
 -- replaced with not-necessarily-closed type families.
 
 -- This last point is crucial for Noether, which aspires to be a library that
--- people can use for their own work, so declaring how a couple standard types
--- are compared inside the core library and putting a catch-all case to handle
--- everything else isn't attractive.
+-- people can use for their own work. The closed-TF approach of declaring how
+-- a couple standard types are compared and putting a catch-all case after
+-- those to handle everything else (all in the core library) isn't really
+-- sensible.
 
 -- I think the same approach can be used to handle inference of algebraic structures
 -- on types without the incoherent nonsense in place currently.
