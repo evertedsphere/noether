@@ -15,6 +15,18 @@ import           Data.Proxy
 import           GHC.Exts
 import           Prelude
 
+-- Flexible, extensible notions of equality with open type families.
+-- There are no incoherent or even overlapping instances anywhere here.
+-- The ideas are based off of the "Advanced overlap" page on the GHC wiki:
+-- <https://wiki.haskell.org/GHC/AdvancedOverlap>, and were inspired by
+-- the observation that the overlapping instances there could be completely
+-- replaced with not-necessarily-closed type families.
+
+-- This last point is crucial for Noether, which aspires to be a library that
+-- people can use for their own work, so declaring how a couple standard types
+-- are compared inside the core library and putting a catch-all case to handle
+-- everything else isn't attractive.
+
 data Numeric
 data Approximate
 data Explicit
@@ -150,7 +162,7 @@ type instance Equality Double = Approximate
 -- What follows is the specifications of the (unique!) equality strategies for
 -- a couple of types.
 -- A user would only interact with this bit, ideally.
--- (Note that every test* type can be inferred, "obviously".)
+-- (Note that every test* type hereafter can be inferred, "obviously".)
 
 -- | 'Common' 'Approximate' is a strategy that uses the same epsilon for
 -- both slots of the tuple, going
@@ -192,7 +204,7 @@ type instance Equality Dbl' = CoerceFrom Numeric Double
 test3 :: Bool
 test3 = Dbl' 2.0 === Dbl' 2.01
 
--- (I'm intentionally using 'Composite' instead of a tuple to leave that option open
+-- | (I'm intentionally using 'Composite' instead of a tuple to leave that option open
 -- for auto-deriving shenanigans.)
 type instance Equality (Dbl, Dbl') = Composite (Equality Dbl) (Equality Dbl')
 
