@@ -40,9 +40,9 @@ instance (EquateAs (Equality a) a) => Equate a where
 class EquateAs s a where
   equateAs :: proxy s -> a -> a -> EquateResult s a
 
-------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Instances
-------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- Prelude equality.
 
@@ -132,6 +132,10 @@ instance ( EquateAs s a
     where
       p = Proxy :: Proxy s
 
+--------------------------------------------------------------------------------
+-- Usage
+--------------------------------------------------------------------------------
+
 -- Library definitions should look like this. (They might even be put in
 -- signature files or something, for, e.g. a swap-in numerically sensible
 -- set of equality strategies that uses approximate equality for everything
@@ -143,8 +147,10 @@ testInt = 0 === (1 :: Int)
 
 type instance Equality Double = Approximate
 
--- | This is the specification of the (unique!) equality strategy.
+-- What follows is the specifications of the (unique!) equality strategies for
+-- a couple of types.
 -- A user would only interact with this bit, ideally.
+-- (Note that every test* type can be inferred, "obviously".)
 
 -- | 'Common' 'Approximate' is a strategy that uses the same epsilon for
 -- both slots of the tuple, going
