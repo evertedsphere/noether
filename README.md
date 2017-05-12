@@ -1,3 +1,5 @@
+[![ii](https://img.shields.io/badge/IncoherentInstances-%E2%9C%93-brightgreen.svg)]()
+
 # Noether
 
 A very WIP number theory / abstract algebra playground in Haskell. 
