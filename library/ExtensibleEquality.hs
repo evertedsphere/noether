@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds        #-}
+{-# LANGUAGE MagicHash #-}
 {-# LANGUAGE DataKinds              #-}
 {-# LANGUAGE EmptyDataDecls         #-}
 {-# LANGUAGE FlexibleInstances      #-}
@@ -7,6 +8,7 @@
 {-# LANGUAGE ScopedTypeVariables    #-}
 {-# LANGUAGE TypeFamilies           #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
+{-# LANGUAGE TypeInType             #-}
 {-# LANGUAGE UndecidableInstances   #-}
 
 {-| Flexible, extensible notions of equality supporting "custom deriving strategies".
@@ -32,13 +34,18 @@
 module ExtensibleEquality where
 
 import           Data.Coerce
+import           Data.Kind hiding (type (*))
 import           Data.Proxy
 import           GHC.Exts
 import           GHC.TypeLits
+import           GHC.Prim
 
 import           Prelude      hiding (Eq, (==))
 import qualified Prelude
 
+data HList (xs :: [Type]) where
+  HNil :: HList '[]
+  HCons :: x -> HList xs -> HList (x : xs)
 
 {-| This represents the unique "equality strategy" to be used for 'a'.
 
@@ -73,14 +80,14 @@ class Eq a where
   (==) :: a -> a -> EquateResult' a
 
 instance (EquateAs s a, s ~ Equality a) => Eq a where
-  (==) = equateAs (Proxy :: Proxy s)
+  (==) = equateAs (proxy# :: Proxy# s)
 
 {-| An instance of this class defines a way to equate two terms of
     a given type according to a given "strategy" 's'.
 -}
 
 class EquateAs s a where
-  equateAs :: proxy s -> a -> a -> EquateResult s a
+  equateAs :: Proxy# s -> a -> a -> EquateResult s a
 
 --------------------------------------------------------------------------------
 -- Instances
@@ -128,7 +135,7 @@ instance (EquateAs Approximate a) =>
          EquateAs (Common Approximate) (a, a) where
   equateAs _ (x,y) (x',y') eps = equateAs p x x' eps && equateAs p y y' eps
     where
-      p = Proxy :: Proxy Approximate
+      p = proxy# :: Proxy# Approximate
 
 {- Ideally, all equality strategies with a 'Bool' equality result could've been
    quantified over here, but I don't see how that can be done without replacing
@@ -149,7 +156,7 @@ instance ( EquateAs Numeric a
 
   equateAs _ (x, y) (x', y') = equateAs p x x' && equateAs p y y'
     where
-      p = Proxy :: Proxy Numeric
+      p = proxy# :: Proxy# Numeric
 
 type instance EquateResult (Common PreludeEq) (a, a) = Bool
 
@@ -159,7 +166,7 @@ instance ( EquateAs PreludeEq a
 
   equateAs _ (x, y) (x', y') = equateAs p x x' && equateAs p y y'
     where
-      p = Proxy :: Proxy PreludeEq
+      p = proxy# :: Proxy# PreludeEq
 
 {-| The 'Composite' strategy just uses the canonical strategies on each
     "slot" of the tuple and returns a tuple of results.
@@ -176,8 +183,8 @@ instance (EquateAs l a, EquateAs r b) =>
          EquateAs (Composite l r) (a, b) where
   equateAs _ (x,y) (x',y') = (equateAs pl x x', equateAs pr y y')
     where
-      pl = Proxy :: Proxy l
-      pr = Proxy :: Proxy r
+      pl = proxy# :: Proxy# l
+      pr = proxy# :: Proxy# r
 
 {- You can always define one-off 'Explicit' equality strategies.
 
@@ -199,7 +206,7 @@ type instance EquateResult (Explicit (Modulo n)) Int = Bool
 instance KnownNat n => EquateAs (Explicit (Modulo n)) Int where
   equateAs _ x y = x `div` n' Prelude.== y `div` n'
     where
-      n' = fromInteger $ natVal (Proxy :: Proxy n)
+      n' = fromInteger $ natVal' (proxy# :: Proxy# n)
 
 {-| Lightweight equality for newtypes using 'Coercible' from 'Data.Coerce'.
 
@@ -217,7 +224,7 @@ instance ( EquateAs s a
          ) => EquateAs (CoerceFrom a s) b where
   equateAs _ x y = equateAs p (coerce x :: a) (coerce y :: a)
     where
-      p = Proxy :: Proxy s
+      p = proxy# :: Proxy# s
 
 --------------------------------------------------------------------------------
 -- Usage
