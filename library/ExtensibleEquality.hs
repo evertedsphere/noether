@@ -35,7 +35,9 @@ import           Data.Coerce
 import           Data.Proxy
 import           GHC.Exts
 import           GHC.TypeLits
-import           Prelude
+
+import           Prelude      hiding (Eq, (==))
+import qualified Prelude
 
 
 {-| This represents the unique "equality strategy" to be used for 'a'.
@@ -63,15 +65,15 @@ type EquateAs' a = EquateAs (Equality a) a
 
 {-| This is the user-facing 'Eq' replacement class.
 
-    The Equate a/EquateAs s a trick is straight off the GHC wiki, as I said, although
+    The Eq a/EquateAs s a trick is straight off the GHC wiki, as I said, although
     we can now use proxies instead of slinging 'undefined's around :)
 -}
 
-class Equate a where
-  (===) :: a -> a -> EquateResult' a
+class Eq a where
+  (==) :: a -> a -> EquateResult' a
 
-instance (EquateAs s a, s ~ Equality a) => Equate a where
-  (===) = equateAs (Proxy :: Proxy s)
+instance (EquateAs s a, s ~ Equality a) => Eq a where
+  (==) = equateAs (Proxy :: Proxy s)
 
 {-| An instance of this class defines a way to equate two terms of
     a given type according to a given "strategy" 's'.
@@ -90,17 +92,21 @@ data PreludeEq
 
 type instance EquateResult PreludeEq a = Bool
 
-instance (Eq a) => EquateAs PreludeEq a where
-  equateAs _ = (==)
+instance (Prelude.Eq a) => EquateAs PreludeEq a where
+  equateAs _ = (Prelude.==)
 
--- "Numeric" equality.
+{- "Numeric" equality.
+
+   This is obviously the same as Prelude equality. It makes for another example,
+   that's all.
+-}
 
 data Numeric
 
 type instance EquateResult Numeric a = Bool
 
-instance (Eq a, Num a) => EquateAs Numeric a where
-  equateAs _ = (==)
+instance (Prelude.Eq a, Num a) => EquateAs Numeric a where
+  equateAs _ = (Prelude.==)
 
 {- "Approximate" equality defined only up to an epsilon.
    (`reflection` could be considered if one wanted to defer the choice of tolerance.)
@@ -124,12 +130,13 @@ instance (EquateAs Approximate a) =>
     where
       p = Proxy :: Proxy Approximate
 
-{- Ideally, all equality strategies with a 'Bool' equality result
-   could've been quantified over here, but I don't see how that can
-   be done without replacing EquateResult by a fundep of some sort
-   or ending up with un-unifiable constraints via the use of a type-level if,
-   where the latter would lead to scary "No instance for <two pages of type synonym
-   expansions>" errors.
+{- Ideally, all equality strategies with a 'Bool' equality result could've been
+   quantified over here, but I don't see how that can be done without replacing
+   EquateResult by a fundep of some sort or ending up with un-unifiable constraints
+   via the use of a type-level if, where the latter would lead to scary errors that
+   look like:
+
+   "No instance for <two pages of really helpfully expanded type synonyms>"
 -}
 
 data Common a
@@ -190,7 +197,7 @@ data Modulo (n :: Nat)
 type instance EquateResult (Explicit (Modulo n)) Int = Bool
 
 instance KnownNat n => EquateAs (Explicit (Modulo n)) Int where
-  equateAs _ x y = x `div` n' == y `div` n'
+  equateAs _ x y = x `div` n' Prelude.== y `div` n'
     where
       n' = fromInteger $ natVal (Proxy :: Proxy n)
 
@@ -231,14 +238,14 @@ instance ( EquateAs s a
 -- | deriving instance Eq Int using strategy Numeric
 type instance Equality Int = Numeric
 
-testInt = 0 === (1 :: Int)
+testInt = 0 == (1 :: Int)
 
 -- | deriving instance Eq Double using strategy Approximate
 type instance Equality Double = Approximate
 
 testDouble = (t eps1, t eps2)
   where
-    t = 0.0 === (0.01 :: Double)
+    t = 0.0 == (0.01 :: Double)
     eps1 = 0.001
     eps2 = 0.1
 
@@ -265,7 +272,7 @@ testDouble = (t eps1, t eps2)
 type instance Equality (Double, Double) = Common Approximate
 
 test1 :: Double -> Bool
-test1 = lhs === rhs
+test1 = lhs == rhs
   where
     lhs, rhs :: (Double, Double)
     lhs = (2.0, 2.0)
@@ -291,7 +298,7 @@ newtype Dbl = Dbl Double
 type instance Equality Dbl = CoerceFrom Double PreludeEq
 
 test2 :: Bool
-test2 = Dbl 2.0 === Dbl 2.01
+test2 = Dbl 2.0 == Dbl 2.01
 
 {- In case of 'Eq' on a newtype-wrapped Prelude numeric type, this is a parlor trick
    at best, but not having to "derive" Num (or write a one-off partial implementation)
@@ -303,7 +310,7 @@ newtype Dbl' = Dbl' Double
 type instance Equality Dbl' = CoerceFrom Double Numeric
 
 test3 :: Bool
-test3 = Dbl' 2.0 === Dbl' 2.01
+test3 = Dbl' 2.0 == Dbl' 2.01
 
 {- (I'm intentionally using 'Composite' instead of a tuple to leave that option open
    for auto-deriving shenanigans.)
@@ -312,7 +319,7 @@ test3 = Dbl' 2.0 === Dbl' 2.01
 type instance Equality (Dbl, Dbl') = Composite (Equality Dbl) (Equality Dbl')
 
 test4 :: (Bool, Bool)
-test4 = (Dbl 2, Dbl' 2) === (Dbl 2.001, Dbl' 2)
+test4 = (Dbl 2, Dbl' 2) == (Dbl 2.001, Dbl' 2)
 
 -- Let's try the Z/n equality we defined above.
 
@@ -327,7 +334,7 @@ type instance Equality (Mod n) = CoerceFrom Int (Explicit (Modulo n))
 --- and profit!
 
 test5 :: Bool
-test5 = a === b
+test5 = a == b
   where
     a, b :: Mod 7
     a = Mod 3
