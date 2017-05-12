@@ -200,14 +200,14 @@ instance KnownNat n => EquateAs (Explicit (Modulo n)) Int where
     representations have gone away, anyway.)
 -}
 
-data CoerceFrom s a
-type CoerceFrom' a = CoerceFrom (Equality a) a
+data CoerceFrom a s
+type CoerceFrom' a = CoerceFrom a (Equality a)
 
-type instance EquateResult (CoerceFrom s a) b = EquateResult s a
+type instance EquateResult (CoerceFrom a s) b = EquateResult s a
 
 instance ( EquateAs s a
          , Coercible b a
-         ) => EquateAs (CoerceFrom s a) b where
+         ) => EquateAs (CoerceFrom a s) b where
   equateAs _ x y = equateAs p (coerce x :: a) (coerce y :: a)
     where
       p = Proxy :: Proxy s
@@ -227,18 +227,22 @@ instance ( EquateAs s a
    'Numeric', but also 'Composite Approximate Numeric', and so on. (More generics?)
 -}
 
--- This might be read as "deriving instance Equality Int using strategy Numeric".
+-- This might be read as
+-- | deriving instance Eq Int using strategy Numeric
 type instance Equality Int = Numeric
 
 testInt = 0 === (1 :: Int)
 
+-- | deriving instance Eq Double using strategy Approximate
 type instance Equality Double = Approximate
 
 testDouble = (t eps1, t eps2)
   where
-    t = (0.0 === (0.01 :: Double))
+    t = 0.0 === (0.01 :: Double)
     eps1 = 0.001
     eps2 = 0.1
+
+-- And so on.
 
 {- What follows are the specifications of (unique!) equality strategies for
    a couple of types. A user would only interact with this bit, ideally, to define
@@ -251,6 +255,12 @@ testDouble = (t eps1, t eps2)
     slots of the tuple, going
 
     (a -> Bool, a -> Bool) ~> a -> (Bool, Bool) ~> a -> Bool
+
+    Note that I can replace this with Common Numeric and have that work just fine,
+    even though the concrete specification of equality on Double is Approximate.
+    Defining the Equality instance does not throw away the information of the other
+    possible equality tests, and bigger types like tuples and such can make use of
+    any equality that the components support.
 -}
 type instance Equality (Double, Double) = Common Approximate
 
@@ -262,37 +272,35 @@ test1 = lhs === rhs
     rhs = (2.00001, 2.0)
 
 {- Suppose I want a newtype that is equated differently.
-   For instance, consider a newtype-wrapped Double that compares
-   according to Prelude equality, not the funky tolerance-ish thing
-   above.
+   For instance, consider a newtype-wrapped Double that compares according to Prelude
+   equality, not the funky tolerance-ish thing above.
 
    In defining it,  I can skip making it support the operations that my choice
    of equality strategy requires. The use of 'PreludeEq' demands an 'Eq' constraint,
    but 'Dbl' does not need to derive that.
 
-   FIXME: Maybe the type family should make this available? The Advanced
-   Overlap page says that getting the class instances and the type instances
-   to agree is "just something you'll have to do", but does ConstraintKinds let
-   us hack around that now?
+   FIXME: Maybe the type family should make this available? The Advanced Overlap page
+   says that getting the class instances and the type instances to agree is "just
+   something you'll have to do", but does ConstraintKinds let us hack around that now?
 -}
 
 newtype Dbl = Dbl Double
 
 -- Now I can simply coerce the equality on the base type to the newtype.
 
-type instance Equality Dbl = CoerceFrom PreludeEq Double
+type instance Equality Dbl = CoerceFrom Double PreludeEq
 
 test2 :: Bool
 test2 = Dbl 2.0 === Dbl 2.01
 
-{- In case of 'Eq' on a newtype-wrapped Prelude numeric type,
-   this is a parlor trick at best, but not having to "derive" Num
-   (or write a one-off partial implementation) is awesome:
+{- In case of 'Eq' on a newtype-wrapped Prelude numeric type, this is a parlor trick
+   at best, but not having to "derive" Num (or write a one-off partial implementation)
+   is awesome:
 -}
 newtype Dbl' = Dbl' Double
 
 -- et .. magic!
-type instance Equality Dbl' = CoerceFrom Numeric Double
+type instance Equality Dbl' = CoerceFrom Double Numeric
 
 test3 :: Bool
 test3 = Dbl' 2.0 === Dbl' 2.01
@@ -314,7 +322,7 @@ newtype Mod (n :: Nat) = Mod Int
 
 -- "derive" the equality strategy...
 
-type instance Equality (Mod n) = CoerceFrom (Explicit (Modulo n)) Int
+type instance Equality (Mod n) = CoerceFrom Int (Explicit (Modulo n))
 
 --- and profit!
 
