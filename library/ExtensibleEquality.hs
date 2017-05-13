@@ -1,11 +1,8 @@
-{-# LANGUAGE AllowAmbiguousTypes    #-}
 {-# LANGUAGE ConstraintKinds        #-}
+{-# LANGUAGE MagicHash #-}
 {-# LANGUAGE DataKinds              #-}
 {-# LANGUAGE EmptyDataDecls         #-}
-{-# LANGUAGE ExplicitNamespaces     #-}
 {-# LANGUAGE FlexibleInstances      #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MagicHash              #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
 {-# LANGUAGE PolyKinds              #-}
 {-# LANGUAGE ScopedTypeVariables    #-}
@@ -13,7 +10,6 @@
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE TypeInType             #-}
 {-# LANGUAGE UndecidableInstances   #-}
-{-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
 
 {-| Flexible, extensible notions of equality supporting "custom deriving strategies".
 
@@ -38,53 +34,18 @@
 module ExtensibleEquality where
 
 import           Data.Coerce
-import           Data.Kind          hiding (type (*))
+import           Data.Kind hiding (type (*))
 import           Data.Proxy
 import           GHC.Exts
-import           GHC.Prim
 import           GHC.TypeLits
+import           GHC.Prim
 
-import           Data.Data
-import           Data.Typeable
-
-import           Data.Type.Equality
-import           Prelude            hiding (Eq, (==))
+import           Prelude      hiding (Eq, (==))
 import qualified Prelude
 
-type family Tactic (a :: k) :: [Type]
-
-type instance Tactic "empty" = '[]
-type instance Tactic "numeric_default" =
-     '[PreludeEq, Numeric, Approximate]
-
-data Tactical a
-
-data TBool = T | F
-
-type family (&&) (a :: TBool) (b :: TBool) :: TBool where
-  T && T = T
-  _ && _ = F
-
-type family (||) (a :: TBool) (b :: TBool) :: TBool where
-  F || F = F
-  _ || _ = T
-
-type family Member (a :: k) (xs :: [k]) :: TBool where
-  Member _ '[] = F
-  Member a (a : _) = T
-  Member a (_ : as) = Member a as
-
--- Sanity checks
-
--- :kind! MemberCheck1
--- MemberCheck1 :: TBool
--- = 'F
-type MemberCheck1 = Member Int (Tactic "numeric_default")
-
--- :kind! MemberCheck2
--- MemberCheck2 :: TBool
--- = 'F
-type MemberCheck2 = Member (Proxy T) (Tactic "empty")
+data HList (xs :: [Type]) where
+  HNil :: HList '[]
+  HCons :: x -> HList xs -> HList (x : xs)
 
 {-| This represents the unique "equality strategy" to be used for 'a'.
 
@@ -104,8 +65,7 @@ type family Equality a
     Logic type family).
 -}
 
-type family EquateResult (s :: k) (a :: Type)
-type family EquateConstraint (s :: k) (a :: Type) :: Constraint
+type family EquateResult s a
 
 type EquateResult' a = EquateResult (Equality a) a
 type EquateAs' a = EquateAs (Equality a) a
@@ -120,14 +80,14 @@ class Eq a where
   (==) :: a -> a -> EquateResult' a
 
 instance (EquateAs s a, s ~ Equality a) => Eq a where
-  (==) = equateAs (Proxy :: Proxy s)
+  (==) = equateAs (proxy# :: Proxy# s)
 
 {-| An instance of this class defines a way to equate two terms of
     a given type according to a given "strategy" 's'.
 -}
 
-class EquateAs (s :: k) (a :: Type) where
-  equateAs :: Proxy s -> a -> a -> EquateResult s a
+class EquateAs s a where
+  equateAs :: Proxy# s -> a -> a -> EquateResult s a
 
 --------------------------------------------------------------------------------
 -- Instances
@@ -138,24 +98,21 @@ class EquateAs (s :: k) (a :: Type) where
 data PreludeEq
 
 type instance EquateResult PreludeEq a = Bool
-type instance EquateConstraint PreludeEq a = Prelude.Eq a
 
-instance EquateConstraint PreludeEq a =>
-         EquateAs PreludeEq a where
+instance (Prelude.Eq a) => EquateAs PreludeEq a where
   equateAs _ = (Prelude.==)
 
 {- "Numeric" equality.
 
-   This is obviously the same as Prelude equality. It makes for another example:
-   see below.
+   This is obviously the same as Prelude equality. It makes for another example,
+   that's all.
 -}
 
 data Numeric
 
 type instance EquateResult Numeric a = Bool
-type instance EquateConstraint Numeric a = (Prelude.Eq a, Num a)
 
-instance EquateConstraint Numeric a => EquateAs Numeric a where
+instance (Prelude.Eq a, Num a) => EquateAs Numeric a where
   equateAs _ = (Prelude.==)
 
 {- "Approximate" equality defined only up to an epsilon.
@@ -165,22 +122,20 @@ instance EquateConstraint Numeric a => EquateAs Numeric a where
 data Approximate
 
 type instance EquateResult Approximate a = a -> Bool
-type instance EquateConstraint Approximate a = (Num a, Ord a)
 
-instance EquateConstraint Approximate a => EquateAs Approximate a where
+instance (Num a, Ord a) =>
+         EquateAs Approximate a where
   equateAs _ x y epsilon = abs (x - y) < epsilon
 
 -- Maybe this is a good time to learn generics?
 
 type instance EquateResult (Common Approximate) (a, a) = a -> Bool
-type instance EquateConstraint (Common Approximate) (a, a) =
-     EquateConstraint Approximate a
 
-instance (EquateConstraint (Common Approximate) (a, a)) =>
+instance (EquateAs Approximate a) =>
          EquateAs (Common Approximate) (a, a) where
-  equateAs _ (x, y) (x', y') eps = equateAs p x x' eps && equateAs p y y' eps
+  equateAs _ (x,y) (x',y') eps = equateAs p x x' eps && equateAs p y y' eps
     where
-      p = Proxy :: Proxy Approximate
+      p = proxy# :: Proxy# Approximate
 
 {- Ideally, all equality strategies with a 'Bool' equality result could've been
    quantified over here, but I don't see how that can be done without replacing
@@ -194,22 +149,24 @@ instance (EquateConstraint (Common Approximate) (a, a)) =>
 data Common a
 
 type instance EquateResult (Common Numeric) (a, a) = Bool
-type instance EquateConstraint (Common Numeric) (a, a) = EquateConstraint Numeric a
 
-instance (EquateConstraint (Common Numeric) (a, a)) =>
-         EquateAs (Common Numeric) (a, a) where
+instance ( EquateAs Numeric a
+         , EquateAs Numeric a
+         ) => EquateAs (Common Numeric) (a, a) where
+
   equateAs _ (x, y) (x', y') = equateAs p x x' && equateAs p y y'
     where
-      p = Proxy :: Proxy Numeric
+      p = proxy# :: Proxy# Numeric
 
 type instance EquateResult (Common PreludeEq) (a, a) = Bool
-type instance EquateConstraint (Common PreludeEq) (a, a) = EquateConstraint PreludeEq a
 
-instance (EquateConstraint (Common PreludeEq) (a, a)) =>
-         EquateAs (Common PreludeEq) (a, a) where
+instance ( EquateAs PreludeEq a
+         , EquateAs PreludeEq a
+         ) => EquateAs (Common PreludeEq) (a, a) where
+
   equateAs _ (x, y) (x', y') = equateAs p x x' && equateAs p y y'
     where
-      p = Proxy :: Proxy PreludeEq
+      p = proxy# :: Proxy# PreludeEq
 
 {-| The 'Composite' strategy just uses the canonical strategies on each
     "slot" of the tuple and returns a tuple of results.
@@ -221,15 +178,13 @@ data Composite a b
 
 type instance EquateResult (Composite l r) (a, b) =
      (EquateResult l a, EquateResult r b)
-type instance EquateConstraint (Composite l r) (a, b) =
-     (EquateAs l a, EquateAs r b)
 
-instance (EquateConstraint (Composite l r) (a, b)) =>
+instance (EquateAs l a, EquateAs r b) =>
          EquateAs (Composite l r) (a, b) where
-  equateAs _ (x, y) (x', y') = (equateAs pl x x', equateAs pr y y')
+  equateAs _ (x,y) (x',y') = (equateAs pl x x', equateAs pr y y')
     where
-      pl = Proxy :: Proxy l
-      pr = Proxy :: Proxy r
+      pl = proxy# :: Proxy# l
+      pr = proxy# :: Proxy# r
 
 {- You can always define one-off 'Explicit' equality strategies.
 
@@ -247,13 +202,11 @@ data Explicit (s :: k)
 data Modulo (n :: Nat)
 
 type instance EquateResult (Explicit (Modulo n)) Int = Bool
-type instance EquateConstraint (Explicit (Modulo n)) Int = KnownNat n
 
-instance (EquateConstraint (Explicit (Modulo n)) Int) =>
-         EquateAs (Explicit (Modulo n)) Int where
+instance KnownNat n => EquateAs (Explicit (Modulo n)) Int where
   equateAs _ x y = x `div` n' Prelude.== y `div` n'
     where
-      n' = fromInteger $ natVal (Proxy :: Proxy n)
+      n' = fromInteger $ natVal' (proxy# :: Proxy# n)
 
 {-| Lightweight equality for newtypes using 'Coercible' from 'Data.Coerce'.
 
@@ -261,111 +214,17 @@ instance (EquateConstraint (Explicit (Modulo n)) Int) =>
     representations have gone away, anyway.)
 -}
 
-data CoerceFrom (a :: Type) (s :: k)
+data CoerceFrom a s
 type CoerceFrom' a = CoerceFrom a (Equality a)
 
 type instance EquateResult (CoerceFrom a s) b = EquateResult s a
-type instance EquateConstraint (CoerceFrom a s) b = (EquateAs s a , Coercible b a)
 
-instance (EquateConstraint (CoerceFrom a s) b) =>
-         EquateAs (CoerceFrom a s) b where
+instance ( EquateAs s a
+         , Coercible b a
+         ) => EquateAs (CoerceFrom a s) b where
   equateAs _ x y = equateAs p (coerce x :: a) (coerce y :: a)
     where
-      p = Proxy :: Proxy s
-
-data N
-  = Z
-  | S N
-data Void
-
-type family NatOf (n :: N) :: Nat where
-  NatOf Z = 0
-  NatOf (S n) = 1 + NatOf n
-
--- class Priority (s :: k) (n :: N) (f :: TBool) | n f -> s
-type family Prio (n :: N) = s where
-  Prio (S Z) = Numeric
-  Prio (S (S Z)) = Approximate
-  Prio (S (S (S Z))) = PreludeEq
-  Prio _ = Void
-
-class Implements (a :: Type) (s :: Type) (r :: TBool) | a s -> r
-
-instance Implements Int Numeric T
-instance Implements Int PreludeEq T
--- instance Implements Int Approximate F
-
-instance Implements Double Numeric T
-instance Implements Double Approximate T
-
-instance {-# OVERLAPPABLE #-} (flag ~ F) => Implements a b flag
-
-class Implemented (a :: Type) (start :: N) (r :: [Type]) | a start -> r where
-  showimpl :: Proxy a -> Proxy start -> Proxy r
-  showimpl' :: Proxy a -> Proxy start -> String
-
-instance Implemented a Z '[] where
-  showimpl _ _ = Proxy :: Proxy r
-  showimpl' _ _ = "0"
-
-instance ( Implemented a n next
-         , Implements a (Prio (S n)) flag
-         , ConsIf flag (Prio (S n)) next ~ next'
-         , KnownNat (1 + NatOf n)
-         ) =>
-         Implemented a (S n) next' where
-  showimpl _ _ = Proxy :: Proxy next'
-  showimpl' pa _ =
-    show (natVal (Proxy :: Proxy (NatOf (S n)))) ++
-    "; " ++ showimpl' pa (Proxy :: Proxy n)
-
-type family ConsIf (cond :: TBool) (a :: k) (b :: [k]) = (r :: [k]) where
-  ConsIf T a b = a : b
-  ConsIf F _ b = b
-
-type Five = S (S (S (S (S Z))))
-
-y :: Implemented Int Five n => Proxy n
-y = undefined
-
--- x :: String
--- x = showimpl' (Proxy :: Proxy Int) (Proxy :: Proxy Five)
-
--- :kind! IntImplements
--- -- IntImplements :: [*]
--- -- = '[Numeric]
--- type IntImplements = Implemented Int Five
-
--- -- :kind! DoubleImplements
--- -- DoubleImplements :: [*]
--- -- = '[Approximate, Numeric]
--- type DoubleImplements = Implemented Double Five
-
--- instance Priority Numeric (S Z) T
--- instance Priority Approximate Z T
-
--- class EquatesTo (s :: k) (a :: Type) (f :: TBool)
-
--- instance EquatesTo Numeric Int T
--- instance {-# OVERLAPPABLE #-} EquatesTo s a F
-
--- class Eq_ (a :: Type) (ix :: N) (fs :: [TBool]) where
---   doeq_ :: Proxy a -> Proxy ix -> Proxy fs -> String
-
--- instance {-# OVERLAPPABLE #-} Eq_ a Z '[] where
---   -- doeq_ _ _ = "Base case"
-
--- instance (Priority s n ff, EquatesTo s a f, Eq_ a n fs) =>
---          Eq_ a (S n) fs where
---   -- doeq_ pa _ = next ++ "; " ++ " +"
---   --   where
---   --     next =
---   --       doeq_
---   --         pa
---   --         (Proxy :: Proxy n)
-
--- a :: String
--- a = doeq_ (Proxy :: Proxy Int) (Proxy :: Proxy (S Z)) _
+      p = proxy# :: Proxy# s
 
 --------------------------------------------------------------------------------
 -- Usage
