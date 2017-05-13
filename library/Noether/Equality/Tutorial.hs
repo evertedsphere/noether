@@ -50,7 +50,8 @@ testDouble = (t eps1, t eps2)
    a couple of types. A user would only interact with this bit, ideally, to define
    equality for her own types.
 
-   (Note that every test* type hereafter can be inferred, "obviously".)
+   The types of the test* functions have intentionally been left out. Inference stays
+   alive and well :)
 -}
 
 {-| 'Common' 'Approximate' is a strategy that uses the same epsilon for both
@@ -66,7 +67,6 @@ testDouble = (t eps1, t eps2)
 -}
 type instance Equality (Double, Double) = Common Approximate
 
-test1 :: Double -> Bool
 test1 = lhs == rhs
   where
     lhs, rhs :: (Double, Double)
@@ -92,19 +92,18 @@ newtype Dbl = Dbl Double
 
 type instance Equality Dbl = CoerceFrom Double PreludeEq
 
-test2 :: Bool
 test2 = Dbl 2.0 == Dbl 2.01
 
 {- In case of 'Eq' on a newtype-wrapped Prelude numeric type, this is a parlor trick
    at best, but not having to "derive" Num (or write a one-off partial implementation)
    is awesome:
 -}
+
 newtype Dbl' = Dbl' Double
 
 -- et .. magic!
 type instance Equality Dbl' = CoerceFrom Double Numeric
 
-test3 :: Bool
 test3 = Dbl' 2.0 == Dbl' 2.01
 
 {- (I'm intentionally using 'Composite' instead of a tuple to leave that option open
@@ -113,7 +112,6 @@ test3 = Dbl' 2.0 == Dbl' 2.01
 
 type instance Equality (Dbl, Dbl') = Composite (Equality Dbl) (Equality Dbl')
 
-test4 :: (Bool, Bool)
 test4 = (Dbl 2, Dbl' 2) == (Dbl 2.001, Dbl' 2)
 
 -- Let's try the Z/n equality we defined above.
@@ -128,7 +126,6 @@ type instance Equality (Mod n) = CoerceFrom Int (Explicit (Modulo n))
 
 --- and profit!
 
-test5 :: Bool
 test5 = a == b
   where
     a, b :: Mod 7
