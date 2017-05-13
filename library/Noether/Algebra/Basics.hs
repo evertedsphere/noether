@@ -1,14 +1,9 @@
-{-# LANGUAGE ConstraintKinds      #-}
-{-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE PatternSynonyms      #-}
 {-# LANGUAGE RebindableSyntax     #-}
-{-# LANGUAGE ScopedTypeVariables  #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
 
 module Noether.Algebra.Basics where
 
-import qualified Data.String             as S
 import qualified Prelude                 as P
 
 import           Data.Complex

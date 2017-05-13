@@ -13,6 +13,8 @@ ghc-options:
   - "-Wall"
   - "-fwarn-implicit-prelude"
 default-extensions:
+  - ConstraintKinds
+  - EmptyDataDecls
   - FlexibleContexts
   - FlexibleInstances
   - GADTs
@@ -20,11 +22,15 @@ default-extensions:
   - MultiParamTypeClasses
   - NoImplicitPrelude
   - OverloadedStrings
+  - PolyKinds
   - RankNTypes
   - ScopedTypeVariables
   - TypeFamilies
+  - TypeFamilyDependencies
+  - TypeInType
   - TypeOperators
   - TypeSynonymInstances
+  - UndecidableInstances
 
 library:
   dependencies:

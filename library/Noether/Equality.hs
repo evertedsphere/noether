@@ -1,15 +1,4 @@
-{-# LANGUAGE ConstraintKinds        #-}
-{-# LANGUAGE DataKinds              #-}
-{-# LANGUAGE EmptyDataDecls         #-}
-{-# LANGUAGE FlexibleInstances      #-}
 {-# LANGUAGE MagicHash              #-}
-{-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE PolyKinds              #-}
-{-# LANGUAGE ScopedTypeVariables    #-}
-{-# LANGUAGE TypeFamilies           #-}
-{-# LANGUAGE TypeFamilyDependencies #-}
-{-# LANGUAGE TypeInType             #-}
-{-# LANGUAGE UndecidableInstances   #-}
 
 {-| Flexible, extensible notions of equality supporting "custom deriving strategies".
 
