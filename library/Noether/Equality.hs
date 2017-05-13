@@ -22,14 +22,12 @@
 
 module Noether.Equality where
 
-import           Data.Coerce
-import           Data.Kind    hiding (type (*))
-import           Data.Proxy
-import           GHC.Exts
 import           GHC.Prim
-import           GHC.TypeLits
 
-import           Prelude      hiding (Eq, (==))
+import           Noether.Lemmata.Prelude
+import           Noether.Lemmata.TypeFu
+
+import           Prelude                 ((-))
 import qualified Prelude
 
 {-| This represents the unique "equality strategy" to be used for 'a'.
