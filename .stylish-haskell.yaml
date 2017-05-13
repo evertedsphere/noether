@@ -195,4 +195,6 @@ language_extensions:
   - GADTs
   - LiberalTypeSynonyms
   - TypeInType
+  - MagicHash
+  - ExplicitNamespaces
   - TypeOperators
