@@ -43,10 +43,6 @@ import           GHC.Prim
 import           Prelude      hiding (Eq, (==))
 import qualified Prelude
 
-data HList (xs :: [Type]) where
-  HNil :: HList '[]
-  HCons :: x -> HList xs -> HList (x : xs)
-
 {-| This represents the unique "equality strategy" to be used for 'a'.
 
     There may be many different notions of equality that can be applied to a
