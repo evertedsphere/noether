@@ -6,17 +6,15 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
 
-module Algebra.Basics where
+module Noether.Algebra.Basics where
 
-import           Data.Proxy
-import           GHC.Exts
-
-import qualified Data.String  as S
-import           Prelude      hiding (Monoid, fromInteger, negate, recip, (*),
-                               (+), (-), (/))
-import qualified Prelude      as P
+import qualified Data.String             as S
+import qualified Prelude                 as P
 
 import           Data.Complex
+
+import           Noether.Lemmata.Prelude
+import           Noether.Lemmata.TypeFu
 
 data UnaryTag = Neg
   deriving Show
@@ -29,12 +27,6 @@ pattern AddP = Proxy
 
 pattern MulP :: Proxy Mul
 pattern MulP = Proxy
-
-fromInteger :: Num a => Integer -> a
-fromInteger = P.fromInteger
-
-fromString :: IsString a => String -> a
-fromString = S.fromString
 
 class UnaryNeutral (op :: UnaryTag) a where
   unaryNeutral :: Proxy op -> a
@@ -134,7 +126,7 @@ instance DistributesOver Add Mul Double
 
 instance Neutral Mul Double where neutral _ = fromInteger 1
 instance Magma Mul Double where binaryOp _ = (P.*)
-instance Invertible Mul Double where invert _ = ((fromInteger 1) P./)
+instance Invertible Mul Double where invert _ = (fromInteger 1 P./)
 instance Commutative Mul Double
 instance Semigroup Mul Double
 
@@ -150,7 +142,7 @@ instance DistributesOver Add Mul ComplexD
 
 instance Neutral Mul ComplexD where neutral _ = fromInteger 1
 instance Magma Mul ComplexD where binaryOp _ = (P.*)
-instance Invertible Mul ComplexD where invert _ = ((fromInteger 1) P./)
+instance Invertible Mul ComplexD where invert _ = (fromInteger 1 P./)
 instance Commutative Mul ComplexD
 instance Semigroup Mul ComplexD
 
