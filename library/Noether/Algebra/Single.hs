@@ -32,21 +32,21 @@ reciprocal = cancel MulP
 
 infixl 6 +
 
-(+) :: Magma Add a => a -> a -> a
+(+) :: Semigroup Add a => a -> a -> a
 (+) = binaryOp AddP
 
 infixl 7 *
 
-(*) :: Magma Mul a => a -> a -> a
+(*) :: Semigroup Mul a => a -> a -> a
 (*) = binaryOp MulP
 
 infixl 6 -
 
-(-) :: (Cancellative Add a, Magma Add a) => a -> a -> a
+(-) :: Group Add a => a -> a -> a
 a - b = a + negate b
 
 infixl 7 /
 
-(/) :: (Cancellative Mul a, Magma Mul a) => a -> a -> a
+(/) :: Group Mul a => a -> a -> a
 a / b = a * reciprocal b
 

@@ -21,22 +21,35 @@ class UnaryNeutralK (op :: UnaryTag) a (s :: k') where
 class UnaryOpK (op :: UnaryTag) a (s :: k') where
   unaryOpK :: Proxy op -> Proxy s -> a -> a
 
-type family MagmaS                 (op :: k) (a :: Type) = (r :: Type)
-type family NeutralS               (op :: k) (a :: Type) = (r :: Type)
-type family CancellativeS          (op :: k) (a :: Type) = (r :: Type)
-type family CommutativeS           (op :: k) (a :: Type) = (r :: Type)
-type family SemigroupS             (op :: k) (a :: Type) = (r :: Type)
-type family MonoidS                (op :: k) (a :: Type) = (r :: Type)
-type family GroupS                 (op :: k) (a :: Type) = (r :: Type)
-type family CancellativeSemigroupS (op :: k) (a :: Type) = (r :: Type)
+type family MagmaS        (op :: k) (a :: Type) = (r :: Type)
+type family NeutralS      (op :: k) (a :: Type) = (r :: Type)
+type family CancellativeS (op :: k) (a :: Type) = (r :: Type)
+type family CommutativeS  (op :: k) (a :: Type) = (r :: Type)
+type family SemigroupS    (op :: k) (a :: Type) = (r :: Type)
+type family MonoidS       (op :: k) (a :: Type) = (r :: Type)
+type family GroupS        (op :: k) (a :: Type) = (r :: Type)
 
-type Neutral op a = NeutralK op a (NeutralS op a)
-type Commutative op a = CommutativeK op a (CommutativeS op a)
-type Magma op a = MagmaK op a (MagmaS op a)
-type Semigroup op a = SemigroupK op a (SemigroupS op a)
-type Cancellative op a = CancellativeK op a (CancellativeS op a)
-type Monoid op a = MonoidK op a (MonoidS op a)
-type Group op a = GroupK op a (GroupS op a)
+infixl 6 &.
+type (&.) (a :: k -> k' -> Constraint) (b :: k -> k' -> Constraint) (p :: k) (q :: k')
+  = (a p q, b p q)
+
+infixl 7 $>
+type ($>) (a :: k1 -> k2 -> k3 -> k4) (b :: k1 -> k2 -> k3) (p :: k1) (q :: k2)
+  = a p q (b p q)
+
+type Neutral op a = (NeutralK $> NeutralS) op a
+type Commutative op a = (CommutativeK $> CommutativeS) op a
+type Cancellative op a = (CancellativeK $> CancellativeS) op a
+
+type Magma     op a = (MagmaK $> MagmaS) op a
+type Semigroup op a = (SemigroupK $> SemigroupS &. Magma) op a
+type Monoid    op a = (MonoidK $> MonoidS &. Neutral &. Semigroup) op a
+type Group     op a = (GroupK $> GroupS &. Monoid &. Cancellative) op a
+
+type CancellativeSemigroup op a = (Cancellative &. Semigroup) op a
+type CommSemigroup op a = (Commutative &. Semigroup) op a
+type CommMonoid op a = (Commutative &. Monoid) op a
+type Abelian op a = (Commutative &. Group) op a
 
 class MagmaK (op :: k) a (s :: k') where
   binaryOpK :: Proxy op -> Proxy s -> a -> a -> a
@@ -54,11 +67,6 @@ class SemigroupK (op :: k) a (s :: k')
 class MonoidK (op :: k) a (s :: k')
 
 class GroupK (op :: k) a (s :: k')
-
-type CancellativeSemigroup op a = (Cancellative op a, Semigroup op a)
-type CommSemigroup         op a = (Commutative  op a,  Semigroup op a)
-type CommMonoid            op a = (Commutative  op a,  Monoid    op a)
-type Abelian               op a = (Commutative  op a,  Group     op a)
 
 data Composite (a :: [k])
 
