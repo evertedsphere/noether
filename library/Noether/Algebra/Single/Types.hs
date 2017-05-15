@@ -203,7 +203,7 @@ instance AbelianK       Mul Double Prim
 
 type instance MagmaS         (_ :: BinaryTag) Integer = Prim
 type instance NeutralS       (_ :: BinaryTag) Integer = Prim
-type instance CancellativeS  (_ :: BinaryTag) Integer = Prim
+type instance CancellativeS        Add        Integer = Prim
 type instance CommutativeS   (_ :: BinaryTag) Integer = Prim
 
 type instance SemigroupS     (_ :: BinaryTag) Integer = Prim
@@ -212,8 +212,8 @@ type instance CommSemigroupS (_ :: BinaryTag) Integer = Prim
 type instance MonoidS        (_ :: BinaryTag) Integer = Prim
 type instance CommMonoidS    (_ :: BinaryTag) Integer = Prim
 
-type instance GroupS         (_ :: BinaryTag) Integer = Prim
-type instance AbelianS       (_ :: BinaryTag) Integer = Prim
+type instance GroupS               Add        Integer = Prim
+type instance AbelianS             Add        Integer = Prim
 
 -- Additive
 
@@ -240,30 +240,47 @@ instance CommSemigroupK Mul Integer Prim
 instance MonoidK        Mul Integer Prim
 instance CommMonoidK    Mul Integer Prim
 
--- -- | Complex numbers with real/imag. parts represented by Double
--- type ComplexD = Complex Double
+-- | Complex numbers with real/imag. parts represented by Double
+type ComplexD = Complex Double
 
--- instance NeutralK Add ComplexD Prim where neutralK _ _ = fromInteger 0
--- instance MagmaK Add ComplexD Prim where binaryOpK _ _ = (P.+)
--- instance CancellativeK Add ComplexD Prim where cancelK _ _ = P.negate
--- instance CommutativeK Add ComplexD
--- instance SemigroupK Add ComplexD
--- instance DistributesOver Add Mul ComplexD
+type instance MagmaS         (_ :: BinaryTag) ComplexD = Prim
+type instance NeutralS       (_ :: BinaryTag) ComplexD = Prim
+type instance CancellativeS  (_ :: BinaryTag) ComplexD = Prim
+type instance CommutativeS   (_ :: BinaryTag) ComplexD = Prim
 
--- instance NeutralK Mul ComplexD Prim where neutralK _ _ = fromInteger 1
--- instance MagmaK Mul ComplexD Prim where binaryOpK _ _ = (P.*)
--- instance CancellativeK Mul ComplexD Prim where cancelK _ _ = (fromInteger 1 P./)
--- instance CommutativeK Mul ComplexD
--- instance SemigroupK Mul ComplexD
+type instance SemigroupS     (_ :: BinaryTag) ComplexD = Prim
+type instance CommSemigroupS (_ :: BinaryTag) ComplexD = Prim
 
--- instance NeutralK Add Integer Prim where neutralK _ _ = fromInteger 0
--- instance MagmaK Add Integer Prim where binaryOpK _ _ = (P.+)
--- instance CancellativeK Add Integer Prim where cancelK _ _ = P.negate
--- instance CommutativeK Add Integer
--- instance SemigroupK Add Integer
--- instance DistributesOver Add Mul Integer
+type instance MonoidS        (_ :: BinaryTag) ComplexD = Prim
+type instance CommMonoidS    (_ :: BinaryTag) ComplexD = Prim
 
--- instance NeutralK Mul Integer Prim where neutralK _ _ = fromInteger 1
--- instance MagmaK Mul Integer Prim where binaryOpK _ _ = (P.*)
--- instance CommutativeK Mul Integer
--- instance SemigroupK Mul Integer
+type instance GroupS         (_ :: BinaryTag) ComplexD = Prim
+type instance AbelianS       (_ :: BinaryTag) ComplexD = Prim
+
+-- ComplexD, additive structure
+
+instance MagmaK         Add ComplexD Prim where binaryOpK _ _ = (P.+)
+instance NeutralK       Add ComplexD Prim where neutralK  _ _ = 0
+instance CancellativeK  Add ComplexD Prim where cancelK   _ _ = P.negate
+instance CommutativeK   Add ComplexD Prim
+
+instance SemigroupK     Add ComplexD Prim
+instance CommSemigroupK Add ComplexD Prim
+instance MonoidK        Add ComplexD Prim
+instance CommMonoidK    Add ComplexD Prim
+instance GroupK         Add ComplexD Prim
+instance AbelianK       Add ComplexD Prim
+
+-- ComplexD, multiplicative structure
+
+instance MagmaK         Mul ComplexD Prim where binaryOpK _ _ = (P.*)
+instance NeutralK       Mul ComplexD Prim where neutralK  _ _ = 1
+instance CancellativeK  Mul ComplexD Prim where cancelK   _ _ = (1 P./)
+instance CommutativeK   Mul ComplexD Prim
+
+instance SemigroupK     Mul ComplexD Prim
+instance CommSemigroupK Mul ComplexD Prim
+instance MonoidK        Mul ComplexD Prim
+instance CommMonoidK    Mul ComplexD Prim
+instance GroupK         Mul ComplexD Prim
+instance AbelianK       Mul ComplexD Prim
