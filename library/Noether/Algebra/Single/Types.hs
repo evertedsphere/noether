@@ -3,22 +3,23 @@
 
 module Noether.Algebra.Single.Types where
 
-import qualified Prelude                 as P
+import qualified Prelude                    as P
 
 import           Data.Complex
 
 import           Noether.Lemmata.Prelude
 import           Noether.Lemmata.TypeFu
+import           Noether.Lemmata.TypeFu.Map
 
 data UnaryTag = Neg deriving Show
 data BinaryTag = Add | Mul deriving Show
 
 data Peano = Z | S Peano
 
-class UnaryNeutralK (op :: UnaryTag) a (s :: k') where
+class UnaryNeutralK (op :: UnaryTag) a s where
   unaryNeutralK :: Proxy op -> Proxy s -> a
 
-class UnaryOpK (op :: UnaryTag) a (s :: k') where
+class UnaryOpK (op :: UnaryTag) a s where
   unaryOpK :: Proxy op -> Proxy s -> a -> a
 
 type family MagmaS        (op :: k) (a :: Type) = (r :: Type)
@@ -51,55 +52,67 @@ type CommSemigroup op a = (Commutative &. Semigroup) op a
 type CommMonoid op a = (Commutative &. Monoid) op a
 type Abelian op a = (Commutative &. Group) op a
 
-class MagmaK (op :: k) a (s :: k') where
+class MagmaK (op :: k) a s where
   binaryOpK :: Proxy op -> Proxy s -> a -> a -> a
 
-class NeutralK (op :: k) a (s :: k') where
+class NeutralK (op :: k) a s where
   neutralK :: Proxy op -> Proxy s -> a
 
-class CancellativeK (op :: k) a (s :: k') where
+class CancellativeK (op :: k) a s where
   cancelK :: Proxy op -> Proxy s -> a -> a
 
-class CommutativeK (op :: k) a (s :: k')
+class CommutativeK (op :: k) a s
 
-class SemigroupK (op :: k) a (s :: k')
+class SemigroupK (op :: k) a s
 
-class MonoidK (op :: k) a (s :: k')
+class MonoidK (op :: k) a s
 
-class GroupK (op :: k) a (s :: k')
+class GroupK (op :: k) a s
 
-data Composite (a :: [k])
+-- bahahahaha
+data Synergise (a :: [k])
 
-data (:=) (sym :: k) (t :: k')
+instance ( SemigroupK op a zs
+         , NeutralK op a zn
+         ) => MonoidK op a (Synergise '["Neutral" := zn, "Semigroup" := zs])
 
-instance (SemigroupK op a zs, NeutralK op a zn) =>
-         MonoidK op a (Composite [SemigroupK := zs, NeutralK := zn])
+instance ( MonoidK op a zm
+         , CancellativeK op a zc
+         ) => GroupK op a (Synergise '["Cancellative" := zc, "Monoid" := zm])
 
-instance (MonoidK op a zm, CancellativeK op a zc) =>
-         GroupK op a (Composite [MonoidK := zm, CancellativeK := zc])
+instance (MagmaK op a zm) =>
+         SemigroupK op a (Synergise '["Magma" := zm])
 
-instance SemigroupK   op a Prim
 instance CommutativeK op a Prim
 
 data DerivedFrom (a :: k)
 
 data Prim
 
-type family Infer (c :: k1) (t :: k2) (a :: Type) :: Type where
-  Infer MonoidK t a = Composite [SemigroupK := SemigroupS t a, NeutralK := NeutralS t a]
-  Infer GroupK  t a = Composite [MonoidK := MonoidS t a, CancellativeK := CancellativeS t a]
+type family SymbolToFamily (t :: k) (a :: Type) (hint :: Symbol) :: Type where
+  SymbolToFamily t a "Magma" = MagmaS t a
+  SymbolToFamily t a "Neutral" = NeutralS t a
+  SymbolToFamily t a "Semigroup" = SemigroupS t a
+  SymbolToFamily t a "Cancellative" = CancellativeS t a
+  SymbolToFamily t a "Monoid" = MonoidS t a
+  SymbolToFamily t a "Group" = GroupS t a
+
+type family Infer_ (t :: k) (a :: Type) (hint :: [Symbol]) :: [Type] where
+  Infer_ t a '[] = '[]
+  Infer_ t a (x : xs) = (x := SymbolToFamily t a x) : Infer_ t a xs
+
+type Infer (t :: k) a (h :: [Symbol]) = Synergise (Nub (Sort (Infer_ t a h)))
 
 -- Double
 
 type instance MagmaS         (_ :: BinaryTag) Double = Prim
 type instance NeutralS       (_ :: BinaryTag) Double = Prim
-type instance CancellativeS  (_ :: BinaryTag) Double = Prim
 type instance CommutativeS   (_ :: BinaryTag) Double = Prim
+type instance CancellativeS  (_ :: BinaryTag) Double = Prim
 
-type instance SemigroupS     (_ :: BinaryTag) Double = Prim
-
-type instance MonoidS t Double = Infer MonoidK t Double
-type instance GroupS  t Double = Infer GroupK  t Double
+type instance SemigroupS t Double = Infer t Double '["Magma"]
+type instance MonoidS    t Double = Infer t Double '["Semigroup", "Neutral"]
+type instance GroupS     t Double = Infer t Double '["Cancellative", "Monoid"]
 
 instance MagmaK         Add Double Prim where binaryOpK _ _ = (P.+)
 instance NeutralK       Add Double Prim where neutralK  _ _ = 0
@@ -113,13 +126,12 @@ instance CancellativeK  Mul Double Prim where cancelK   _ _ = (1 P./)
 
 type instance MagmaS         (_ :: BinaryTag) Integer = Prim
 type instance NeutralS       (_ :: BinaryTag) Integer = Prim
-type instance CancellativeS        Add        Integer = Prim
 type instance CommutativeS   (_ :: BinaryTag) Integer = Prim
+type instance CancellativeS        Add        Integer = Prim
 
-type instance SemigroupS     (_ :: BinaryTag) Integer = Prim
-
-type instance MonoidS t Integer = Infer MonoidK t Integer
-type instance GroupS Add Integer = Infer GroupK Add Integer
+type instance SemigroupS t Integer = Infer t Integer '["Magma"]
+type instance MonoidS    t Integer = Infer t Integer '["Semigroup", "Neutral"]
+type instance GroupS   Add Integer = Infer Add Integer '["Cancellative", "Monoid"]
 
 instance MagmaK         Add Integer Prim where binaryOpK _ _ = (P.+)
 instance NeutralK       Add Integer Prim where neutralK  _ _ = 0
@@ -134,12 +146,12 @@ type ComplexD = Complex Double
 
 type instance MagmaS         (_ :: BinaryTag) ComplexD = Prim
 type instance NeutralS       (_ :: BinaryTag) ComplexD = Prim
-type instance CancellativeS  (_ :: BinaryTag) ComplexD = Prim
 type instance CommutativeS   (_ :: BinaryTag) ComplexD = Prim
-type instance SemigroupS     (_ :: BinaryTag) ComplexD = Prim
+type instance CancellativeS  (_ :: BinaryTag) ComplexD = Prim
 
-type instance MonoidS t ComplexD = Infer MonoidK t ComplexD
-type instance GroupS  t ComplexD = Infer GroupK  t ComplexD
+type instance SemigroupS t ComplexD = Infer t ComplexD '["Magma"]
+type instance MonoidS    t ComplexD = Infer t ComplexD '["Semigroup", "Neutral"]
+type instance GroupS     t ComplexD = Infer t ComplexD '["Cancellative", "Monoid"]
 
 instance MagmaK         Add ComplexD Prim where binaryOpK _ _ = (P.+)
 instance NeutralK       Add ComplexD Prim where neutralK  _ _ = 0

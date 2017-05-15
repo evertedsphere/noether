@@ -12,7 +12,3 @@ import           Data.Proxy         as X
 import           Data.Kind          as X hiding (type (*))
 import           Data.Type.Bool     as X
 import           Data.Type.Equality as X
-
--- import           Data.Data          as X
--- import           Data.Typeable      as X
--- import           GHC.Generics       as X
