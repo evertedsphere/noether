@@ -77,6 +77,10 @@ data DerivedFrom (a :: k)
 
 data Prim
 
+type family Infer (c :: k1) (t :: k2) (a :: Type) :: Type where
+  Infer MonoidK t a = Composite [SemigroupK := SemigroupS t a, NeutralK := NeutralS t a]
+  Infer GroupK  t a = Composite [MonoidK := MonoidS t a, CancellativeK := CancellativeS t a]
+
 -- Double
 
 type instance MagmaS         (_ :: BinaryTag) Double = Prim
@@ -86,15 +90,8 @@ type instance CommutativeS   (_ :: BinaryTag) Double = Prim
 
 type instance SemigroupS     (_ :: BinaryTag) Double = Prim
 
-type instance MonoidS t Double =
-     Composite
-       [SemigroupK := SemigroupS t Double
-       , NeutralK := NeutralS t Double]
-
-type instance GroupS t Double =
-     Composite
-       [MonoidK := MonoidS t Double,
-        CancellativeK := CancellativeS t Double]
+type instance MonoidS t Double = Infer MonoidK t Double
+type instance GroupS  t Double = Infer GroupK  t Double
 
 instance MagmaK         Add Double Prim where binaryOpK _ _ = (P.+)
 instance NeutralK       Add Double Prim where neutralK  _ _ = 0
@@ -113,15 +110,8 @@ type instance CommutativeS   (_ :: BinaryTag) Integer = Prim
 
 type instance SemigroupS     (_ :: BinaryTag) Integer = Prim
 
-type instance MonoidS t Integer =
-     Composite
-       [SemigroupK := SemigroupS t Integer,
-        NeutralK := NeutralS t Integer]
-
-type instance GroupS Add Integer =
-     Composite
-       [MonoidK := MonoidS Add Integer,
-        CancellativeK := CancellativeS Add Integer]
+type instance MonoidS t Integer = Infer MonoidK t Integer
+type instance GroupS Add Integer = Infer GroupK Add Integer
 
 instance MagmaK         Add Integer Prim where binaryOpK _ _ = (P.+)
 instance NeutralK       Add Integer Prim where neutralK  _ _ = 0
@@ -140,15 +130,8 @@ type instance CancellativeS  (_ :: BinaryTag) ComplexD = Prim
 type instance CommutativeS   (_ :: BinaryTag) ComplexD = Prim
 type instance SemigroupS     (_ :: BinaryTag) ComplexD = Prim
 
-type instance MonoidS t ComplexD =
-     Composite
-       [SemigroupK := SemigroupS t ComplexD
-       , NeutralK := NeutralS t ComplexD]
-
-type instance GroupS t ComplexD =
-     Composite
-       [MonoidK := MonoidS t ComplexD,
-        CancellativeK := CancellativeS t ComplexD]
+type instance MonoidS t ComplexD = Infer MonoidK t ComplexD
+type instance GroupS  t ComplexD = Infer GroupK  t ComplexD
 
 instance MagmaK         Add ComplexD Prim where binaryOpK _ _ = (P.+)
 instance NeutralK       Add ComplexD Prim where neutralK  _ _ = 0
