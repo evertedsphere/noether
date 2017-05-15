@@ -6,6 +6,12 @@ import           Noether.Lemmata.TypeFu
 
 -- Some proxy synonyms
 
+pattern AddP :: Proxy Add
+pattern AddP = Proxy
+
+pattern MulP :: Proxy Mul
+pattern MulP = Proxy
+
 neutralSP :: Proxy (NeutralS op a)
 neutralSP = Proxy
 

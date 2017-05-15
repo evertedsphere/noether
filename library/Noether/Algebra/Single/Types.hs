@@ -16,12 +16,6 @@ data UnaryTag = Neg
 data BinaryTag = Add | Mul
   deriving Show
 
-pattern AddP :: Proxy Add
-pattern AddP = Proxy
-
-pattern MulP :: Proxy Mul
-pattern MulP = Proxy
-
 data Peano = Z | S Peano
 
 class UnaryNeutralK (op :: UnaryTag) a s where
