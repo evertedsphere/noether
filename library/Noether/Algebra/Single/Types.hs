@@ -157,59 +157,88 @@ data DerivedFrom (a :: k)
 
 data Prim
 
+type instance MagmaS         (_ :: BinaryTag) Double = Prim
+type instance NeutralS       (_ :: BinaryTag) Double = Prim
+type instance CancellativeS  (_ :: BinaryTag) Double = Prim
+type instance CommutativeS   (_ :: BinaryTag) Double = Prim
+
+type instance SemigroupS     (_ :: BinaryTag) Double = Prim
+type instance CommSemigroupS (_ :: BinaryTag) Double = Prim
+
+type instance MonoidS        (_ :: BinaryTag) Double = Prim
+type instance CommMonoidS    (_ :: BinaryTag) Double = Prim
+
+type instance GroupS         (_ :: BinaryTag) Double = Prim
+type instance AbelianS       (_ :: BinaryTag) Double = Prim
+
 -- Double, additive structure
 
-type instance MagmaS Add Double = Prim
-type instance NeutralS Add Double = Prim
-type instance CancellativeS Add Double = Prim
-type instance CommutativeS Add Double = Prim
+instance MagmaK         Add Double Prim where binaryOpK _ _ = (P.+)
+instance NeutralK       Add Double Prim where neutralK  _ _ = 0
+instance CancellativeK  Add Double Prim where cancelK   _ _ = P.negate
+instance CommutativeK   Add Double Prim
 
-type instance SemigroupS Add Double = Prim
-type instance CommSemigroupS Add Double = Prim
-
-type instance MonoidS Add Double = Prim
-type instance CommMonoidS Add Double = Prim
-
-type instance GroupS Add Double = Prim
-type instance AbelianS Add Double = Prim
-
-instance MagmaK Add Double Prim where binaryOpK _ _ = (P.+)
-instance NeutralK Add Double Prim where neutralK _ _ = fromInteger 0
-instance CancellativeK Add Double Prim where cancelK _ _ = P.negate
-instance CommutativeK Add Double Prim
-
-instance SemigroupK Add Double Prim
+instance SemigroupK     Add Double Prim
 instance CommSemigroupK Add Double Prim
-instance MonoidK Add Double Prim
-instance CommMonoidK Add Double Prim
-instance GroupK Add Double Prim
-instance AbelianK Add Double Prim
+instance MonoidK        Add Double Prim
+instance CommMonoidK    Add Double Prim
+instance GroupK         Add Double Prim
+instance AbelianK       Add Double Prim
 
 -- Double, multiplicative structure
 
-type instance MagmaS Mul Double = Prim
-type instance NeutralS Mul Double = Prim
-type instance CancellativeS Mul Double = Prim
-type instance CommutativeS Mul Double = Prim
+instance MagmaK         Mul Double Prim where binaryOpK _ _ = (P.*)
+instance NeutralK       Mul Double Prim where neutralK  _ _ = 1
+instance CancellativeK  Mul Double Prim where cancelK   _ _ = (1 P./)
+instance CommutativeK   Mul Double Prim
 
-type instance SemigroupS Mul Double = Prim
-type instance CommSemigroupS Mul Double = Prim
-
-type instance MonoidS Mul Double = Prim
-type instance CommMonoidS Mul Double = Prim
-
-type instance GroupS Mul Double = Prim
-type instance AbelianS Mul Double = Prim
-
-instance MagmaK Mul Double Prim where binaryOpK _ _ = (P.*)
-instance NeutralK Mul Double Prim where neutralK _ _ = fromInteger 1
-instance CancellativeK Mul Double Prim where cancelK _ _ = (fromInteger 1 P./)
-instance CommutativeK Mul Double Prim
-
-instance SemigroupK Mul Double Prim
+instance SemigroupK     Mul Double Prim
 instance CommSemigroupK Mul Double Prim
-instance MonoidK Mul Double Prim
-instance CommMonoidK Mul Double Prim
+instance MonoidK        Mul Double Prim
+instance CommMonoidK    Mul Double Prim
+instance GroupK         Mul Double Prim
+instance AbelianK       Mul Double Prim
+
+-- Integers
+
+type instance MagmaS         (_ :: BinaryTag) Integer = Prim
+type instance NeutralS       (_ :: BinaryTag) Integer = Prim
+type instance CancellativeS  (_ :: BinaryTag) Integer = Prim
+type instance CommutativeS   (_ :: BinaryTag) Integer = Prim
+
+type instance SemigroupS     (_ :: BinaryTag) Integer = Prim
+type instance CommSemigroupS (_ :: BinaryTag) Integer = Prim
+
+type instance MonoidS        (_ :: BinaryTag) Integer = Prim
+type instance CommMonoidS    (_ :: BinaryTag) Integer = Prim
+
+type instance GroupS         (_ :: BinaryTag) Integer = Prim
+type instance AbelianS       (_ :: BinaryTag) Integer = Prim
+
+-- Additive
+
+instance MagmaK         Add Integer Prim where binaryOpK _ _ = (P.+)
+instance NeutralK       Add Integer Prim where neutralK  _ _ = 0
+instance CancellativeK  Add Integer Prim where cancelK   _ _ = P.negate
+instance CommutativeK   Add Integer Prim
+
+instance SemigroupK     Add Integer Prim
+instance CommSemigroupK Add Integer Prim
+instance MonoidK        Add Integer Prim
+instance CommMonoidK    Add Integer Prim
+instance GroupK         Add Integer Prim
+instance AbelianK       Add Integer Prim
+
+-- Multiplicative
+
+instance MagmaK         Mul Integer Prim where binaryOpK _ _ = (P.*)
+instance NeutralK       Mul Integer Prim where neutralK  _ _ = 1
+instance CommutativeK   Mul Integer Prim
+
+instance SemigroupK     Mul Integer Prim
+instance CommSemigroupK Mul Integer Prim
+instance MonoidK        Mul Integer Prim
+instance CommMonoidK    Mul Integer Prim
 
 -- -- | Complex numbers with real/imag. parts represented by Double
 -- type ComplexD = Complex Double
