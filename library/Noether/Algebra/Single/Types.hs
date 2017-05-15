@@ -30,14 +30,6 @@ type family SemigroupS    (op :: k) (a :: Type) = (r :: Type)
 type family MonoidS       (op :: k) (a :: Type) = (r :: Type)
 type family GroupS        (op :: k) (a :: Type) = (r :: Type)
 
-infixl 6 &.
-type (&.) (a :: k -> k' -> Constraint) (b :: k -> k' -> Constraint) (p :: k) (q :: k')
-  = (a p q, b p q)
-
-infixl 7 $>
-type ($>) (a :: k1 -> k2 -> k3 -> k4) (b :: k1 -> k2 -> k3) (p :: k1) (q :: k2)
-  = a p q (b p q)
-
 type Neutral op a = (NeutralK $> NeutralS) op a
 type Commutative op a = (CommutativeK $> CommutativeS) op a
 type Cancellative op a = (CancellativeK $> CancellativeS) op a
