@@ -34,20 +34,19 @@ zero = neutral AddP
 one :: Neutral Mul a => a
 one = neutral MulP
 
--- negate :: AbelianGroup Add a => a -> a
--- negate = cancelK AddP
+negate :: Abelian Add a => a -> a
+negate = cancel AddP
 
--- reciprocal :: Group Mul a => a -> a
--- reciprocal = cancelK MulP
+reciprocal :: Group Mul a => a -> a
+reciprocal = cancel MulP
 
--- infixl 6 -
+infixl 6 -
 
--- (-) :: AbelianGroup Add a => a -> a -> a
--- a - b = a + (negate b)
+(-) :: Abelian Add a => a -> a -> a
+a - b = a + negate b
 
--- infixl 7 /
--- (/) :: Group Mul a => a -> a -> a
--- a / b = a * (reciprocal b)
+infixl 7 /
 
--- invert :: Cancellative Mul a => a -> a
--- invert = cancel MulP
+(/) :: Group Mul a => a -> a -> a
+a / b = a * reciprocal b
+

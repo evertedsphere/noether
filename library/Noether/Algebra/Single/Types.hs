@@ -170,6 +170,9 @@ type instance CommSemigroupS Add Double = Prim
 type instance MonoidS Add Double = Prim
 type instance CommMonoidS Add Double = Prim
 
+type instance GroupS Add Double = Prim
+type instance AbelianS Add Double = Prim
+
 instance MagmaK Add Double Prim where binaryOpK _ _ = (P.+)
 instance NeutralK Add Double Prim where neutralK _ _ = fromInteger 0
 instance CancellativeK Add Double Prim where cancelK _ _ = P.negate
@@ -179,19 +182,34 @@ instance SemigroupK Add Double Prim
 instance CommSemigroupK Add Double Prim
 instance MonoidK Add Double Prim
 instance CommMonoidK Add Double Prim
+instance GroupK Add Double Prim
+instance AbelianK Add Double Prim
 
 -- Double, multiplicative structure
 
 type instance MagmaS Mul Double = Prim
 type instance NeutralS Mul Double = Prim
 type instance CancellativeS Mul Double = Prim
+type instance CommutativeS Mul Double = Prim
+
 type instance SemigroupS Mul Double = Prim
+type instance CommSemigroupS Mul Double = Prim
+
+type instance MonoidS Mul Double = Prim
+type instance CommMonoidS Mul Double = Prim
+
+type instance GroupS Mul Double = Prim
+type instance AbelianS Mul Double = Prim
 
 instance MagmaK Mul Double Prim where binaryOpK _ _ = (P.*)
 instance NeutralK Mul Double Prim where neutralK _ _ = fromInteger 1
 instance CancellativeK Mul Double Prim where cancelK _ _ = (fromInteger 1 P./)
 instance CommutativeK Mul Double Prim
+
 instance SemigroupK Mul Double Prim
+instance CommSemigroupK Mul Double Prim
+instance MonoidK Mul Double Prim
+instance CommMonoidK Mul Double Prim
 
 -- -- | Complex numbers with real/imag. parts represented by Double
 -- type ComplexD = Complex Double
