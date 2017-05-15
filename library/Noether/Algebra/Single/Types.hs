@@ -32,7 +32,6 @@ type Magma op a = MagmaK op a (MagmaS op a)
 class MagmaK (op :: k) a s where
   binaryOpK :: Proxy op -> Proxy s -> a -> a -> a
 
-
 -- | NeutralK
 
 type family NeutralS (op :: k) (a :: Type) = (r :: Type)
@@ -40,7 +39,6 @@ type Neutral op a = (NeutralK op a (NeutralS op a))
 
 class NeutralK (op :: k) a s where
   neutralK :: Proxy op -> Proxy s -> a
-
 
 -- | Cancellative
 
@@ -51,11 +49,7 @@ type family CancellativeS (op :: k) (a :: Type) = (r :: Type)
 
 type Cancellative (op :: k) a = CancellativeK op a (CancellativeS op a)
 
--- class (MagmaK add a s, MagmaK mul a t) => DistributesOver add mul a s
-
--- | Classes
-
--- | Commutative (FIXME: any dependencies?)
+-- (FIXME: any dependencies?)
 
 type family CommutativeS (op :: k) (a :: Type) = (r :: Type)
 
@@ -86,36 +80,16 @@ class (Semigroup op a, Cancellative op a) =>
 
 type CancellativeSemigroup op a = CancellativeSemigroupK op a (CancellativeSemigroupS op a)
 
-{-| Commutative semigroups
-
--}
-
-
-type family CommSemigroupS (op :: k) (a :: Type) = (r :: Type)
-
-class CommSemigroupK op a s
-
-type CommSemigroup op a = CommSemigroupK op a (CommSemigroupS op a)
 
 {-| Monoids
 
 -}
-
-class (Semigroup op a, Neutral op a) => MonoidK op a s
 
 type family MonoidS (op :: k) (a :: Type) = (r :: Type)
 
+class (Semigroup op a, Neutral op a) => MonoidK (op :: k) a s
+
 type Monoid op a = MonoidK op a (MonoidS op a)
-
-{-| Monoids
-
--}
-
-class (Monoid op a, Commutative op a) => CommMonoidK op a s
-
-type family CommMonoidS (op :: k) (a :: Type) = (r :: Type)
-
-type CommMonoid op a = CommMonoidK op a (CommMonoidS op a)
 
 {-| Groups
 
@@ -123,20 +97,13 @@ type CommMonoid op a = CommMonoidK op a (CommMonoidS op a)
 
 class (Monoid op a, Cancellative op a) => GroupK op a s
 
--- todo move into instances?
 type family GroupS (op :: k) (a :: Type) = (r :: Type)
 
 type Group op a = GroupK op a (GroupS op a)
 
-{-| Abelian groups
-
--}
-
-type family AbelianS (op :: k) (a :: Type) = (r :: Type)
-
-class (Group op a, Commutative op a) => AbelianK op a s
-
-type Abelian op a = (AbelianK op a (AbelianS op a))
+type CommSemigroup op a = (Commutative op a, Semigroup op a)
+type CommMonoid    op a = (Commutative op a, Monoid    op a)
+type Abelian       op a = (Commutative op a, Group     op a)
 
 data Composite (a :: k) (b :: k')
 
@@ -152,13 +119,8 @@ type instance CancellativeS  (_ :: BinaryTag) Double = Prim
 type instance CommutativeS   (_ :: BinaryTag) Double = Prim
 
 type instance SemigroupS     (_ :: BinaryTag) Double = Prim
-type instance CommSemigroupS (_ :: BinaryTag) Double = Prim
-
 type instance MonoidS        (_ :: BinaryTag) Double = Prim
-type instance CommMonoidS    (_ :: BinaryTag) Double = Prim
-
 type instance GroupS         (_ :: BinaryTag) Double = Prim
-type instance AbelianS       (_ :: BinaryTag) Double = Prim
 
 -- Double, additive structure
 
@@ -168,11 +130,8 @@ instance CancellativeK  Add Double Prim where cancelK   _ _ = P.negate
 instance CommutativeK   Add Double Prim
 
 instance SemigroupK     Add Double Prim
-instance CommSemigroupK Add Double Prim
 instance MonoidK        Add Double Prim
-instance CommMonoidK    Add Double Prim
 instance GroupK         Add Double Prim
-instance AbelianK       Add Double Prim
 
 -- Double, multiplicative structure
 
@@ -182,11 +141,8 @@ instance CancellativeK  Mul Double Prim where cancelK   _ _ = (1 P./)
 instance CommutativeK   Mul Double Prim
 
 instance SemigroupK     Mul Double Prim
-instance CommSemigroupK Mul Double Prim
 instance MonoidK        Mul Double Prim
-instance CommMonoidK    Mul Double Prim
 instance GroupK         Mul Double Prim
-instance AbelianK       Mul Double Prim
 
 -- Integers
 
@@ -196,13 +152,8 @@ type instance CancellativeS        Add        Integer = Prim
 type instance CommutativeS   (_ :: BinaryTag) Integer = Prim
 
 type instance SemigroupS     (_ :: BinaryTag) Integer = Prim
-type instance CommSemigroupS (_ :: BinaryTag) Integer = Prim
-
 type instance MonoidS        (_ :: BinaryTag) Integer = Prim
-type instance CommMonoidS    (_ :: BinaryTag) Integer = Prim
-
 type instance GroupS               Add        Integer = Prim
-type instance AbelianS             Add        Integer = Prim
 
 -- Additive
 
@@ -212,11 +163,8 @@ instance CancellativeK  Add Integer Prim where cancelK   _ _ = P.negate
 instance CommutativeK   Add Integer Prim
 
 instance SemigroupK     Add Integer Prim
-instance CommSemigroupK Add Integer Prim
 instance MonoidK        Add Integer Prim
-instance CommMonoidK    Add Integer Prim
 instance GroupK         Add Integer Prim
-instance AbelianK       Add Integer Prim
 
 -- Multiplicative
 
@@ -225,9 +173,7 @@ instance NeutralK       Mul Integer Prim where neutralK  _ _ = 1
 instance CommutativeK   Mul Integer Prim
 
 instance SemigroupK     Mul Integer Prim
-instance CommSemigroupK Mul Integer Prim
 instance MonoidK        Mul Integer Prim
-instance CommMonoidK    Mul Integer Prim
 
 -- | Complex numbers with real/imag. parts represented by Double
 type ComplexD = Complex Double
@@ -238,13 +184,8 @@ type instance CancellativeS  (_ :: BinaryTag) ComplexD = Prim
 type instance CommutativeS   (_ :: BinaryTag) ComplexD = Prim
 
 type instance SemigroupS     (_ :: BinaryTag) ComplexD = Prim
-type instance CommSemigroupS (_ :: BinaryTag) ComplexD = Prim
-
 type instance MonoidS        (_ :: BinaryTag) ComplexD = Prim
-type instance CommMonoidS    (_ :: BinaryTag) ComplexD = Prim
-
 type instance GroupS         (_ :: BinaryTag) ComplexD = Prim
-type instance AbelianS       (_ :: BinaryTag) ComplexD = Prim
 
 -- ComplexD, additive structure
 
@@ -254,11 +195,8 @@ instance CancellativeK  Add ComplexD Prim where cancelK   _ _ = P.negate
 instance CommutativeK   Add ComplexD Prim
 
 instance SemigroupK     Add ComplexD Prim
-instance CommSemigroupK Add ComplexD Prim
 instance MonoidK        Add ComplexD Prim
-instance CommMonoidK    Add ComplexD Prim
 instance GroupK         Add ComplexD Prim
-instance AbelianK       Add ComplexD Prim
 
 -- ComplexD, multiplicative structure
 
@@ -268,8 +206,5 @@ instance CancellativeK  Mul ComplexD Prim where cancelK   _ _ = (1 P./)
 instance CommutativeK   Mul ComplexD Prim
 
 instance SemigroupK     Mul ComplexD Prim
-instance CommSemigroupK Mul ComplexD Prim
 instance MonoidK        Mul ComplexD Prim
-instance CommMonoidK    Mul ComplexD Prim
 instance GroupK         Mul ComplexD Prim
-instance AbelianK       Mul ComplexD Prim

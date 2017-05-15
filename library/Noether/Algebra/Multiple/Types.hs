@@ -69,9 +69,9 @@ type Field add mul a = FieldK add mul a (FieldS add mul a)
 
 -- Convenience synonyms
 
-type Semiring'            a = Semiring     Add Mul a
-type CommSemiring'        a = CommSemiring Add Mul a
-type Ring'                a = Ring         Add Mul a
-type CommRing'            a = CommRing     Add Mul a
-type DivisionRing'        a = DivisionRing Add Mul a
-type Field'               a = Field        Add Mul a
+type Semiring'     a = Semiring     Add Mul a
+type CommSemiring' a = CommSemiring Add Mul a
+type Ring'         a = Ring         Add Mul a
+type CommRing'     a = CommRing     Add Mul a
+type DivisionRing' a = DivisionRing Add Mul a
+type Field'        a = Field        Add Mul a
