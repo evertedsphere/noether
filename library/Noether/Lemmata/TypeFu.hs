@@ -3,6 +3,7 @@ module Noether.Lemmata.TypeFu
   ) where
 
 import           GHC.Exts           as X
+import           GHC.Prim           as X
 import           GHC.TypeLits       as X
 
 import           Data.Coerce        as X

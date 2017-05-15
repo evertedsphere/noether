@@ -198,3 +198,5 @@ language_extensions:
   - MagicHash
   - ExplicitNamespaces
   - TypeOperators
+  - DataKinds
+  - PolyKinds
