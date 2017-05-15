@@ -18,16 +18,6 @@ binaryOp p = binaryOpK p (magmaSP @op @a)
 neutral :: forall op a. Neutral op a => Proxy op -> a
 neutral p = neutralK p (neutralSP @op @a)
 
-infixl 6 +
-
-(+) :: Semigroup Add a => a -> a -> a
-(+) = binaryOp AddP
-
-infixl 7 *
-
-(*) :: Semigroup Mul a => a -> a -> a
-(*) = binaryOp MulP
-
 zero :: Neutral Add a => a
 zero = neutral AddP
 
@@ -39,6 +29,16 @@ negate = cancel AddP
 
 reciprocal :: Group Mul a => a -> a
 reciprocal = cancel MulP
+
+infixl 6 +
+
+(+) :: Semigroup Add a => a -> a -> a
+(+) = binaryOp AddP
+
+infixl 7 *
+
+(*) :: Semigroup Mul a => a -> a -> a
+(*) = binaryOp MulP
 
 infixl 6 -
 
