@@ -140,11 +140,6 @@ type Abelian op a = (AbelianK op a (AbelianS op a))
 
 data Composite (a :: k) (b :: k')
 
-instance ( SemigroupK op a zs
-         , CommutativeK op a zt
-         , z ~ (Composite zs zt)
-         ) => CommSemigroupK op a z
-
 --
 
 data DerivedFrom (a :: k)

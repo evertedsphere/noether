@@ -1,7 +1,8 @@
 {-# LANGUAGE RebindableSyntax #-}
 {-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Noether.Algebra.Single.Derived where
+module Noether.Algebra.Single.Derive where
 
 import qualified Prelude                      as P
 
@@ -12,6 +13,9 @@ import           Noether.Lemmata.TypeFu
 
 import           Noether.Algebra.Single.Types
 
+instance ( SemigroupK op a zs
+         , CommutativeK op a zt
+         ) => CommSemigroupK op a (Composite zs zt)
 
 -- instance NeutralK o a =>
 --          NeutralK o (i -> a) Prim where

@@ -12,49 +12,66 @@ import           Noether.Lemmata.TypeFu
 
 import           Noether.Algebra.Single.Types
 
--- -- Two binary operations
+-- Semirings, aka "rigs"
 
--- -- | Semirings, aka "rigs"
--- class ( CommMonoid add a s
---       , Monoid mul a s
---       , DistributesOver add mul a s
---       ) => Semiring add mul a s
--- class (Semiring add mul a s, CommutativeK mul a s) => CommSemiring add mul a s
+type family SemiringS (add :: k) (mul :: k) (a :: Type) = (r :: Type)
 
--- class ( AbelianGroup add a s
-  --       , Monoid mul a s
---       , DistributesOver add mul a s
---       ) => Ring add mul a s
--- class (Ring add mul a s, CommutativeK mul a s) => CommRing add mul a s
+-- FIXME: add DistributesOver add mul a s
+class ( CommMonoid add a
+      , Monoid mul a
+      ) => SemiringK add mul a s
 
--- class (Ring add mul a s, CancellativeK mul a s) => DivisionRing add mul a s
--- class (Ring add mul a s, AbelianGroup mul a s) => Field add mul a s
+type Semiring add mul a = SemiringK add mul a (SemiringS add mul a)
 
--- -- Convenience synonyms
+-- Semirings, aka "rigs"
 
--- type Semiring'            = Semiring     Add Mul
--- type CommSemiring'        = CommSemiring Add Mul
--- type Ring'                = Ring         Add Mul
--- type CommRing'            = CommRing     Add Mul
--- type DivisionRing'        = DivisionRing Add Mul
--- type Field'               = Field        Add Mul
+type family CommSemiringS (add :: k) (mul :: k) (a :: Type) = (r :: Type)
 
--- -- | Instances
+class ( Semiring add mul a
+      , Commutative mul a
+      ) => CommSemiringK add mul a s
 
--- data Composite s t
--- instance ( CommMonoid add a s
---          , Monoid mul a s
---          , DistributesOver add mul a s
---          ) => Semiring add mul a s
+type CommSemiring add mul a = CommSemiringK add mul a (CommSemiringS add mul a)
 
--- instance (Semiring add mul a s, CommutativeK mul a s) => CommSemiring add mul a s
+-- Rings
 
--- instance ( AbelianGroup add a s
---          , Monoid mul a s
---          , DistributesOver add mul a s
---          ) => Ring add mul a s
+type family RingS (add :: k) (mul :: k) (a :: Type) = (r :: Type)
 
--- instance (Ring add mul a s, CommutativeK mul a s) => CommRing add mul a s
+class ( Abelian add a
+      , Monoid mul a
+      ) => RingK add mul a s
 
--- instance (Ring add mul a s, CancellativeK mul a s) => DivisionRing add mul a s
--- instance (Ring add mul a s, AbelianGroup mul a s) => Field add mul a s
+type Ring add mul a = RingK add mul a (RingS add mul a)
+
+type family CommRingS (add :: k) (mul :: k) (a :: Type) = (r :: Type)
+
+class ( Ring add mul a
+      , Commutative mul a
+      ) => CommRingK add mul a s
+
+type CommRing add mul a = CommRingK add mul a (CommRingS add mul a)
+
+type family DivisionRingS (add :: k) (mul :: k) (a :: Type) = (r :: Type)
+
+class ( Ring add mul a
+      , Cancellative mul a
+      ) => DivisionRingK add mul a s
+
+type DivisionRing add mul a = DivisionRingK add mul a (DivisionRingS add mul a)
+
+type family FieldS (add :: k) (mul :: k) (a :: Type) = (r :: Type)
+
+class ( Ring add mul a
+      , Abelian mul a
+      ) => FieldK add mul a s
+
+type Field add mul a = FieldK add mul a (FieldS add mul a)
+
+-- Convenience synonyms
+
+type Semiring'            a = Semiring     Add Mul a
+type CommSemiring'        a = CommSemiring Add Mul a
+type Ring'                a = Ring         Add Mul a
+type CommRing'            a = CommRing     Add Mul a
+type DivisionRing'        a = DivisionRing Add Mul a
+type Field'               a = Field        Add Mul a
