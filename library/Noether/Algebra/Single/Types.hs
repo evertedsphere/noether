@@ -81,13 +81,14 @@ data DerivedFrom (a :: k)
 
 data Prim
 
-type family SymbolToFamily (t :: k) (a :: Type) (hint :: Symbol) :: Type where
-  SymbolToFamily t a "Magma" = MagmaS t a
-  SymbolToFamily t a "Neutral" = NeutralS t a
-  SymbolToFamily t a "Semigroup" = SemigroupS t a
-  SymbolToFamily t a "Cancellative" = CancellativeS t a
-  SymbolToFamily t a "Monoid" = MonoidS t a
-  SymbolToFamily t a "Group" = GroupS t a
+type family SymbolToFamily (t :: k) (a :: Type) (hint :: Symbol) :: Type
+
+type instance SymbolToFamily t a "Magma" = MagmaS t a
+type instance SymbolToFamily t a "Neutral" = NeutralS t a
+type instance SymbolToFamily t a "Semigroup" = SemigroupS t a
+type instance SymbolToFamily t a "Cancellative" = CancellativeS t a
+type instance SymbolToFamily t a "Monoid" = MonoidS t a
+type instance SymbolToFamily t a "Group" = GroupS t a
 
 type family Infer_ (t :: k) (a :: Type) (hint :: [Symbol]) :: [Type] where
   Infer_ t a '[] = '[]
