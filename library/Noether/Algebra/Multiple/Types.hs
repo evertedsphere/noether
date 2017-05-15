@@ -1,4 +1,3 @@
-{-# LANGUAGE RebindableSyntax #-}
 {-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
 
 module Noether.Algebra.Multiple.Types where

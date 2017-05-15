@@ -24,7 +24,7 @@ type RightActs a b = Acts R a b
 
 -- | A compatible action satisfies
 -- a `act` (a' `act` b) = (a `op` a') `act` b
-class (Acts lr a b, Semigroup op a) => CompatibleK (lr :: k1) op a b (s :: k2)
+class (Acts lr a b, Semigroup op a) => CompatibleK (lr :: k1) (op :: k2) a b (s :: k3)
 
 type family CompatibleS (lr :: k1) (op :: k2) (a :: Type) (b :: Type) = (r :: k3)
 
@@ -56,3 +56,13 @@ class (Acts lr a b, Semigroup ao a, Semigroup bo b) =>
 type ActeeLinear lr ao a bo b = ActeeLinearK lr ao a bo b (ActeeLinearS lr ao a bo b)
 
 type LinearActs lr ao a bo b = (ActorLinear lr ao a bo b, ActeeLinear lr ao a bo b)
+
+type LeftLinear  ao a bo b = LinearActs L ao a bo b
+type RightLinear ao a bo b = LinearActs R ao a bo b
+
+type LeftCompatible  ao a b = Compatible L ao a b
+type RightCompatible ao a b = Compatible R ao a b
+
+data Known
+
+
