@@ -5,6 +5,7 @@
 module Noether.Algebra.Single where
 
 import           Noether.Lemmata.TypeFu
+import           Noether.Lemmata.TypeFu.Map
 
 import           Noether.Algebra.Single.Synonyms
 import           Noether.Algebra.Single.Types

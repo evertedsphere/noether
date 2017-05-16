@@ -32,6 +32,7 @@ type family Nub t where
   Nub (x : y : s) = x : Nub (y : s)
 
 type family Combine (a :: v) (b :: v) :: v
+type instance Combine a a = a
 
 type family (m :: [k]) \\ (c :: Symbol) :: [k] where
   '[] \\ _ = '[]
