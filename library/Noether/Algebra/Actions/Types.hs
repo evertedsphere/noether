@@ -41,7 +41,9 @@ type Compatible lr op a b
   & Semigroup op a
   & Acts lr a b
 
--- | Group actions
+--------------------------------------------------------------------------------
+-- Group actions
+--------------------------------------------------------------------------------
 
 type family GSetS (lr :: k1) (op :: k2) (g :: Type) (b :: Type) = (r :: Type)
 
@@ -56,6 +58,10 @@ type GSet lr op g b
 
 type LeftGSet  op g b = GSet L op g b
 type RightGSet op g b = GSet R op g b
+
+--------------------------------------------------------------------------------
+-- Linearity
+--------------------------------------------------------------------------------
 
 type family ActorLinearS (lr :: k1) (ao :: k2) (a :: Type) (bo :: k3) (b :: Type) = (r :: Type)
 type family ActeeLinearS (lr :: k1) (ao :: k2) (a :: Type) (bo :: k3) (b :: Type) = (r :: Type)
@@ -78,6 +84,10 @@ type RightLinear ao a bo b = LinearActs R ao a bo b
 
 type LeftCompatible  ao a b = Compatible L ao a b
 type RightCompatible ao a b = Compatible R ao a b
+
+--------------------------------------------------------------------------------
+-- Derived instances
+--------------------------------------------------------------------------------
 
 instance (ActsK lr a b za, SemigroupK op a zs) =>
          CompatibleK lr op a b (Synergise '["Acts" := za, "Semigroup" := zs])
