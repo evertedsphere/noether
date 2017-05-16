@@ -2,9 +2,7 @@
 -- and only use it in the executable. Doing so allows others to use what you
 -- wrote in their libraries.
 
-import qualified Algebra.Actions
-import qualified Example
-import           Lemmata         (IO)
+import           Lemmata
 
 main :: IO ()
-main = Example.main
+main = putText "cool and good"
