@@ -4,10 +4,11 @@ module Noether.Algebra.Inference
   , Prim
   , DerivedFrom
   , Strategy
+  , module TypeFu.Map
   ) where
 
 import           Noether.Lemmata.TypeFu
-import           Noether.Lemmata.TypeFu.Map
+import           Noether.Lemmata.TypeFu.Map as TypeFu.Map
 
 -- bahahahaha
 data Synergise (a :: [k])
