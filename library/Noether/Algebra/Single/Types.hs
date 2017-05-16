@@ -33,19 +33,26 @@ type family MonoidS       (op :: k) (a :: Type) = (r :: Type)
 type family GroupS        (op :: k) (a :: Type) = (r :: Type)
 type family AbelianS      (op :: k) (a :: Type) = (r :: Type)
 
-type Neutral op a = (NeutralK $> NeutralS) op a
-type Commutative op a = (CommutativeK $> CommutativeS) op a
+type Neutral      op a = (NeutralK $> NeutralS) op a
+type Commutative  op a = (CommutativeK $> CommutativeS) op a
 type Cancellative op a = (CancellativeK $> CancellativeS) op a
+type Magma        op a = (MagmaK $> MagmaS) op a
 
-type Magma     op a = (MagmaK $> MagmaS) op a
-type Semigroup op a = (SemigroupK $> SemigroupS &. Magma) op a
-type Monoid    op a = (MonoidK $> MonoidS &. Neutral &. Semigroup) op a
-type Group     op a = (GroupK $> GroupS &. Monoid &. Cancellative) op a
+type SemigroupC   op a = (SemigroupK $> SemigroupS) op a
+type MonoidC      op a = (MonoidK $> MonoidS) op a
+type GroupC       op a = (GroupK $> GroupS) op a
+type AbelianC     op a = (AbelianK $> AbelianS) op a
 
-type CancellativeSemigroup op a = (Cancellative &. Semigroup) op a
+-- Convenience synonyms including a few "expected" additional entailed constraints
+
+type Semigroup    op a = (SemigroupC &. Magma) op a
+type Monoid       op a = (MonoidC &. Neutral &. Semigroup) op a
+type Group        op a = (GroupC &. Monoid &. Cancellative) op a
+type Abelian      op a = (AbelianC &. Group) op a
+
 type CommSemigroup op a = (Commutative &. Semigroup) op a
 type CommMonoid op a = (Commutative &. Monoid) op a
-type Abelian op a = (AbelianK $> AbelianS &. Group) op a
+type CancellativeSemigroup op a = (Cancellative &. Semigroup) op a
 
 class MagmaK (op :: k) a s where
   binaryOpK :: Proxy op -> Proxy s -> a -> a -> a
