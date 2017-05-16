@@ -9,6 +9,7 @@ import           Noether.Lemmata.Prelude
 import           Noether.Lemmata.TypeFu
 
 import           Noether.Algebra.Inference
+import           Noether.Algebra.Single
 import           Noether.Algebra.Single.Types
 
 -- | Oh, Either...
@@ -30,7 +31,7 @@ type RightActs a b = Acts R a b
     A compatible action satisfies
     a `act` (a' `act` b) = (a `op` a') `act` b
 -}
-class CompatibleK (lr :: k1) (op :: k2) tor tee (s :: k3)
+class CompatibleK (lr :: k1) (op :: k2) tor tee (s :: Type)
 
 type family CompatibleS (lr :: k1) (op :: k2) (a :: Type) (b :: Type) = (r :: Type)
 
@@ -113,3 +114,18 @@ instance ( ActsK lr a b za
             , "Semigroup/actor" := zsa
             ])
 
+-- FIXME: It seems like we need to rethink this a bit
+instance (MagmaK op a s) =>
+         ActsK side a a (Synergise '["Magma" := s, "operation" := op, "side" := side]) where
+  actK _ _ = binaryOpK (Proxy :: Proxy op) (Proxy :: Proxy s)
+
+type instance Strategy lr (a, b) "Acts" = ActsS lr a b
+type instance Strategy (Synergise '["side" := lr, "operation" := op]) (g, b) "GSet"
+     = GSetS lr op g b
+
+type ActionFromMagma (lr :: Side) op a =
+     Synergise '["Magma" := MagmaS op a, "operation" := op, "side" := lr]
+
+type instance ActsS lr Integer Integer = ActionFromMagma lr Mul Integer
+type instance ActsS lr Double Double = ActionFromMagma lr Mul Double
+type instance ActsS lr ComplexD ComplexD = ActionFromMagma lr Mul ComplexD

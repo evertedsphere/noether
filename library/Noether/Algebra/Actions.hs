@@ -19,3 +19,6 @@ leftAct = leftActK (Proxy :: Proxy (ActsS 'L a b))
 
 rightAct :: forall a b. RightActs a b => a -> b -> b
 rightAct = rightActK (Proxy :: Proxy (ActsS 'R a b))
+
+a :: Double
+a = leftAct (3 :: Double) (rightAct (4 :: Double) (3 :: Double))
