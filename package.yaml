@@ -50,6 +50,7 @@ library:
   - mtl
   - mtl-compat
   - safe
+  - pretty-show
 
   - reflection
   - template-haskell
