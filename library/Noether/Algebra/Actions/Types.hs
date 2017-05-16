@@ -100,8 +100,8 @@ instance ( ActsK lr a b za
          , SemigroupK bo b zsb
          ) => ActorLinearK lr ao a bo b (Synergise
            '[ "Acts" := za
-            , "Semigroup (actor)" := zsa
-            , "Semigroup (actee)" := zsb
+            , "Semigroup/actee" := zsb
+            , "Semigroup/actor" := zsa
             ])
 
 instance ( ActsK lr a b za
@@ -109,6 +109,7 @@ instance ( ActsK lr a b za
          , SemigroupK bo b zsb
          ) => ActeeLinearK lr ao a bo b (Synergise
            '[ "Acts" := za
-            , "Semigroup (actor)" := zsa
-            , "Semigroup (actee)" := zsb
+            , "Semigroup/actee" := zsb
+            , "Semigroup/actor" := zsa
             ])
+
