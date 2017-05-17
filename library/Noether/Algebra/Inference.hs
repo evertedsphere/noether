@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 module Noether.Algebra.Inference
   ( Synergise
   , Infer

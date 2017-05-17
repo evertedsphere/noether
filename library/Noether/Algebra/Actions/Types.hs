@@ -90,11 +90,22 @@ type RightCompatible ao a b = Compatible R ao a b
 -- Derived instances
 --------------------------------------------------------------------------------
 
+type family Derive (to :: Symbol) (from :: [Symbol]) (args :: [Type]) :: Type
+
 instance (ActsK lr a b za, SemigroupK op a zs) =>
          CompatibleK lr op a b (Synergise '["Acts" := za, "Semigroup" := zs])
 
+
 instance (GroupK op g zg, CompatibleK lr op g b zc) =>
          GSetK lr op g b (Synergise '["Compatible" := zc, "Group" := zg])
+
+type instance
+     Derive "ActorLinear"
+       '["Acts", "Semigroup/actee", "Semigroup/actor"]
+       [za, zsa, zsb]
+     =
+     Synergise
+       '["Acts" := za, "Semigroup/actee" := zsb, "Semigroup/actor" := zsa]
 
 instance ( ActsK lr a b za
          , SemigroupK ao a zsa
@@ -104,6 +115,13 @@ instance ( ActsK lr a b za
             , "Semigroup/actee" := zsb
             , "Semigroup/actor" := zsa
             ])
+
+type instance
+     Derive "ActeeLinear" ["Acts", "Semigroup/actee", "Semigroup/actor"]
+       [za, zsa, zsb]
+     =
+     Synergise
+       '["Acts" := za, "Semigroup/actee" := zsb, "Semigroup/actor" := zsa]
 
 instance ( ActsK lr a b za
          , SemigroupK ao a zsa
@@ -115,16 +133,19 @@ instance ( ActsK lr a b za
             ])
 
 -- FIXME: It seems like we need to rethink this a bit
+type ActionFromMagma (lr :: Side) op a =
+  Synergise '[ "Magma" := MagmaS op a
+             , "operation" := op
+             , "side" := lr
+             ]
+
 instance (MagmaK op a s) =>
          ActsK side a a (Synergise '["Magma" := s, "operation" := op, "side" := side]) where
   actK _ _ = binaryOpK (Proxy :: Proxy op) (Proxy :: Proxy s)
 
 type instance Strategy lr (a, b) "Acts" = ActsS lr a b
-type instance Strategy (Synergise '["side" := lr, "operation" := op]) (g, b) "GSet"
+type instance Strategy (Synergise '["operation" := op, "side" := lr]) (g, b) "GSet"
      = GSetS lr op g b
-
-type ActionFromMagma (lr :: Side) op a =
-     Synergise '["Magma" := MagmaS op a, "operation" := op, "side" := lr]
 
 type instance ActsS lr Integer Integer = ActionFromMagma lr Mul Integer
 type instance ActsS lr Double Double = ActionFromMagma lr Mul Double
