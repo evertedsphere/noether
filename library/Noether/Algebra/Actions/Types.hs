@@ -90,8 +90,6 @@ type RightCompatible ao a b = Compatible R ao a b
 -- Derived instances
 --------------------------------------------------------------------------------
 
-type family Derive (to :: Symbol) (from :: [Symbol]) (args :: [Type]) :: Type
-
 instance (ActsK lr a b za, SemigroupK op a zs) =>
          CompatibleK lr op a b (Synergise '["Acts" := za, "Semigroup" := zs])
 
@@ -99,29 +97,22 @@ instance (ActsK lr a b za, SemigroupK op a zs) =>
 instance (GroupK op g zg, CompatibleK lr op g b zc) =>
          GSetK lr op g b (Synergise '["Compatible" := zc, "Group" := zg])
 
-type instance
-     Derive "ActorLinear"
-       '["Acts", "Semigroup/actee", "Semigroup/actor"]
-       [za, zsa, zsb]
-     =
-     Synergise
-       '["Acts" := za, "Semigroup/actee" := zsb, "Semigroup/actor" := zsa]
+    -- Synergise
+    --    '["Acts" := za, "Semigroup/actee" := zsb, "Semigroup/actor" := zsa]
 
-instance ( ActsK lr a b za
-         , SemigroupK ao a zsa
-         , SemigroupK bo b zsb
-         ) => ActorLinearK lr ao a bo b (Synergise
-           '[ "Acts" := za
-            , "Semigroup/actee" := zsb
-            , "Semigroup/actor" := zsa
-            ])
+data family InferS (s :: Symbol) (a :: k)
 
-type instance
-     Derive "ActeeLinear" ["Acts", "Semigroup/actee", "Semigroup/actor"]
-       [za, zsa, zsb]
-     =
-     Synergise
-       '["Acts" := za, "Semigroup/actee" := zsb, "Semigroup/actor" := zsa]
+data instance InferS "AL" z = P | Q
+
+instance (ActsK lr a b za, SemigroupK ao a zsa, SemigroupK bo b zsb) =>
+         ActorLinearK lr ao a bo b (InferS "AL" (za, zsa, zsb))
+
+-- type instance
+--      Derive "ActeeLinear"
+--        [za, zsa, zsb]
+--      =
+--      Synergise
+--        '["Acts" := za, "Semigroup/actee" := zsb, "Semigroup/actor" := zsa]
 
 instance ( ActsK lr a b za
          , SemigroupK ao a zsa
@@ -133,19 +124,21 @@ instance ( ActsK lr a b za
             ])
 
 -- FIXME: It seems like we need to rethink this a bit
-type ActionFromMagma (lr :: Side) op a =
-  Synergise '[ "Magma" := MagmaS op a
+type ActionFromMagma' inst (lr :: Side) op a =
+  Synergise '[ "Magma" := inst
              , "operation" := op
              , "side" := lr
              ]
 
+type ActionFromMagma lr op a = ActionFromMagma' (MagmaS op a) lr op a
+
 instance (MagmaK op a s) =>
-         ActsK side a a (Synergise '["Magma" := s, "operation" := op, "side" := side]) where
+         ActsK side a a (ActionFromMagma' s lr op a) where
   actK _ _ = binaryOpK (Proxy :: Proxy op) (Proxy :: Proxy s)
 
 type instance Strategy lr (a, b) "Acts" = ActsS lr a b
-type instance Strategy (Synergise '["operation" := op, "side" := lr]) (g, b) "GSet"
-     = GSetS lr op g b
+type instance Strategy (tags :: [k]) (g, b) "GSet"
+     = GSetS (Lookup' tags "side") (Lookup' tags "operation") g b
 
 type instance ActsS lr Integer Integer = ActionFromMagma lr Mul Integer
 type instance ActsS lr Double Double = ActionFromMagma lr Mul Double

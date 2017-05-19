@@ -13,6 +13,8 @@ import           Noether.Algebra.Inference
 import           Noether.Lemmata.TypeFu
 import           Noether.Lemmata.TypeFu.Map
 
+import           Noether.Algebra.Subtyping
+
 data UnaryTag = Neg deriving Show
 data BinaryTag = Add | Mul deriving Show
 
@@ -24,52 +26,12 @@ class UnaryNeutralK (op :: UnaryTag) a s where
 class UnaryOpK (op :: UnaryTag) a s where
   unaryOpK :: Proxy op -> Proxy s -> a -> a
 
-type family MagmaS        (op :: k) (a :: Type) = (r :: Type)
-type family NeutralS      (op :: k) (a :: Type) = (r :: Type)
-type family CancellativeS (op :: k) (a :: Type) = (r :: Type)
-type family CommutativeS  (op :: k) (a :: Type) = (r :: Type)
-type family SemigroupS    (op :: k) (a :: Type) = (r :: Type)
-type family MonoidS       (op :: k) (a :: Type) = (r :: Type)
-type family GroupS        (op :: k) (a :: Type) = (r :: Type)
-type family AbelianS      (op :: k) (a :: Type) = (r :: Type)
-
-type Neutral      op a = (NeutralK $> NeutralS) op a
-type Commutative  op a = (CommutativeK $> CommutativeS) op a
-type Cancellative op a = (CancellativeK $> CancellativeS) op a
-type Magma        op a = (MagmaK $> MagmaS) op a
-
-type SemigroupC   op a = (SemigroupK $> SemigroupS) op a
-type MonoidC      op a = (MonoidK $> MonoidS) op a
-type GroupC       op a = (GroupK $> GroupS) op a
-type AbelianC     op a = (AbelianK $> AbelianS) op a
-
--- Convenience synonyms including a few "expected" additional entailed constraints
-
-type Semigroup    op a = (SemigroupC &. Magma) op a
-type Monoid       op a = (MonoidC &. Neutral &. Semigroup) op a
-type Group        op a = (GroupC &. Monoid &. Cancellative) op a
-type Abelian      op a = (AbelianC &. Group) op a
+type Submonoid op a b = (Subtype a b, Monoid op a, Monoid op b)
+type Subgroup  op a b = (Subtype a b, Group op a, Group op b)
 
 type CommSemigroup op a = (Commutative &. Semigroup) op a
 type CommMonoid op a = (Commutative &. Monoid) op a
 type CancellativeSemigroup op a = (Cancellative &. Semigroup) op a
-
-class MagmaK (op :: k) a s where
-  binaryOpK :: Proxy op -> Proxy s -> a -> a -> a
-
-class NeutralK (op :: k) a s where
-  neutralK :: Proxy op -> Proxy s -> a
-
-class CancellativeK (op :: k) a s where
-  cancelK :: Proxy op -> Proxy s -> a -> a
-
-class CommutativeK (op :: k) a s
-
-class SemigroupK (op :: k) a s
-
-class MonoidK (op :: k) a s
-
-class GroupK (op :: k) a s
 
 class AbelianK (op :: k) a s
 
@@ -159,3 +121,9 @@ instance CancellativeK  Add ComplexD Prim where cancelK   _ _ = P.negate
 instance MagmaK         Mul ComplexD Prim where binaryOpK _ _ = (P.*)
 instance NeutralK       Mul ComplexD Prim where neutralK  _ _ = 1
 instance CancellativeK  Mul ComplexD Prim where cancelK   _ _ = (1 P./)
+
+data Frob = B
+  { a :: Type
+  }
+
+type F (b :: Frob) = Proxy b

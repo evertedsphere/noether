@@ -5,10 +5,21 @@
 module Noether.Algebra.Single where
 
 import           Noether.Lemmata.TypeFu
-import           Noether.Lemmata.TypeFu.Map
 
+import           Noether.Algebra.Single.Cancellative
+import           Noether.Algebra.Single.Neutral
+
+import           Noether.Algebra.Single.Magma
+import           Noether.Algebra.Single.Monoid
+import           Noether.Algebra.Single.Semigroup
+
+import           Noether.Algebra.Single.Group
+
+import           Noether.Algebra.Single.Strategies
 import           Noether.Algebra.Single.Synonyms
-import           Noether.Algebra.Single.Types
+import           Noether.Algebra.Tags
+
+import           Noether.Lemmata.Prelude             (Bool (..))
 
 cancel :: forall op a. Cancellative op a => Proxy op -> a -> a
 cancel p = cancelK p (Proxy :: Proxy (CancellativeS op a))
@@ -50,4 +61,3 @@ infixl 7 /
 
 (/) :: Group Mul a => a -> a -> a
 a / b = a * reciprocal b
-

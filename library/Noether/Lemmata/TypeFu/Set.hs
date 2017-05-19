@@ -35,3 +35,5 @@ type family Filter (f :: Bool) (p :: k) (xs :: [k]) :: [k] where
 type family IfCons (pred :: Bool) (x :: k) (xs :: [k]) :: [k] where
   IfCons False _ xs = xs
   IfCons True x xs = x : xs
+
+type instance Cmp (k :: Symbol) (k' :: Symbol) = CmpSymbol k k'

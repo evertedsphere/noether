@@ -8,6 +8,7 @@ module Noether.Lemmata.TypeFu.Map
   , (:=)
   , type (\\)
   , Lookup
+  , Lookup'
   , Combine
   , Member
   ) where
@@ -44,10 +45,13 @@ type family Lookup (m :: [k']) (c :: k) :: Maybe v where
   Lookup ((k := v) : _) k = Just v
   Lookup (_ : m) k = Lookup m k
 
+type family Lookup' (m :: [k']) (c :: k) :: v where
+  Lookup' ((k := v) : _) k = v
+  Lookup' (_ : m) k = Lookup' m k
+
 type family Member (c :: k) (m :: [Type]) :: Bool where
   Member _ '[] = False
   Member k ((k := _) : _) = True
   Member k (_ : m) = Member k m
 
-type instance Cmp (k :: Symbol) (k' :: Symbol) = CmpSymbol k k'
 type instance Cmp (k := _) (k' := _) = CmpSymbol k k'

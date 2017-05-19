@@ -22,6 +22,8 @@ type family Infer_ (t :: k) (a :: Type) (hint :: [Symbol]) :: [Type] where
 
 type Infer (t :: k) a (h :: [Symbol]) = Synergise (Nub (Sort (Infer_ t a h)))
 
+data family Sorted (t :: k)
+
 -- Tags
 
 data DerivedFrom (a :: k)
