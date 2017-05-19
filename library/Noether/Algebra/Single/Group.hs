@@ -9,13 +9,13 @@ import           Noether.Algebra.Single.Monoid
 type family GroupS (op :: k) (a :: Type) = (r :: GroupE)
 
 data GroupE
-  = MonoidCancellative MonoidE CancellativeE
+  = Group_Monoid_Cancellative MonoidE CancellativeE
   | GroupNamed Symbol GroupE
 
 class GroupK (op :: k) a (s :: GroupE)
 
 instance (MonoidK op a zm, CancellativeK op a zl) =>
-         GroupK op a (MonoidCancellative zm zl)
+         GroupK op a (Group_Monoid_Cancellative zm zl)
 
 instance (KnownSymbol sym, GroupK op a s) =>
          GroupK op a (GroupNamed sym s)

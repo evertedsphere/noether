@@ -22,6 +22,3 @@ instance (KnownSymbol sym, CommutativeK op a s) =>
 type Commutative op a = (CommutativeK $> CommutativeS) op a
 
 type family CommutativeS (op :: k) (a :: Type) = (r :: CommutativeE)
-
-type instance CommutativeS (op :: BinaryBoolean) Bool = CommutativePrim
-type instance CommutativeS (t :: BinaryNumeric) Double = CommutativePrim

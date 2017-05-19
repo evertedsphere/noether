@@ -1,7 +1,7 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
 module Noether.Algebra.Single.Synonyms where
 
-import           Noether.Lemmata.TypeFu
+import           Noether.Lemmata.TypeFu (Proxy(..))
+
 import           Noether.Algebra.Tags
 
 -- Some proxy synonyms
@@ -12,11 +12,11 @@ pattern AddP = Proxy
 pattern MulP :: Proxy Mul
 pattern MulP = Proxy
 
--- neutralSP :: Proxy (NeutralS op a)
--- neutralSP = Proxy
+pattern AndP :: Proxy And
+pattern AndP = Proxy
 
--- cancellativeSP :: Proxy (CancellativeS op a)
--- cancellativeSP = Proxy
+pattern OrP :: Proxy Or
+pattern OrP = Proxy
 
--- magmaSP :: Proxy (MagmaS op a)
--- magmaSP = Proxy
+pattern XorP :: Proxy Xor
+pattern XorP = Proxy

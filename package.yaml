@@ -10,8 +10,8 @@ license: MIT
 description: TODO
 
 ghc-options:
-  - "-Wall"
   - "-fwarn-implicit-prelude"
+  - "-fno-warn-unticked-promoted-constructors"
 default-extensions:
   - ConstraintKinds
   - DataKinds
