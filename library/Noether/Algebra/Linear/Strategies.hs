@@ -45,4 +45,3 @@ r %< v = leftAct @Mul r v
 
 (>%) :: RightModule' r v => v -> r -> v
 v >% r = rightAct @Mul r v
-

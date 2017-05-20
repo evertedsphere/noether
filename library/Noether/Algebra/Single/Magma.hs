@@ -26,6 +26,6 @@ instance MagmaK And P.Bool MagmaPrim where
 instance MagmaK Or P.Bool MagmaPrim where
   binaryOpK _ _ = (P.||)
 
-type Magma        op a = (MagmaK $> MagmaS) op a
+type Magma op a = MagmaK op a (MagmaS op a)
 
 type family MagmaS (op :: k) (a :: Type) = (r :: MagmaE)

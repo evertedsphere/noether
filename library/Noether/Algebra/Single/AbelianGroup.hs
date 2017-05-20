@@ -19,5 +19,4 @@ instance (GroupK op a zm, CommutativeK op a zl) =>
 instance (KnownSymbol sym, AbelianGroupK op a s) =>
          AbelianGroupK op a (AbelianGroupNamed sym s)
 
-type AbelianGroupC op a = (AbelianGroupK $> AbelianGroupS) op a
-type AbelianGroup op a = (AbelianGroupC &. Group &. Commutative) op a
+type AbelianGroupC op a = AbelianGroupK op a (AbelianGroupS op a)

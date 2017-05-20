@@ -16,6 +16,14 @@ import           Noether.Algebra.Single.Semigroup
 import           Noether.Algebra.Single.AbelianGroup
 import           Noether.Algebra.Single.Group
 
+type Semigroup op a = (SemigroupC op a, Magma op a)
+
+type Monoid op a = (MonoidC op a, Semigroup op a)
+
+type Group op a = (GroupC op a, Monoid op a, Cancellative op a)
+
+type AbelianGroup op a = (AbelianGroupC op a, Group op a, Commutative op a)
+
 -- Lifting strategies
 
 type DeriveSemigroup_Magma t a = Semigroup_Magma (MagmaS t a)

@@ -22,9 +22,3 @@ instance (KnownSymbol sym, SemiringK p m a s) =>
          SemiringK p m a (SemiringNamed sym s)
 
 type SemiringC p m a = (SemiringK $$> SemiringS) p m a
-
-type Semiring p m a
-  = SemiringC p m a
-  & Commutative p a
-  & Monoid p a
-  & Monoid m a

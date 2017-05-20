@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fconstraint-solver-iterations=0 #-}
+{-# OPTIONS_GHC -ddump-cs-trace #-}
 module Noether.Algebra.Multiple.Strategies where
 
 import           Noether.Lemmata.Prelude
@@ -9,6 +10,19 @@ import           Noether.Algebra.Tags
 import           Noether.Algebra.Multiple.Ring
 import           Noether.Algebra.Multiple.Semiring
 import           Noether.Algebra.Single
+
+type Ring p m a =
+  ( RingC p m a
+  , Group m a
+  , AbelianGroup p a
+  )
+
+type Semiring p m a =
+  ( SemiringC p m a
+  , Commutative p a
+  , Monoid p a
+  , Monoid m a
+  )
 
 -- Lifting strategies
 
@@ -26,21 +40,24 @@ type DeriveRing_Semiring_Cancellative p m a =
 type DeriveRing_AbelianGroup_Group p m a =
   Ring_AbelianGroup_Group
     (AbelianGroupS p a)
-    (GroupS m a) -- XXX
+    (GroupS m a)
+
+type family RingNamedT a where
+  RingNamedT (Ring_AbelianGroup_Group ab grp) = Ring_AbelianGroup_Group
+    (AbelianGroupNamed "Additive group" ab)
+    (GroupNamed "Multiplicative group" grp)
 
 type DeriveRingDoc_AbelianGroup_Group p m a =
-  Ring_AbelianGroup_Group
-    (AbelianGroupNamed "Additive group" (AbelianGroupS p a))
-    (GroupNamed "Multiplicative group" (GroupS m a))
+  RingNamedT (DeriveRing_AbelianGroup_Group p m a)
 
 type instance SemiringS Add Mul Double =
      DeriveSemiring_Commutative_Monoid_Monoid Add Mul Double
 
 type instance RingS Add Mul Double =
-     DeriveRing_AbelianGroup_Group Add Mul Double
+     DeriveRingDoc_AbelianGroup_Group Add Mul Double
 
-p :: Ring Add Mul r => r -> r -> r
-p a b = a + b / a
+p :: Ring Add Mul a => a -> a -> a
+p a b = a + b / (b - a) * b + (b + a / b * b - a)
 
--- q :: Double
-q = p (2 :: Double) (4 :: Double)
+q :: Double
+q = p 2 (p 3 4)

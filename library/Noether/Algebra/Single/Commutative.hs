@@ -18,6 +18,6 @@ instance P.Num a => CommutativeK Mul a CommutativeNum
 instance (KnownSymbol sym, CommutativeK op a s) =>
          CommutativeK op a (CommutativeNamed sym s)
 
-type Commutative op a = (CommutativeK $> CommutativeS) op a
+type Commutative op a = CommutativeK op a (CommutativeS op a)
 
 type family CommutativeS (op :: k) (a :: Type) = (r :: CommutativeE)

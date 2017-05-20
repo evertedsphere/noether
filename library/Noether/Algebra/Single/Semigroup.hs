@@ -17,7 +17,6 @@ instance (KnownSymbol sym, SemigroupK op a s) =>
          SemigroupK op a (SemigroupNamed sym s)
 
 type SemigroupC op a = SemigroupK op a (SemigroupS op a)
-type Semigroup op a = (SemigroupC &. Magma) op a
 
 type family SemigroupS (op :: k) (a :: Type) = (r :: SemigroupE)
 

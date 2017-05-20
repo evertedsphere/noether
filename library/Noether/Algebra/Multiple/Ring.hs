@@ -26,9 +26,4 @@ instance (AbelianGroupK p a zpab, GroupK m a zmg) =>
 instance (KnownSymbol sym, RingK p m a s) =>
          RingK p m a (RingNamed sym s)
 
-type RingC p m a = (RingK $$> RingS) p m a
-
-type Ring p m a
-  = RingC p m a
-  & AbelianGroup p a
-  & Group m a
+type RingC p m a = RingK p m a (RingS p m a)

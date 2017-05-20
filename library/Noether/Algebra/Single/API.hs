@@ -47,34 +47,34 @@ reciprocal = cancel MulP
 
 infixl 6 +
 
-(+) :: Semigroup Add a => a -> a -> a
+(+) :: Magma Add a => a -> a -> a
 (+) = binaryOp AddP
 
 infixl 7 *
 
-(*) :: Semigroup Mul a => a -> a -> a
+(*) :: Magma Mul a => a -> a -> a
 (*) = binaryOp MulP
 
 -- Groupy things
 
 infixl 6 -
 
-(-) :: Group Add a => a -> a -> a
+(-) :: (Magma Add a, Cancellative Add a) => a -> a -> a
 a - b = a + negate b
 
 infixl 7 /
 
-(/) :: Group Mul a => a -> a -> a
+(/) :: (Magma Mul a, Cancellative Mul a) => a -> a -> a
 a / b = a * reciprocal b
 
 -- Binary operations
 
 infixl 3 &&
 
-(&&) :: Semigroup And a => a -> a -> a
+(&&) :: Magma And a => a -> a -> a
 (&&) = binaryOp AndP
 
 infixl 2 ||
 
-(||) :: Semigroup Or a => a -> a -> a
+(||) :: Magma Or a => a -> a -> a
 (||) = binaryOp OrP

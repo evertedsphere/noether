@@ -4,6 +4,7 @@ import           Noether.Lemmata.TypeFu
 
 import           Noether.Algebra.Single.Cancellative
 import           Noether.Algebra.Single.Commutative
+import           Noether.Algebra.Single.Magma
 import           Noether.Algebra.Single.Monoid
 
 type family GroupS (op :: k) (a :: Type) = (r :: GroupE)
@@ -20,5 +21,4 @@ instance (MonoidK op a zm, CancellativeK op a zl) =>
 instance (KnownSymbol sym, GroupK op a s) =>
          GroupK op a (GroupNamed sym s)
 
-type GroupC op a = (GroupK $> GroupS) op a
-type Group op a = (GroupC &. Monoid &. Cancellative) op a
+type GroupC op a = GroupK op a (GroupS op a)

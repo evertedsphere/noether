@@ -17,7 +17,6 @@ instance (SemigroupK op a zs, NeutralK op a zn) =>
 instance (KnownSymbol sym, MonoidK op a s) =>
          MonoidK op a (MonoidNamed sym s)
 
-type MonoidC op a = (MonoidK $> MonoidS) op a
-type Monoid op a = (MonoidC &. Semigroup) op a
+type MonoidC op a = MonoidK op a (MonoidS op a)
 
 type family MonoidS (op :: k) (a :: Type) = (r :: MonoidE)
