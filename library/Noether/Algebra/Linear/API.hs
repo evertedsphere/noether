@@ -22,15 +22,14 @@ r %< v = leftAct @Mul r v
 (>%) :: RightModule' r v => v -> r -> v
 v >% r = rightAct @Mul r v
 
--- | Locally use the action induced by the multiplicative magma structure on the
--- ring, whatever structure the user may have chosen to use globally.
+-- | Locally use the self-action induced by the multiplicative magma structure
+-- of the ring, whatever structure the user may have chosen to use globally.
 (>%%) :: forall r. Ring Add Mul r => r -> r -> r
 a >%% b = rightActK @Mul @(DeriveActs_Magma Mul r) a b
 
 -- | Linear interpolation.
 -- >>> lerp λ v w = λv + (1 - λ)w
 lerp
-  :: ( LeftModule' r r
-     , RightModule' r r
-     ) => r -> r -> r -> r
+  :: (LeftModule' r v, RightModule' r v)
+  => r -> v -> v -> v
 lerp lambda v w = lambda %< v + w >% (one - lambda)

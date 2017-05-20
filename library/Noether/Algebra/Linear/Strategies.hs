@@ -34,5 +34,8 @@ type DeriveRightModule_Ring_AbelianGroup op p m r a v =
 
 type DeriveRightModule_Self p m r = DeriveRightModule_Ring_AbelianGroup m p m r p r
 
-type instance LeftModuleS Mul Add Mul Double Add Double = DeriveLeftModule_Self Add Mul Double
-type instance RightModuleS Mul Add Mul Double Add Double = DeriveRightModule_Self Add Mul Double
+type instance LeftModuleS Mul Add Mul Double Add Double =
+     DeriveLeftModule_Self Add Mul Double
+
+type instance RightModuleS Mul Add Mul Double Add Double =
+     DeriveRightModule_Self Add Mul Double
