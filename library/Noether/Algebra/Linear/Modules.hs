@@ -20,91 +20,142 @@
 
 module Noether.Algebra.Linear.Modules where
 
-import           Prelude                        hiding (Monoid, fromInteger,
-                                                 negate, recip, (*), (+), (-),
-                                                 (/))
-
 import           Data.Complex
 
 import           Noether.Lemmata.Prelude
 import           Noether.Lemmata.TypeFu
 
 import           Noether.Algebra.Actions
-import           Noether.Algebra.Multiple.Types
+import           Noether.Algebra.Multiple
 import           Noether.Algebra.Single
-import           Noether.Algebra.Single.Types
+
+import           Noether.Algebra.Tags
+
+data LeftModuleE
+  = LeftModule_Ring_AbelianGroup_Linear_Compatible
+    { leftModule_ring           :: RingE
+    , leftModule_abelianGroup   :: AbelianGroupE
+    , leftModule_actorLinearity :: ActorLinearE
+    , leftModule_acteeLinearity :: ActeeLinearE
+    , leftModule_compatibility  :: CompatibleE}
+  | LeftModule_Named Symbol
+                     LeftModuleE
 
 -- | A left module (v, a) over the ring (r, p, m).
-class ( Ring p m r
-      , Abelian a v
-      , LeftLinear p r a v
-      , LeftCompatible m r v
-      ) => LeftModuleK p m r a v s
+class LeftModuleK p m r a v s
 
-type family LeftModuleS (p :: k1) (m :: k2) r (a :: k3) v :: k
+type family LeftModuleS (p :: k1) (m :: k2) r (a :: k3) v :: LeftModuleE
 
-type LeftModule p m r a v = LeftModuleK p m r a v (LeftModuleS p m r a v)
+type LeftModuleC p m r a v = LeftModuleK p m r a v (LeftModuleS p m r a v)
 
--- | A right module (v, a) over the ring (r, p, m).
-class ( Ring p m r
-      , Abelian a v
-      , RightLinear p r a v
-      , RightCompatible m r v
-      ) => RightModuleK p m r a v s
+type LeftModule p m r a v
+  = LeftModuleC p m r a v
+  & Ring p m r
+  & AbelianGroup a v
+  & LinearActsOn L m p r a v
+  & LeftCompatible m p r v
 
-type family RightModuleS (p :: k1) (m :: k2) r (a :: k3) v :: k
+data RightModuleE
+  = RightModule_Ring_AbelianGroup_Linear_Compatible
+    { rightModule_ring           :: RingE
+    , rightModule_abelianGroup   :: AbelianGroupE
+    , rightModule_actorLinearity :: ActorLinearE
+    , rightModule_acteeLinearity :: ActeeLinearE
+    , rightModule_compatibility  :: CompatibleE
+    }
+  | RightModule_LeftModule_Commutative
+    { rightModule_leftModule  :: LeftModuleE
+    , rightModule_commutative :: CommutativeE
+    }
+  | RightModule_Named Symbol
+                     RightModuleE
 
-type RightModule p m r a v = RightModuleK p m r a v (RightModuleS p m r a v)
+instance ( Ring p m r
+         , AbelianGroup a v
+         , LeftLinear m p r a v
+         , LeftCompatible m m r v
+         ) => LeftModuleK p m r a v s
 
--- | R,S-bimodules.
-class ( LeftModule p m r a v
-      , RightModule q n s a v
-      ) => BimoduleK p m r q n s a v z
+-- | A left module (v, a) over the ring (r, p, m).
+class RightModuleK p m r a v s
 
-type family BimoduleS (p :: k1) (m :: k2) r (q :: k3) (n :: k4) s (a :: k5) v :: k
-type Bimodule p m r q n s a v = BimoduleK p m r q n s a v (BimoduleS p m r q n s a v)
+type family RightModuleS (p :: k1) (m :: k2) r (a :: k3) v :: RightModuleE
 
--- | An R,R-bimodule for commutative R is just called an R-module.
+type RightModuleC p m r a v = RightModuleK p m r a v (RightModuleS p m r a v)
 
-type Module p m r a v = (Bimodule p m r p m r a v, CommRing p m r)
+type RightModule p m r a v
+  = RightModuleC p m r a v
+  & Ring p m r
+  & AbelianGroup a v
+  & LinearActsOn R m p r a v
+  & RightCompatible m p r v
 
--- | A vector space over the field (k,p,m).
+instance ( Ring p m r
+         , AbelianGroup a v
+         , RightLinear m p r a v
+         , RightCompatible m m r v
+         ) => RightModuleK p m r a v s
 
-class ( Module p m k a v
-      , Field p m k
-      ) => VectorSpaceK p m k a v z
+-- -- | A right module (v, a) over the ring (r, p, m).
+-- class ( Ring p m r
+--       , AbelianGroup a v
+--       , RightLinear p r a v
+--       , RightCompatible m r v
+--       ) => RightModuleK p m r a v s
 
-type family VectorSpaceS (p :: k1) (m :: k2) k (a :: k3) v :: k4
+-- type family RightModuleS (p :: k1) (m :: k2) r (a :: k3) v :: k
 
-type VectorSpace p m k a v = VectorSpaceK p m k a v (VectorSpaceS p m k a v)
+-- type RightModule p m r a v = RightModuleK p m r a v (RightModuleS p m r a v)
 
-data InnerProductTag = DotProduct
+-- -- | R,S-bimodules.
+-- class ( LeftModule p m r a v
+--       , RightModule q n s a v
+--       ) => BimoduleK p m r q n s a v z
 
--- pattern DotProductP :: Proxy DotProduct
--- pattern DotProductP = Proxy
+-- type family BimoduleS (p :: k1) (m :: k2) r (q :: k3) (n :: k4) s (a :: k5) v :: k
+-- type Bimodule p m r q n s a v = BimoduleK p m r q n s a v (BimoduleS p m r q n s a v)
 
-class (VectorSpace p m k a v) =>
-      InnerProductSpaceK ip p m k a v s where
-  innerProductK :: Proxy ip -> Proxy p -> Proxy m -> Proxy a -> Proxy s -> v -> v -> k
+-- -- | An R,R-bimodule for commutative R is just called an R-module.
 
-type family InnerProductSpaceS (ip :: k0) (p :: k1) (m :: k2) k (a :: k3) v :: k4
+-- type Module p m r a v = (Bimodule p m r p m r a v, CommRing p m r)
 
-type InnerProductSpace ip p m k a v = InnerProductSpaceK ip p m k a v (InnerProductSpaceS ip p m k a v)
+-- -- | A vector space over the field (k,p,m).
 
-----------------------------------------------------------------------------------
---- Convenience synonyms
-----------------------------------------------------------------------------------
+-- class ( Module p m k a v
+--       , Field p m k
+--       ) => VectorSpaceK p m k a v z
 
-type RightModule'          r v = RightModule Add Mul r Add v
-type LeftModule'           r v = LeftModule  Add Mul r Add v
+-- type family VectorSpaceS (p :: k1) (m :: k2) k (a :: k3) v :: k4
 
-type Bimodule'           r s v = Bimodule  Add Mul r Add Mul s Add v
-type Bimodule_             r v = Bimodule  Add Mul r Add Mul r Add v
-type Module'               r v = Module    Add Mul r Add v
+-- type VectorSpace p m k a v = VectorSpaceK p m k a v (VectorSpaceS p m k a v)
 
-type VectorSpace'          k v = VectorSpace           Add Mul k Add v
-type InnerProductSpace' ip k v = InnerProductSpace  ip Add Mul k Add v
-type DotProductSpace'      k v = InnerProductSpace' DotProduct k v
+-- data InnerProductTag = DotProduct
+
+-- -- pattern DotProductP :: Proxy DotProduct
+-- -- pattern DotProductP = Proxy
+
+-- class (VectorSpace p m k a v) =>
+--       InnerProductSpaceK ip p m k a v s where
+--   innerProductK :: Proxy ip -> Proxy p -> Proxy m -> Proxy a -> Proxy s -> v -> v -> k
+
+-- type family InnerProductSpaceS (ip :: k0) (p :: k1) (m :: k2) k (a :: k3) v :: k4
+
+-- type InnerProductSpace ip p m k a v = InnerProductSpaceK ip p m k a v (InnerProductSpaceS ip p m k a v)
+
+-- ----------------------------------------------------------------------------------
+-- --- Convenience synonyms
+-- ----------------------------------------------------------------------------------
+
+-- type RightModule'          r v = RightModule Add Mul r Add v
+-- type LeftModule'           r v = LeftModule  Add Mul r Add v
+
+-- type Bimodule'           r s v = Bimodule  Add Mul r Add Mul s Add v
+-- type Bimodule_             r v = Bimodule  Add Mul r Add Mul r Add v
+-- type Module'               r v = Module    Add Mul r Add v
+
+-- type VectorSpace'          k v = VectorSpace           Add Mul k Add v
+-- type InnerProductSpace' ip k v = InnerProductSpace  ip Add Mul k Add v
+-- type DotProductSpace'      k v = InnerProductSpace' DotProduct k v
 
 -- ----------------------------------------------------------------------------------
 -- --- "Derived" instances. Possibly too general?

@@ -21,7 +21,8 @@ import           Noether.Algebra.Actions.Acts
 class CompatibleK (lr :: Side) (op :: k1) (act :: k2) a b (s :: CompatibleE)
 
 data CompatibleE = Compatible_Acts_Semigroup
-  { compatible_action          :: ActsE
+  { compatible_actor           :: Type
+  , compatible_action          :: ActsE
   , compatible_actor_semigroup :: SemigroupE
   }
 
@@ -30,7 +31,7 @@ type family CompatibleS (lr :: Side) (op :: k1) (act :: k2) (a :: Type) (b :: Ty
 type CompatibleC lr op act a b = CompatibleK lr op act a b (CompatibleS lr op act a b)
 
 instance (ActsK lr act a b za, SemigroupK op a zs) =>
-         CompatibleK lr op act a b (Compatible_Acts_Semigroup za zs)
+         CompatibleK lr op act a b (Compatible_Acts_Semigroup a za zs)
 
 type Compatible lr op act a b
   = CompatibleC lr op act a b

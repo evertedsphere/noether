@@ -7,8 +7,7 @@ import           Noether.Lemmata.Prelude hiding (Num)
 import           Noether.Lemmata.TypeFu
 
 data CommutativeE
-  = CommutativePrim
-  | CommutativeNum
+  = CommutativeNum
   | CommutativeNamed Symbol CommutativeE
 
 class CommutativeK (op :: k) a (s :: CommutativeE)

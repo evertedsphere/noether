@@ -12,7 +12,7 @@ type DeriveActs_Magma op a =
   Acts_Magma (MagmaS op a)
 
 type DeriveCompatible_Acts_Semigroup lr op act a b =
-  Compatible_Acts_Semigroup
+  Compatible_Acts_Semigroup a
     (ActsS lr act a b)
     (SemigroupS op a)
 

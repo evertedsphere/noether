@@ -38,7 +38,7 @@ type DeriveAbelianGroup_Commutative_Monoid_Cancellative t a =
 
 type instance MagmaS (_ :: BinaryBoolean) Bool = MagmaPrim
 type instance NeutralS (_ :: BinaryBoolean) Bool = NeutralPrim
-type instance CommutativeS (_ :: BinaryBoolean) Bool = CommutativePrim
+type instance CommutativeS (_ :: BinaryBoolean) Bool = CommutativeNum
 type instance SemigroupS (op :: BinaryBoolean) Bool =
      DeriveSemigroup_Magma op Bool
 
@@ -58,7 +58,7 @@ type instance CancellativeS Mul Double = CancellativeFractional
 type instance GroupS (op :: BinaryNumeric) Double =
      DeriveGroup_Monoid_Cancellative op Double
 
-type instance CommutativeS (_ :: BinaryNumeric) Double = CommutativePrim
+type instance CommutativeS (_ :: BinaryNumeric) Double = CommutativeNum
 
 type instance AbelianGroupS (op :: BinaryNumeric) Double =
      DeriveAbelianGroup_Commutative_Group op Double

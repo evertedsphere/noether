@@ -1,25 +1,19 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 module Noether.Algebra.Actions
-  ( leftAct
-  , rightAct
-  , module Types
+  ( module Noether.Algebra.Actions.Acts
+  , module Noether.Algebra.Actions.Compatible
+  , module Noether.Algebra.Actions.Linearity
+  , module Noether.Algebra.Actions.API
+  , module Noether.Algebra.Actions.Strategies
   ) where
 
 import           Noether.Lemmata.TypeFu
 
-import           Noether.Algebra.Actions.Acts
 import           Noether.Algebra.Tags
 
-leftActK :: forall a b s. ActsK 'L a b s => Proxy s -> a -> b -> b
-leftActK p = actK p (Proxy :: Proxy 'L)
+import           Noether.Algebra.Actions.Acts
+import           Noether.Algebra.Actions.Compatible
+import           Noether.Algebra.Actions.Linearity
 
-rightActK :: forall a b s. ActsK 'R a b s => Proxy s -> a -> b -> b
-rightActK p = actK p (Proxy :: Proxy 'R)
-
-leftAct :: forall a b. LeftActs a b => a -> b -> b
-leftAct = leftActK (Proxy :: Proxy (ActsS 'L a b))
-
-rightAct :: forall a b. RightActs a b => a -> b -> b
-rightAct = rightActK (Proxy :: Proxy (ActsS 'R a b))
-
--- a :: RightActs Double a => a -> a
--- a = rightAct (3 :: Double)
+import           Noether.Algebra.Actions.API
+import           Noether.Algebra.Actions.Strategies

@@ -25,12 +25,12 @@ type DeriveRing_Semiring_Cancellative p m a =
 type DeriveRing_AbelianGroup_Group p m a =
   Ring_AbelianGroup_Group
     (AbelianGroupS p a)
-    (GroupS p a)
+    (GroupS m a)
 
 type DeriveRingDoc_AbelianGroup_Group p m a =
   Ring_AbelianGroup_Group
     (AbelianGroupNamed "Additive group" (AbelianGroupS p a))
-    (GroupNamed "Multiplicative group" (GroupS p a))
+    (GroupNamed "Multiplicative group" (GroupS m a))
 
 type instance SemiringS Add Mul Double =
      DeriveSemiring_Commutative_Monoid_Monoid Add Mul Double
