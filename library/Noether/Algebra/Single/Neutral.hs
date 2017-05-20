@@ -31,4 +31,4 @@ instance (KnownSymbol sym, NeutralK op a s) => NeutralK op a (NeutralNamed sym s
   neutralK opP _ = neutralK opP (Proxy :: Proxy s)
 
 type family NeutralS (op :: k) (a :: Type) = (r :: NeutralE)
-type Neutral op a = (NeutralK $> NeutralS) op a
+type Neutral op a = NeutralK op a (NeutralS op a)

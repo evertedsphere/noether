@@ -18,7 +18,7 @@ import           Noether.Algebra.Single.Group
 
 type Semigroup op a = (SemigroupC op a, Magma op a)
 
-type Monoid op a = (MonoidC op a, Semigroup op a)
+type Monoid op a = (MonoidC op a, Semigroup op a, Neutral op a)
 
 type Group op a = (GroupC op a, Monoid op a, Cancellative op a)
 

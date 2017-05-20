@@ -27,6 +27,5 @@ v >% r = rightAct @Mul r v
 lerp
   :: ( LeftModule' r v
      , RightModule' r v
-     , Neutral Mul r
      ) => r -> v -> v -> v
 lerp lambda v w = lambda %< v + w >% (one - lambda)
