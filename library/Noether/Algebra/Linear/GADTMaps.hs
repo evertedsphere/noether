@@ -1,32 +1,26 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskellQuotes #-}
-{-# LANGUAGE GADTs                 #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE StandaloneDeriving    #-}
-{-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE TypeInType            #-}
-{-# LANGUAGE UndecidableInstances  #-}
 {-# OPTIONS_GHC -fno-warn-unticked-promoted-constructors #-}
 
-module Algebra.Linear.GADTMaps where
+module Noether.Algebra.Linear.GADTMaps where
 
-import           Algebra.Basics
-import           Algebra.Actions
-import           Algebra.Modules
+import           Noether.Algebra.Single
+import           Noether.Algebra.Multiple
+import           Noether.Algebra.Actions
+import           Noether.Algebra.Linear.Module
+
 import           Prelude         hiding (Monoid, fromInteger, negate, recip,
                                   (*), (+), (-), (/))
+import Noether.Lemmata.TypeFu
 
-import           Data.Kind       (type (*))
+-------------------------------------------------------------------------
+-- FIXME: This module is broken, as it relies on the old encoding of 
+-- the algebraic structures.
 
----------------------------------------------------------------------------
 -- Linear maps in the style of Conal Elliott
 -- from <http://conal.net/blog/posts/reimagining-matrices>,
 -- adapted for compatibility with All The Polymorphism™.
 -- Likely extremely nonperformant, but definitely pretty and a good place
 -- to test the abstractions developed so far.
----------------------------------------------------------------------------
+-------------------------------------------------------------------------
 
 infixr 1 \>
 infixr 0 ~>
@@ -45,7 +39,7 @@ type (~>) a b = a b
 -- doesn't work is because we are doing something coordinate-wise in some sense,
 -- I believe.
 
-data (\>) :: (* -> * -> * -> *) where
+data (\>) :: (Type -> Type -> Type -> Type) where
   Dot
     :: DotProductSpace' k a
     => a
@@ -222,12 +216,10 @@ instance Commutative Add (k \> a ~> b)
 -- | Trivial multiplicative semigroup structure
 instance Semigroup Mul (k \> a ~> a)
 
-instance DistributesOver Add Mul (k \> a ~> a)
-
 -- | Additive neutral element, base case
 instance ( Neutral Add (k \> a ~> b)
          , Field' k
-         ) => Invertible Add (k \> a ~> b) where
+         ) => Cancellative Add (k \> a ~> b) where
   invert _ = scaleLMap (-one)
 
 -- Monoid structures come for free
