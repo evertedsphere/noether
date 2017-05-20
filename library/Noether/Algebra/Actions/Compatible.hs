@@ -28,15 +28,5 @@ data CompatibleE = Compatible_Acts_Semigroup
 
 type family CompatibleS (lr :: Side) (op :: k1) (act :: k2) (a :: Type) (b :: Type) = (r :: CompatibleE)
 
-type CompatibleC lr op act a b = CompatibleK lr op act a b (CompatibleS lr op act a b)
-
 instance (ActsK lr act a b za, SemigroupK op a zs) =>
          CompatibleK lr op act a b (Compatible_Acts_Semigroup a za zs)
-
-type Compatible lr op act a b
-  = CompatibleC lr op act a b
-  & Semigroup op a
-  & Acts lr act a b
-
-type LeftCompatible act ao a b = Compatible L act ao a b
-type RightCompatible act ao a b = Compatible R act ao a b

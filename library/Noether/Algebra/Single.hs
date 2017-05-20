@@ -11,6 +11,7 @@ module Noether.Algebra.Single
   , module Noether.Algebra.Single.AbelianGroup
   -- $strategies
   , module Noether.Algebra.Single.Strategies
+  , module Noether.Algebra.Single.Synonyms
   ) where
 
 import           Noether.Algebra.Single.API
@@ -27,3 +28,4 @@ import           Noether.Algebra.Single.AbelianGroup
 import           Noether.Algebra.Single.Group
 
 import           Noether.Algebra.Single.Strategies
+import           Noether.Algebra.Single.Synonyms

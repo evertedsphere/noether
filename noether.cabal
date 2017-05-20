@@ -46,6 +46,7 @@ library
     , mtl-compat
     , safe
     , pretty-show
+    , vector
     , reflection
     , template-haskell
     , ghc-typelits-natnormalise

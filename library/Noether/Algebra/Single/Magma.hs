@@ -10,6 +10,9 @@ import           Noether.Algebra.Tags
 data MagmaE
   = MagmaPrim
   | MagmaNum
+  | MagmaOther Type -- non-* open kinds pls
+  | MagmaNamed Symbol MagmaE
+  | MagmaTagged Type MagmaE
 
 class MagmaK (op :: k) a (s :: MagmaE) where
   binaryOpK :: Proxy op -> Proxy s -> a -> a -> a
@@ -25,6 +28,9 @@ instance MagmaK And P.Bool MagmaPrim where
 
 instance MagmaK Or P.Bool MagmaPrim where
   binaryOpK _ _ = (P.||)
+
+instance MagmaK op a s => MagmaK op a (MagmaNamed sym s) where
+  binaryOpK o _ = binaryOpK o (Proxy :: Proxy (MagmaNamed sym s))
 
 type Magma op a = MagmaK op a (MagmaS op a)
 

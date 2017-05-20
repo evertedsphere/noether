@@ -8,6 +8,8 @@ import           Noether.Algebra.Actions.Acts
 import           Noether.Algebra.Actions.Compatible
 import           Noether.Algebra.Actions.Linearity
 
+import           Noether.Algebra.Actions.API
+
 type DeriveActs_Magma op a =
   Acts_Magma (MagmaS op a)
 
