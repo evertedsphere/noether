@@ -30,5 +30,5 @@ type RingC p m a = (RingK $$> RingS) p m a
 
 type Ring p m a
   = RingC p m a
-  & Semiring p m a
   & AbelianGroup p a
+  & Group m a

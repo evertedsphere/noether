@@ -22,10 +22,10 @@ rightActK
   => Proxy op -> Proxy s -> a -> b -> b
 rightActK opP sP = actK opP sP (Proxy :: Proxy 'R)
 
-leftAct :: forall a b op. LeftActs op a b => a -> b -> b
+leftAct :: forall op a b. LeftActs op a b => a -> b -> b
 leftAct = leftActK (Proxy :: Proxy op) (Proxy :: Proxy (ActsS 'L op a b))
 
-rightAct :: forall a b op. RightActs op a b => a -> b -> b
+rightAct :: forall op a b. RightActs op a b => a -> b -> b
 rightAct = rightActK (Proxy :: Proxy op) (Proxy :: Proxy (ActsS 'R op a b))
 
 -- a :: RightActs Double a => a -> a

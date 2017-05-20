@@ -53,7 +53,7 @@ type LeftModule p m r a v
   & Ring p m r
   & AbelianGroup a v
   & LinearActsOn L m p r a v
-  & LeftCompatible m p r v
+  & LeftCompatible m m r v
 
 data RightModuleE
   = RightModule_Ring_AbelianGroup_Linear_Compatible
@@ -88,7 +88,7 @@ type RightModule p m r a v
   & Ring p m r
   & AbelianGroup a v
   & LinearActsOn R m p r a v
-  & RightCompatible m p r v
+  & RightCompatible m m r v
 
 instance ( Ring p m r
          , AbelianGroup a v

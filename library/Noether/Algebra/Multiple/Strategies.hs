@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fconstraint-solver-iterations=0 #-}
 module Noether.Algebra.Multiple.Strategies where
 
 import           Noether.Lemmata.Prelude
@@ -25,7 +26,7 @@ type DeriveRing_Semiring_Cancellative p m a =
 type DeriveRing_AbelianGroup_Group p m a =
   Ring_AbelianGroup_Group
     (AbelianGroupS p a)
-    (GroupS m a)
+    (GroupS m a) -- XXX
 
 type DeriveRingDoc_AbelianGroup_Group p m a =
   Ring_AbelianGroup_Group
@@ -37,3 +38,11 @@ type instance SemiringS Add Mul Double =
 
 type instance RingS Add Mul Double =
      DeriveRing_AbelianGroup_Group Add Mul Double
+
+p
+  :: Ring Add Mul r
+  => r -> r -> r
+p a b = a + b / a
+
+q :: Double
+q = p (2 :: Double) (4 :: Double)

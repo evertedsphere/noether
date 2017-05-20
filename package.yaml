@@ -33,6 +33,7 @@ default-extensions:
   - TypeOperators
   - TypeSynonymInstances
   - UndecidableInstances
+  - UndecidableSuperClasses
 
 library:
   dependencies:
