@@ -77,8 +77,10 @@ library
       Noether.Algebra.Actions.Strategies
       Noether.Algebra.Derive
       Noether.Algebra.Inference
+      Noether.Algebra.Linear
+      Noether.Algebra.Linear.API
       Noether.Algebra.Linear.GADTMaps
-      Noether.Algebra.Linear.Modules
+      Noether.Algebra.Linear.Module
       Noether.Algebra.Linear.Strategies
       Noether.Algebra.Multiple
       Noether.Algebra.Multiple.Ring

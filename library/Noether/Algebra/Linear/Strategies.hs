@@ -12,7 +12,7 @@ import           Noether.Algebra.Single
 import           Noether.Algebra.Single.Synonyms
 import           Noether.Algebra.Tags
 
-import           Noether.Algebra.Linear.Modules
+import           Noether.Algebra.Linear.Module
 
 type DeriveLeftModule_Ring_AbelianGroup op p m r a v =
   LeftModule_Ring_AbelianGroup_Linear_Compatible
@@ -34,14 +34,5 @@ type DeriveRightModule_Ring_AbelianGroup op p m r a v =
 
 type DeriveRightModule_Self p m r = DeriveRightModule_Ring_AbelianGroup m p m r p r
 
-type instance LeftModuleS Add Mul Double Add Double = DeriveLeftModule_Self Add Mul Double
-type instance RightModuleS Add Mul Double Add Double = DeriveRightModule_Self Add Mul Double
-
-type LeftModule' r v = LeftModule Add Mul r Add v
-type RightModule' r v = RightModule Add Mul r Add v
-
-(%<) :: LeftModule' r v => r -> v -> v
-r %< v = leftAct @Mul r v
-
-(>%) :: RightModule' r v => v -> r -> v
-v >% r = rightAct @Mul r v
+type instance LeftModuleS Mul Add Mul Double Add Double = DeriveLeftModule_Self Add Mul Double
+type instance RightModuleS Mul Add Mul Double Add Double = DeriveRightModule_Self Add Mul Double

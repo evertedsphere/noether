@@ -1,5 +1,4 @@
 {-# OPTIONS_GHC -fconstraint-solver-iterations=0 #-}
-{-# OPTIONS_GHC -ddump-cs-trace #-}
 module Noether.Algebra.Multiple.Strategies where
 
 import           Noether.Lemmata.Prelude
@@ -43,9 +42,10 @@ type DeriveRing_AbelianGroup_Group p m a =
     (GroupS m a)
 
 type family RingNamedT a where
-  RingNamedT (Ring_AbelianGroup_Group ab grp) = Ring_AbelianGroup_Group
-    (AbelianGroupNamed "Additive group" ab)
-    (GroupNamed "Multiplicative group" grp)
+  RingNamedT (Ring_AbelianGroup_Group ab grp) =
+    Ring_AbelianGroup_Group
+      (AbelianGroupNamed "Additive group" ab)
+      (GroupNamed "Multiplicative group" grp)
 
 type DeriveRingDoc_AbelianGroup_Group p m a =
   RingNamedT (DeriveRing_AbelianGroup_Group p m a)
