@@ -1,0 +1,147 @@
+-- This file has been generated from package.yaml by hpack version 0.17.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           noether
+version:        0.0.0
+synopsis:       Math in Haskell.
+description:    TODO
+category:       Math
+homepage:       https://github.com/mrkgnao/noether#readme
+bug-reports:    https://github.com/mrkgnao/noether/issues
+maintainer:     Soham Chowdhury
+license:        MIT
+build-type:     Simple
+cabal-version:  >= 1.10
+
+extra-source-files:
+    CHANGELOG.md
+    LICENSE.md
+    package.yaml
+    README.md
+    stack.yaml
+
+source-repository head
+  type: git
+  location: https://github.com/mrkgnao/noether
+
+library
+  hs-source-dirs:
+      library
+  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeFamilyDependencies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
+  ghc-options: -fwarn-implicit-prelude -fno-warn-unticked-promoted-constructors
+  build-depends:
+      base
+    , array
+    , ghc-prim
+    , async
+    , deepseq
+    , containers
+    , hashable
+    , transformers
+    , text
+    , stm
+    , bytestring
+    , mtl
+    , mtl-compat
+    , safe
+    , pretty-show
+    , reflection
+    , template-haskell
+    , ghc-typelits-natnormalise
+  exposed-modules:
+      EllipticCurve
+      Lemmata
+      Lemmata.Applicative
+      Lemmata.Base
+      Lemmata.Bifunctor
+      Lemmata.Bool
+      Lemmata.Conv
+      Lemmata.Debug
+      Lemmata.Either
+      Lemmata.Exceptions
+      Lemmata.Functor
+      Lemmata.List
+      Lemmata.Monad
+      Lemmata.Panic
+      Lemmata.Semiring
+      Lemmata.Show
+      Lemmata.Unsafe
+      Noether.Algebra
+      Noether.Algebra.Actions
+      Noether.Algebra.Actions.Acts
+      Noether.Algebra.Actions.API
+      Noether.Algebra.Actions.Compatible
+      Noether.Algebra.Actions.GroupActions
+      Noether.Algebra.Actions.Linearity
+      Noether.Algebra.Actions.Strategies
+      Noether.Algebra.Derive
+      Noether.Algebra.Inference
+      Noether.Algebra.Linear.GADTMaps
+      Noether.Algebra.Linear.Modules
+      Noether.Algebra.Linear.Strategies
+      Noether.Algebra.Multiple
+      Noether.Algebra.Multiple.Ring
+      Noether.Algebra.Multiple.Semiring
+      Noether.Algebra.Multiple.Strategies
+      Noether.Algebra.Single
+      Noether.Algebra.Single.AbelianGroup
+      Noether.Algebra.Single.API
+      Noether.Algebra.Single.Cancellative
+      Noether.Algebra.Single.Commutative
+      Noether.Algebra.Single.Group
+      Noether.Algebra.Single.Magma
+      Noether.Algebra.Single.Monoid
+      Noether.Algebra.Single.Neutral
+      Noether.Algebra.Single.Semigroup
+      Noether.Algebra.Single.Strategies
+      Noether.Algebra.Single.Synonyms
+      Noether.Algebra.Subtyping
+      Noether.Algebra.Tags
+      Noether.Equality
+      Noether.Equality.Tutorial
+      Noether.Lemmata.Prelude
+      Noether.Lemmata.TypeFu
+      Noether.Lemmata.TypeFu.DList
+      Noether.Lemmata.TypeFu.Map
+      Noether.Lemmata.TypeFu.Set
+  default-language: Haskell2010
+
+executable noether
+  main-is: Main.hs
+  hs-source-dirs:
+      executable
+  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeFamilyDependencies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
+  ghc-options: -fwarn-implicit-prelude -fno-warn-unticked-promoted-constructors -rtsopts -threaded -with-rtsopts=-N
+  build-depends:
+      base
+    , noether
+  default-language: Haskell2010
+
+test-suite noether-test-suite
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  hs-source-dirs:
+      test-suite
+  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeFamilyDependencies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
+  ghc-options: -fwarn-implicit-prelude -fno-warn-unticked-promoted-constructors -rtsopts -threaded -with-rtsopts=-N
+  build-depends:
+      base
+    , noether
+    , hedgehog
+  other-modules:
+      Algebra
+  default-language: Haskell2010
+
+benchmark noether-benchmarks
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  hs-source-dirs:
+      benchmark
+  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeFamilyDependencies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
+  ghc-options: -fwarn-implicit-prelude -fno-warn-unticked-promoted-constructors -rtsopts -threaded -with-rtsopts=-N
+  build-depends:
+      base
+    , noether
+    , criterion
+  default-language: Haskell2010

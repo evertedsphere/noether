@@ -39,10 +39,8 @@ type instance SemiringS Add Mul Double =
 type instance RingS Add Mul Double =
      DeriveRing_AbelianGroup_Group Add Mul Double
 
-p
-  :: Ring Add Mul r
-  => r -> r -> r
+p :: Ring Add Mul r => r -> r -> r
 p a b = a + b / a
 
-q :: Double
+-- q :: Double
 q = p (2 :: Double) (4 :: Double)
