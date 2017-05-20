@@ -18,7 +18,7 @@ import           Noether.Algebra.Single.Group
 
 -- Lifting strategies
 
-type DeriveSemigroup_Magma t a = SemigroupMagma (MagmaS t a)
+type DeriveSemigroup_Magma t a = Semigroup_Magma (MagmaS t a)
 
 type DeriveMonoid_Semigroup_Neutral t a =
   Monoid_Semigroup_Neutral (SemigroupS t a) (NeutralS t a)

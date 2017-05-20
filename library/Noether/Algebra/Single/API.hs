@@ -7,6 +7,7 @@ import           Noether.Lemmata.TypeFu
 import           Noether.Algebra.Single.Cancellative
 import           Noether.Algebra.Single.Group
 import           Noether.Algebra.Single.Magma
+import           Noether.Algebra.Single.Monoid
 import           Noether.Algebra.Single.Neutral
 import           Noether.Algebra.Single.Semigroup
 

@@ -6,12 +6,12 @@ import           Noether.Algebra.Single.Magma
 import           Noether.Algebra.Tags
 
 data SemigroupE
-  = SemigroupMagma MagmaE
+  = Semigroup_Magma MagmaE
   | SemigroupNamed Symbol SemigroupE
 
 class SemigroupK (op :: k) a (s :: SemigroupE)
 
-instance MagmaK op a s => SemigroupK op a (SemigroupMagma s)
+instance MagmaK op a s => SemigroupK op a (Semigroup_Magma s)
 
 instance (KnownSymbol sym, SemigroupK op a s) =>
          SemigroupK op a (SemigroupNamed sym s)

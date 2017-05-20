@@ -13,17 +13,6 @@ import           Noether.Algebra.Single.Types
 
 -- Semirings, aka "rigs"
 
-type family SemiringS (add :: k) (mul :: k) (a :: Type) = (r :: Type)
-
--- FIXME: add DistributesOver add mul a s
-class ( CommMonoid add a
-      , Monoid mul a
-      ) => SemiringK add mul a s
-
-type Semiring add mul a = SemiringK add mul a (SemiringS add mul a)
-
--- Semirings, aka "rigs"
-
 type family CommSemiringS (add :: k) (mul :: k) (a :: Type) = (r :: Type)
 
 class ( Semiring add mul a

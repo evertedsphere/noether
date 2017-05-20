@@ -6,7 +6,8 @@ module Noether.Algebra.Actions
 
 import           Noether.Lemmata.TypeFu
 
-import           Noether.Algebra.Actions.Types as Types
+import           Noether.Algebra.Actions.Acts
+import           Noether.Algebra.Tags
 
 leftActK :: forall a b s. ActsK 'L a b s => Proxy s -> a -> b -> b
 leftActK p = actK p (Proxy :: Proxy 'L)
