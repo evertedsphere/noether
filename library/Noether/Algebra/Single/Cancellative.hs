@@ -10,6 +10,7 @@ data CancellativeE
   = CancellativeNum
   | CancellativeFractional
   | CancellativeNamed Symbol CancellativeE
+  | CancellativeTagged Type CancellativeE
 
 class CancellativeK (op :: k) a (s :: CancellativeE) where
   cancelK :: Proxy op -> Proxy s -> a -> a

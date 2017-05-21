@@ -26,7 +26,16 @@ type AbelianGroup op a = (AbelianGroupC op a, Group op a, Commutative op a)
 
 -- Lifting strategies
 
-type DeriveSemigroup_Magma t a = Semigroup_Magma (MagmaS t a)
+type DeriveMagma_Tagged tag op a = MagmaTagged tag (MagmaS op a)
+
+type DeriveCommutative_Tagged tag op a = CommutativeTagged tag (CommutativeS op a)
+
+type DeriveCancellative_Tagged tag op a = CancellativeTagged tag (CancellativeS op a)
+
+type DeriveNeutral_Tagged tag op a = NeutralTagged tag (NeutralS op a)
+
+type DeriveSemigroup_Magma (t :: k) (a :: Type) = Semigroup_Magma (MagmaS t a)
+
 
 type DeriveMonoid_Semigroup_Neutral t a =
   Monoid_Semigroup_Neutral (SemigroupS t a) (NeutralS t a)

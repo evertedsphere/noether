@@ -9,6 +9,7 @@ import           Noether.Lemmata.TypeFu
 data CommutativeE
   = CommutativeNum
   | CommutativeNamed Symbol CommutativeE
+  | CommutativeTagged Type CommutativeE
 
 class CommutativeK (op :: k) a (s :: CommutativeE)
 
@@ -17,6 +18,9 @@ instance P.Num a => CommutativeK Mul a CommutativeNum
 
 instance (KnownSymbol sym, CommutativeK op a s) =>
          CommutativeK op a (CommutativeNamed sym s)
+
+instance (CommutativeK op a s) =>
+         CommutativeK op a (CommutativeTagged tag s)
 
 type Commutative op a = CommutativeK op a (CommutativeS op a)
 

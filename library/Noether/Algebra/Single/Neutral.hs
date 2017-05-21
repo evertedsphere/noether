@@ -11,6 +11,7 @@ data NeutralE
   = NeutralPrim
   | NeutralNum
   | NeutralNamed Symbol NeutralE
+  | NeutralTagged Type NeutralE
 
 class NeutralK (op :: k) a (s :: NeutralE) where
   neutralK :: Proxy op -> Proxy s -> a

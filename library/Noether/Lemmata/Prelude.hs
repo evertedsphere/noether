@@ -4,6 +4,7 @@ module Noether.Lemmata.Prelude
   , fromString
   ) where
 
+import           Data.Monoid as X ((<>))
 import           Prelude     as X hiding (Eq, Monoid, fromInteger, negate,
                                    recip, (*), (+), (-), (/), (==))
 
