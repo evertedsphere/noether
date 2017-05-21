@@ -56,7 +56,7 @@ type instance AbelianGroupS (op :: BinaryNumeric) (UArray n Double) =
      DeriveAbelianGroup_Commutative_Group op (UArray n Double)
 
 vec :: UArray 10 Double
-vec = zero + one * one
+vec = zero + one * one + one + one
 
 -- Inferred type:
 -- f ::
@@ -67,5 +67,7 @@ vec = zero + one * one
 -- basically, something ringish
 f x = x + x - x / x
 
+-- | This is equal to
+-- > UArray [5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0]
 g :: UArray 10 Double
 g = f vec
