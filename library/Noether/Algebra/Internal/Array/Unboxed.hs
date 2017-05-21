@@ -34,17 +34,14 @@ instance (Unbox v, KnownNat n, CancellativeK op v s) =>
     where
       cancelK' = cancelK o (Proxy :: Proxy s)
 
-type instance MagmaS (op :: BinaryNumeric) (UArray n Double) =
-     DeriveMagma_Tagged UVectorLift op Double
+-- Instances of the "basic types". Everything else can be derived from these.
 
-type instance NeutralS (op :: BinaryNumeric) (UArray n Double) =
-     DeriveNeutral_Tagged UVectorLift op Double
+type instance MagmaS        (op :: BinaryNumeric) (UArray n Double) = DeriveMagma_Tagged        UVectorLift op Double
+type instance NeutralS      (op :: BinaryNumeric) (UArray n Double) = DeriveNeutral_Tagged      UVectorLift op Double
+type instance CommutativeS  (op :: BinaryNumeric) (UArray n Double) = DeriveCommutative_Tagged  UVectorLift op Double
+type instance CancellativeS (op :: BinaryNumeric) (UArray n Double) = DeriveCancellative_Tagged UVectorLift op Double
 
-type instance CommutativeS (op :: BinaryNumeric) (UArray n Double) =
-     DeriveCommutative_Tagged UVectorLift op Double
-
-type instance CancellativeS (op :: BinaryNumeric) (UArray n Double) =
-     DeriveCancellative_Tagged UVectorLift op Double
+-- Like I said:
 
 type instance SemigroupS (op :: BinaryNumeric) (UArray n Double) =
      DeriveSemigroup_Magma op (UArray n Double)
