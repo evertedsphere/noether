@@ -39,12 +39,13 @@ instance ( RingK p m r zr
          LeftModuleK op p m r a v
            (LeftModule_Ring_AbelianGroup_Linear_Compatible zr zag zor zee zlc)
 
-type LeftModule op p m r a v
-  = LeftModuleC op p m r a v
-  & Ring p m r
-  & AbelianGroup a v
-  & LinearActsOn L m p r a v
-  & LeftCompatible op m r v
+type LeftModule op p m r a v =
+  ( LeftModuleC op p m r a v
+  , Ring p m r
+  , AbelianGroup a v
+  , LinearActsOn L m p r a v
+  , LeftCompatible op m r v
+  )
 
 data RightModuleE
   = RightModule_Ring_AbelianGroup_Linear_Compatible
@@ -71,9 +72,10 @@ instance ( RingK p m r zr
          ) => RightModuleK op p m r a v
            (RightModule_Ring_AbelianGroup_Linear_Compatible zr zag zor zee zrc)
 
-type RightModule op p m r a v
-  = RightModuleC op p m r a v
-  & Ring p m r
-  & AbelianGroup a v
-  & LinearActsOn R m p r a v
-  & RightCompatible op m r v
+type RightModule op p m r a v =
+  ( RightModuleC op p m r a v
+  , Ring p m r
+  , AbelianGroup a v
+  , LinearActsOn R m p r a v
+  , RightCompatible op m r v
+  )
