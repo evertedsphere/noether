@@ -10,6 +10,9 @@ import           Noether.Algebra.Actions.Linearity
 
 import           Noether.Algebra.Actions.API
 
+type DeriveActs_Tagged tag lr op a b =
+  ActsTagged tag (ActsS lr op a b)
+
 type DeriveActs_Magma op a =
   Acts_Magma (MagmaS op a)
 
