@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass   #-}
 {-# LANGUAGE TypeApplications #-}
 module Noether.Algebra.Vector.Boxed where
 
@@ -90,51 +91,3 @@ type instance ActorLinearS lr Mul Add a Add (BVector n a) =
 type instance ActeeLinearS lr Mul a Add (BVector n a) =
      DeriveActeeLinearActs_Acts_Semigroup lr Mul a Add (BVector n a)
 
-{-
-   Basic demo
--}
-
--- | This annotation actually does nothing but bring the KnownNat constraint
--- into scope. (TODO demo with PartialTypeSignatures?)
-v :: BVector 10 (Complex Double)
-v = zero + (unsafeFromList $ map (\x -> cis (x * pi / 10)) [1..10])
-
--- w :: BVector 10 (Complex Double)
-w = unsafeFromList $ map (\x -> cis (-x * pi / 10)) [1..10]
-
--- Inferred type:
--- f ::
---   (MagmaK 'Mul a (MagmaS 'Mul a), MagmaK 'Add a (MagmaS 'Add a),
---    CancellativeK 'Add a (CancellativeS 'Add a)) =>
---   a -> a
-
-f x = x + x - x * x
-
--- | This is equal to
--- > BVector [5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0]
-
--- g :: [BVector 10 (Complex Double)]
-g = map (\γ -> lerp (γ :+ 0) v w) [0.0,0.1..1.0 :: Double]
-
-{-
-   Computing with statically differentiable but unknown dimensions, a la subhask
--}
-
-u1 :: BVector "a" Double
-u1 = unsafeFromList [1..10]
-
-u2 :: BVector "b" Double
-u2 = unsafeFromList [1..10]
-
-u3 :: BVector "a" Double
-u3 = unsafeFromList [1..10]
-
-s = u1 + u3
-
--- • Couldn't match type ‘"b"’ with ‘"a"’
---   Expected type: BVector "a" Double
---     Actual type: BVector "b" Double
--- t = u1 + u2
--- You need to do the whole "I know what I'm doing":
-
-t = u1 + unsafeChangeDimension u3
