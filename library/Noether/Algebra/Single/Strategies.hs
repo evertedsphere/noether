@@ -79,3 +79,22 @@ type instance CommutativeS (_ :: BinaryNumeric) Double = CommutativeNum
 
 type instance AbelianGroupS (op :: BinaryNumeric) Double =
      DeriveAbelianGroup_Commutative_Group op Double
+
+type instance MagmaS (_ :: BinaryNumeric) Rational = MagmaNum
+type instance NeutralS (_ :: BinaryNumeric) Rational = NeutralNum
+type instance SemigroupS (op :: BinaryNumeric) Rational =
+     DeriveSemigroup_Magma op Rational
+
+type instance MonoidS (op :: BinaryNumeric) Rational =
+     DeriveMonoid_Semigroup_Neutral op Rational
+
+type instance CancellativeS Add Rational = CancellativeNum
+type instance CancellativeS Mul Rational = CancellativeFractional
+
+type instance GroupS (op :: BinaryNumeric) Rational =
+     DeriveGroup_Monoid_Cancellative op Rational
+
+type instance CommutativeS (_ :: BinaryNumeric) Rational = CommutativeNum
+
+type instance AbelianGroupS (op :: BinaryNumeric) Rational =
+     DeriveAbelianGroup_Commutative_Group op Rational

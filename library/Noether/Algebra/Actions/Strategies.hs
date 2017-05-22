@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Noether.Algebra.Actions.Strategies where
 
 import           Noether.Algebra.Single
@@ -44,15 +45,14 @@ type DeriveActorLinearActs_LeftDistributivity lr p m a =
 type DeriveActeeLinearActs_RightDistributivity lr p m a =
   DeriveActeeLinearActs_Acts_Semigroup lr m a p a
 
-type instance ActsS lr (op :: BinaryNumeric) Double Double =
-     DeriveActs_Magma op Double
+-- Forgive me.
 
-type instance CompatibleS lr (op :: BinaryNumeric) op Double Double =
-     DeriveCompatible_Associativity lr op Double
+#define self_action(ty) \
+type instance ActsS lr (op :: BinaryNumeric) (ty) (ty) = DeriveActs_Magma op (ty); \
+type instance CompatibleS lr (op :: BinaryNumeric) op (ty) (ty) = DeriveCompatible_Associativity lr op (ty); \
+type instance ActorLinearS lr Mul Add (ty) Add (ty) = DeriveActorLinearActs_LeftDistributivity lr Add Mul (ty); \
+type instance ActeeLinearS lr Mul (ty) Add (ty) = DeriveActeeLinearActs_RightDistributivity lr Add Mul (ty)
 
-type instance ActorLinearS lr Mul Add Double Add Double =
-     DeriveActorLinearActs_LeftDistributivity lr Add Mul Double
-
-type instance ActeeLinearS lr Mul Double Add Double =
-     DeriveActeeLinearActs_RightDistributivity lr Add Mul Double
-
+self_action(Double)
+self_action(Rational)
+self_action(Complex Double)

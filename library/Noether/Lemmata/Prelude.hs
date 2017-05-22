@@ -4,12 +4,13 @@ module Noether.Lemmata.Prelude
   , fromString
   ) where
 
-import           Data.Monoid as X ((<>))
-import           Prelude     as X hiding (Eq, Monoid, fromInteger, negate,
-                                   recip, (*), (+), (-), (/), (==))
+import           Data.Complex as X
+import           Data.Monoid  as X ((<>))
+import           Prelude      as X hiding (Eq, Monoid, fromInteger, negate,
+                                    recip, (*), (+), (-), (/), (==))
 
-import qualified Data.String as S
-import qualified Prelude     as P
+import qualified Data.String  as S
+import qualified Prelude      as P
 
 fromInteger :: Num a => Integer -> a
 fromInteger = P.fromInteger
