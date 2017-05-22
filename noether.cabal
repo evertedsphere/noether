@@ -78,6 +78,7 @@ library
       Noether.Algebra.Actions.Strategies
       Noether.Algebra.Derive
       Noether.Algebra.Inference
+      Noether.Algebra.Internal.Array.Tags
       Noether.Algebra.Internal.Array.Unboxed
       Noether.Algebra.Internal.Tagless
       Noether.Algebra.Linear
