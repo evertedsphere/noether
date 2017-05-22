@@ -1,4 +1,4 @@
-module Noether.Algebra.Internal.Array.Tags where
+module Noether.Algebra.Vector.Tags where
 
 import           Noether.Lemmata.TypeFu
 

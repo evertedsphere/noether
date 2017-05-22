@@ -27,6 +27,7 @@ type AbelianGroup op a = (AbelianGroupC op a, Group op a, Commutative op a)
 -- Lifting strategies
 
 type DeriveMagma_Tagged tag op a = MagmaTagged tag (MagmaS op a)
+type DeriveMagma_Named tag op a = MagmaNamed tag (MagmaS op a)
 
 type DeriveCommutative_Tagged tag op a = CommutativeTagged tag (CommutativeS op a)
 
@@ -59,42 +60,55 @@ type instance CommutativeS (_ :: BinaryBoolean) Bool = CommutativeNum
 type instance SemigroupS (op :: BinaryBoolean) Bool =
      DeriveSemigroup_Magma op Bool
 
--- Double
+-- Int
 
-type instance MagmaS (_ :: BinaryNumeric) Double = MagmaNum
-type instance NeutralS (_ :: BinaryNumeric) Double = NeutralNum
-type instance SemigroupS (op :: BinaryNumeric) Double =
-     DeriveSemigroup_Magma op Double
+type instance MagmaS       (_ :: BinaryNumeric) Int = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) Int = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) Int = CommutativeNum
 
-type instance MonoidS (op :: BinaryNumeric) Double =
-     DeriveMonoid_Semigroup_Neutral op Double
+type instance SemigroupS  (op :: BinaryNumeric) Int = DeriveSemigroup_Magma          op Int
+type instance MonoidS     (op :: BinaryNumeric) Int = DeriveMonoid_Semigroup_Neutral op Int
+
+type instance CancellativeS Add Int = CancellativeNum
+type instance GroupS        Add Int = DeriveGroup_Monoid_Cancellative      Add Int
+type instance AbelianGroupS Add Int = DeriveAbelianGroup_Commutative_Group Add Int
+
+type instance MagmaS       (_ :: BinaryNumeric) Double = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) Double = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) Double = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) Double = DeriveSemigroup_Magma          op Double
+type instance MonoidS     (op :: BinaryNumeric) Double = DeriveMonoid_Semigroup_Neutral op Double
 
 type instance CancellativeS Add Double = CancellativeNum
 type instance CancellativeS Mul Double = CancellativeFractional
 
-type instance GroupS (op :: BinaryNumeric) Double =
-     DeriveGroup_Monoid_Cancellative op Double
+type instance GroupS        (op :: BinaryNumeric) Double = DeriveGroup_Monoid_Cancellative      op Double
+type instance AbelianGroupS (op :: BinaryNumeric) Double = DeriveAbelianGroup_Commutative_Group op Double
 
-type instance CommutativeS (_ :: BinaryNumeric) Double = CommutativeNum
 
-type instance AbelianGroupS (op :: BinaryNumeric) Double =
-     DeriveAbelianGroup_Commutative_Group op Double
+type instance MagmaS       (_ :: BinaryNumeric) Rational = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) Rational = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) Rational = CommutativeNum
 
-type instance MagmaS (_ :: BinaryNumeric) Rational = MagmaNum
-type instance NeutralS (_ :: BinaryNumeric) Rational = NeutralNum
-type instance SemigroupS (op :: BinaryNumeric) Rational =
-     DeriveSemigroup_Magma op Rational
-
-type instance MonoidS (op :: BinaryNumeric) Rational =
-     DeriveMonoid_Semigroup_Neutral op Rational
+type instance SemigroupS  (op :: BinaryNumeric) Rational = DeriveSemigroup_Magma          op Rational
+type instance MonoidS     (op :: BinaryNumeric) Rational = DeriveMonoid_Semigroup_Neutral op Rational
 
 type instance CancellativeS Add Rational = CancellativeNum
 type instance CancellativeS Mul Rational = CancellativeFractional
 
-type instance GroupS (op :: BinaryNumeric) Rational =
-     DeriveGroup_Monoid_Cancellative op Rational
+type instance GroupS        (op :: BinaryNumeric) Rational = DeriveGroup_Monoid_Cancellative      op Rational
+type instance AbelianGroupS (op :: BinaryNumeric) Rational = DeriveAbelianGroup_Commutative_Group op Rational
 
-type instance CommutativeS (_ :: BinaryNumeric) Rational = CommutativeNum
+data ComplexLift
 
-type instance AbelianGroupS (op :: BinaryNumeric) Rational =
-     DeriveAbelianGroup_Commutative_Group op Rational
+type instance MagmaS        (op :: BinaryNumeric) (Complex a) = MagmaNum
+type instance NeutralS      (op :: BinaryNumeric) (Complex a) = NeutralNum
+type instance CommutativeS  (op :: BinaryNumeric) (Complex a) = CommutativeNum
+type instance CancellativeS (op :: BinaryNumeric) (Complex a) = CancellativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Complex a) = DeriveSemigroup_Magma          op (Complex a)
+type instance MonoidS     (op :: BinaryNumeric) (Complex a) = DeriveMonoid_Semigroup_Neutral op (Complex a)
+
+type instance GroupS        (op :: BinaryNumeric) (Complex a) = DeriveGroup_Monoid_Cancellative      op (Complex a)
+type instance AbelianGroupS (op :: BinaryNumeric) (Complex a) = DeriveAbelianGroup_Commutative_Group op (Complex a)

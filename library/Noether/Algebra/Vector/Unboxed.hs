@@ -1,17 +1,17 @@
-module Noether.Algebra.Internal.Array.Unboxed where
+module Noether.Algebra.Vector.Unboxed where
 
-import qualified Prelude                             as P
+import qualified Prelude                     as P
 
 import           Noether.Lemmata.Prelude
 import           Noether.Lemmata.TypeFu
 
 import           Noether.Algebra.Actions
-import           Noether.Algebra.Internal.Array.Tags
 import           Noether.Algebra.Linear
 import           Noether.Algebra.Single
 import           Noether.Algebra.Tags
+import           Noether.Algebra.Vector.Tags
 
-import qualified Data.Vector.Unboxed                 as U
+import qualified Data.Vector.Unboxed         as U
 
 {-| UVector n v ≅ v^n for 'Unbox' types 'v'. -}
 
