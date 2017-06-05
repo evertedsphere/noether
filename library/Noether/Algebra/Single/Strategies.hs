@@ -28,15 +28,10 @@ type AbelianGroup op a = (AbelianGroupC op a, Group op a, Commutative op a)
 
 type DeriveMagma_Tagged tag op a = MagmaTagged tag (MagmaS op a)
 type DeriveMagma_Named tag op a = MagmaNamed tag (MagmaS op a)
-
 type DeriveCommutative_Tagged tag op a = CommutativeTagged tag (CommutativeS op a)
-
 type DeriveCancellative_Tagged tag op a = CancellativeTagged tag (CancellativeS op a)
-
 type DeriveNeutral_Tagged tag op a = NeutralTagged tag (NeutralS op a)
-
 type DeriveSemigroup_Magma (t :: k) (a :: Type) = Semigroup_Magma (MagmaS t a)
-
 
 type DeriveMonoid_Semigroup_Neutral t a =
   Monoid_Semigroup_Neutral (SemigroupS t a) (NeutralS t a)
@@ -85,7 +80,6 @@ type instance CancellativeS Mul Double = CancellativeFractional
 
 type instance GroupS        (op :: BinaryNumeric) Double = DeriveGroup_Monoid_Cancellative      op Double
 type instance AbelianGroupS (op :: BinaryNumeric) Double = DeriveAbelianGroup_Commutative_Group op Double
-
 
 type instance MagmaS       (_ :: BinaryNumeric) Rational = MagmaNum
 type instance NeutralS     (_ :: BinaryNumeric) Rational = NeutralNum

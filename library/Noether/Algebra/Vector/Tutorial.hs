@@ -1,5 +1,6 @@
 module Noether.Algebra.Vector.Tutorial where
 
+import           Noether.Algebra.Tags
 import           Noether.Lemmata.Prelude
 
 import           Noether.Algebra.Actions
@@ -26,11 +27,8 @@ w = unsafeFromList $ map (\x -> cis (-x * pi / 10)) [1..10]
 --      a -> a
 f x = x + x - x * x + zero
 
--- | This is equal to
--- > BVector [5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0]
-
 -- g :: [BVector 10 (Complex Double)]
-g = map (\γ -> lerp (γ :+ 0) v (f w)) [0.0,0.1..1.0 :: Double]
+g = map (\lambda -> lerp (lambda :+ 0) v (f w)) [0.0,0.1..1.0 :: Double]
 
 {-
    Computing with statically differentiable but unknown dimensions, a la subhask
@@ -45,13 +43,25 @@ u2 = unsafeFromList [1..10]
 u3 :: BVector "a" Double
 u3 = unsafeFromList [1..10]
 
-s = u1 + x %< u3
-  where x = 0.3 :: Double
+-- Given an action of the a on b, a %< b computes the results. Usually,
+-- this is just multiplication. Other interesting examples exist: e.g. group
+-- actions, where b is just a set, and so on.
+--
+-- A particularly pervasive one is the action of Z on groups:
+-- > n %< a = a + a + ... + a
+-- where the right side is a added to itself n times.
 
+s = u1 + x %< u3
+  where
+    x = 0.3 :: Double
+
+-- This fails:
+-- > t = u1 + u2
 -- • Couldn't match type ‘"b"’ with ‘"a"’
 --   Expected type: BVector "a" Double
 --     Actual type: BVector "b" Double
--- t = u1 + u2
+
 -- You need to do the whole "I know what I'm doing":
 
 t = u1 + unsafeChangeDimension u3
+

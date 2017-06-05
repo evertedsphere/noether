@@ -25,6 +25,12 @@ instance (KnownSymbol sym, CancellativeK op a s) =>
          CancellativeK op a (CancellativeNamed sym s) where
   cancelK opP _ = cancelK opP (Proxy :: Proxy s)
 
+instance CancellativeK op a s =>
+         CancellativeK op (i -> a) (CancellativeTagged FunctionLift s) where
+  cancelK o _ f = cancelK' . f
+    where
+      cancelK' = cancelK o (Proxy :: Proxy s)
+
 type Cancellative op a = CancellativeK op a (CancellativeS op a)
 
 type family CancellativeS (op :: k) (a :: Type) = (r :: CancellativeE)

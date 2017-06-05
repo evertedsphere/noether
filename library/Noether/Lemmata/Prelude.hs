@@ -7,7 +7,7 @@ module Noether.Lemmata.Prelude
 import           Data.Complex as X
 import           Data.Monoid  as X ((<>))
 import           Prelude      as X hiding (Eq, Monoid, fromInteger, negate,
-                                    recip, (*), (+), (-), (/), (==))
+                                    recip, (&&), (*), (+), (-), (/), (==), (||))
 
 import qualified Data.String  as S
 import qualified Prelude      as P

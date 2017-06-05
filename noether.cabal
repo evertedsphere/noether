@@ -78,8 +78,6 @@ library
       Noether.Algebra.Actions.Strategies
       Noether.Algebra.Derive
       Noether.Algebra.Inference
-      Noether.Algebra.Internal.Array.Tags
-      Noether.Algebra.Internal.Array.Unboxed
       Noether.Algebra.Internal.Tagless
       Noether.Algebra.Linear
       Noether.Algebra.Linear.API
@@ -104,6 +102,12 @@ library
       Noether.Algebra.Single.Synonyms
       Noether.Algebra.Subtyping
       Noether.Algebra.Tags
+      Noether.Algebra.Vector.Boxed
+      Noether.Algebra.Vector.Generic
+      Noether.Algebra.Vector.Tagless
+      Noether.Algebra.Vector.Tags
+      Noether.Algebra.Vector.Tutorial
+      Noether.Algebra.Vector.Unboxed
       Noether.Equality
       Noether.Equality.Tutorial
       Noether.Lemmata.Prelude
