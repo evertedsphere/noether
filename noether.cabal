@@ -49,9 +49,7 @@ library
     , vector
     , reflection
     , template-haskell
-    , ghc-typelits-natnormalise
   exposed-modules:
-      EllipticCurve
       Lemmata
       Lemmata.Applicative
       Lemmata.Base
@@ -68,7 +66,6 @@ library
       Lemmata.Semiring
       Lemmata.Show
       Lemmata.Unsafe
-      Noether.Algebra
       Noether.Algebra.Actions
       Noether.Algebra.Actions.Acts
       Noether.Algebra.Actions.API
@@ -78,10 +75,8 @@ library
       Noether.Algebra.Actions.Strategies
       Noether.Algebra.Derive
       Noether.Algebra.Inference
-      Noether.Algebra.Internal.Tagless
       Noether.Algebra.Linear
       Noether.Algebra.Linear.API
-      Noether.Algebra.Linear.GADTMaps
       Noether.Algebra.Linear.Module
       Noether.Algebra.Linear.Strategies
       Noether.Algebra.Multiple
@@ -104,7 +99,6 @@ library
       Noether.Algebra.Tags
       Noether.Algebra.Vector.Boxed
       Noether.Algebra.Vector.Generic
-      Noether.Algebra.Vector.Tagless
       Noether.Algebra.Vector.Tags
       Noether.Algebra.Vector.Tutorial
       Noether.Algebra.Vector.Unboxed

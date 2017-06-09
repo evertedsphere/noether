@@ -56,7 +56,6 @@ library:
 
   - reflection
   - template-haskell
-  - ghc-typelits-natnormalise
   source-dirs:
   - library
 

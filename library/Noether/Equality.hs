@@ -1,6 +1,9 @@
-{-# LANGUAGE MagicHash              #-}
+{-# LANGUAGE MagicHash #-}
 
 {-| Flexible, extensible notions of equality supporting "custom deriving strategies".
+
+    This module is, as of now, completely separate from the rest of the codebase
+    (which was developed later, using ideas first tested here).
 
     There are no incoherent or even overlapping instances anywhere here.
     The ideas are based off of the "Advanced Overlap" page on the Haskell wiki:
@@ -27,7 +30,7 @@ import           GHC.Prim
 import           Noether.Lemmata.Prelude
 import           Noether.Lemmata.TypeFu
 
-import           Prelude                 ((-))
+import           Prelude                 ((&&), (-))
 import qualified Prelude
 
 {-| This represents the unique "equality strategy" to be used for 'a'.

@@ -9,17 +9,18 @@
 module EllipticCurve where
 
 
-import           Lemmata         hiding (Monoid, Semigroup, Semiring,
-                                  fromInteger, negate, one, show, zero, (*),
-                                  (+), (-), (/))
+import           Lemmata                  hiding (Monoid, Semigroup, Semiring,
+                                           fromInteger, negate, one, show, zero,
+                                           (*), (+), (-), (/))
 
-import qualified Lemmata         as L
+import qualified Lemmata                  as L
 
-import           Algebra
 import           Data.Kind
 import           Data.Proxy
 import           Data.Reflection
 import           GHC.Show
+import           Noether.Algebra.Multiple
+import           Noether.Algebra.Single
 
 data P1 a = P1 a a
   deriving Show
@@ -142,7 +143,7 @@ instance (Field k, Eq k, Num k, HasWM k s) => Cancellative (CurvePt k s) where
 instance (Field k, Eq k, Num k, HasWM k s) => Group (CurvePt k s) where
   negate = CurvePt . ecNegate . unCurvePt
 
-instance (Field k, Eq k, Num k, HasWM k s) => Abelian (CurvePt k s)
+-- instance (Field k, Eq k, Num k, HasWM k s) => AbelianGroup (CurvePt k s)
 
 computeOver
   :: (Field k, Eq k, Num k)
