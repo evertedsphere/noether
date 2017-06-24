@@ -111,12 +111,139 @@ type instance CancellativeS Mul Double = CancellativeFractional
 type instance GroupS        (op :: BinaryNumeric) Double = DeriveGroup_Monoid_Cancellative      op Double
 type instance AbelianGroupS (op :: BinaryNumeric) Double = DeriveAbelianGroup_Commutative_Group op Double
 
+-- Rational
+
 type instance MagmaS       (_ :: BinaryNumeric) Rational = MagmaNum
 type instance NeutralS     (_ :: BinaryNumeric) Rational = NeutralNum
 type instance CommutativeS (_ :: BinaryNumeric) Rational = CommutativeNum
 
 type instance SemigroupS  (op :: BinaryNumeric) Rational = DeriveSemigroup_Magma          op Rational
 type instance MonoidS     (op :: BinaryNumeric) Rational = DeriveMonoid_Semigroup_Neutral op Rational
+
+type instance CancellativeS Add Rational = CancellativeNum
+type instance CancellativeS Mul Rational = CancellativeFractional
+
+type instance GroupS        (op :: BinaryNumeric) Rational = DeriveGroup_Monoid_Cancellative      op Rational
+type instance AbelianGroupS (op :: BinaryNumeric) Rational = DeriveAbelianGroup_Commutative_Group op Rational
+
+type instance MagmaS       (_ :: BinaryNumeric) Rational = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) Rational = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) Rational = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) Rational = DeriveSemigroup_Magma          op Rational
+type instance MonoidS     (op :: BinaryNumeric) Rational = DeriveMonoid_Semigroup_Neutral op Rational
+
+-- Ratio Int8
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int8) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int8) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int8) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int8) = DeriveSemigroup_Magma          op (Ratio Int8)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int8) = DeriveMonoid_Semigroup_Neutral op (Ratio Int8)
+
+type instance CancellativeS Add (Ratio Int8) = CancellativeNum
+type instance CancellativeS Mul (Ratio Int8) = CancellativeFractional
+
+type instance GroupS        (op :: BinaryNumeric) (Ratio Int8) = DeriveGroup_Monoid_Cancellative      op (Ratio Int8)
+type instance AbelianGroupS (op :: BinaryNumeric) (Ratio Int8) = DeriveAbelianGroup_Commutative_Group op (Ratio Int8)
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int8) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int8) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int8) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int8) = DeriveSemigroup_Magma          op (Ratio Int8)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int8) = DeriveMonoid_Semigroup_Neutral op (Ratio Int8)
+
+-- Ratio Int8
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int8) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int8) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int8) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int8) = DeriveSemigroup_Magma          op (Ratio Int8)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int8) = DeriveMonoid_Semigroup_Neutral op (Ratio Int8)
+
+type instance CancellativeS Add (Ratio Int8) = CancellativeNum
+type instance CancellativeS Mul (Ratio Int8) = CancellativeFractional
+
+type instance GroupS        (op :: BinaryNumeric) (Ratio Int8) = DeriveGroup_Monoid_Cancellative      op (Ratio Int8)
+type instance AbelianGroupS (op :: BinaryNumeric) (Ratio Int8) = DeriveAbelianGroup_Commutative_Group op (Ratio Int8)
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int8) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int8) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int8) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int8) = DeriveSemigroup_Magma          op (Ratio Int8)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int8) = DeriveMonoid_Semigroup_Neutral op (Ratio Int8)
+
+-- Ratio Int16
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int16) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int16) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int16) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int16) = DeriveSemigroup_Magma          op (Ratio Int16)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int16) = DeriveMonoid_Semigroup_Neutral op (Ratio Int16)
+
+type instance CancellativeS Add (Ratio Int16) = CancellativeNum
+type instance CancellativeS Mul (Ratio Int16) = CancellativeFractional
+
+type instance GroupS        (op :: BinaryNumeric) (Ratio Int16) = DeriveGroup_Monoid_Cancellative      op (Ratio Int16)
+type instance AbelianGroupS (op :: BinaryNumeric) (Ratio Int16) = DeriveAbelianGroup_Commutative_Group op (Ratio Int16)
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int16) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int16) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int16) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int16) = DeriveSemigroup_Magma          op (Ratio Int16)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int16) = DeriveMonoid_Semigroup_Neutral op (Ratio Int16)
+
+-- Ratio Int32
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int32) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int32) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int32) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int32) = DeriveSemigroup_Magma          op (Ratio Int32)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int32) = DeriveMonoid_Semigroup_Neutral op (Ratio Int32)
+
+type instance CancellativeS Add (Ratio Int32) = CancellativeNum
+type instance CancellativeS Mul (Ratio Int32) = CancellativeFractional
+
+type instance GroupS        (op :: BinaryNumeric) (Ratio Int32) = DeriveGroup_Monoid_Cancellative      op (Ratio Int32)
+type instance AbelianGroupS (op :: BinaryNumeric) (Ratio Int32) = DeriveAbelianGroup_Commutative_Group op (Ratio Int32)
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int32) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int32) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int32) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int32) = DeriveSemigroup_Magma          op (Ratio Int32)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int32) = DeriveMonoid_Semigroup_Neutral op (Ratio Int32)
+
+
+-- Ratio Int64
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int64) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int64) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int64) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int64) = DeriveSemigroup_Magma          op (Ratio Int64)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int64) = DeriveMonoid_Semigroup_Neutral op (Ratio Int64)
+
+type instance CancellativeS Add (Ratio Int64) = CancellativeNum
+type instance CancellativeS Mul (Ratio Int64) = CancellativeFractional
+
+type instance GroupS        (op :: BinaryNumeric) (Ratio Int64) = DeriveGroup_Monoid_Cancellative      op (Ratio Int64)
+type instance AbelianGroupS (op :: BinaryNumeric) (Ratio Int64) = DeriveAbelianGroup_Commutative_Group op (Ratio Int64)
+
+type instance MagmaS       (_ :: BinaryNumeric) (Ratio Int64) = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) (Ratio Int64) = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) (Ratio Int64) = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) (Ratio Int64) = DeriveSemigroup_Magma          op (Ratio Int64)
+type instance MonoidS     (op :: BinaryNumeric) (Ratio Int64) = DeriveMonoid_Semigroup_Neutral op (Ratio Int64)
+
 
 type instance CancellativeS Add Rational = CancellativeNum
 type instance CancellativeS Mul Rational = CancellativeFractional

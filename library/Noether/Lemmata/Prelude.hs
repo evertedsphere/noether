@@ -9,6 +9,8 @@ import           Data.Monoid  as X ((<>))
 import           Prelude      as X hiding (Eq, Monoid, fromInteger, negate,
                                     recip, (&&), (*), (+), (-), (/), (==), (||))
 
+import           Data.Ratio   as X
+import           Data.Int     as X
 import qualified Data.String  as S
 import qualified Prelude      as P
 

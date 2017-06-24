@@ -120,6 +120,85 @@ prop_prelude_div_double = mkProp_realFloat @Double "(/) : Double" (P./) (/)
 
 namedProperty name prop = (name, property prop)
 
+-- | Create a property for a 'Ratio' type.
+mkProp_rational
+  :: forall a t.
+  (Ord a, Show a, Integral a)
+  => t
+  -> (Ratio a -> Ratio a -> Ratio a)
+  -> (Ratio a -> Ratio a -> Ratio a)
+  -> (t, Property)
+mkProp_rational name preludeOp noetherOp =
+  namedProperty
+    name
+    (do let
+          num = Gen.integral (Range.linear (-100) 100)
+          den = Gen.integral (Range.linear 1 100)
+          r = forAll ((%) <$> num <*> den)
+        a <- r
+        b <- r
+        (a `preludeOp` b) =~= (a `noetherOp` b))
+
+prop_prelude_add_rational_integer :: (PropertyName, Property)
+prop_prelude_add_rational_integer = mkProp_rational @Integer "(+) : Ratio Integer" (P.+) (+)
+
+prop_prelude_mul_rational_integer :: (PropertyName, Property)
+prop_prelude_mul_rational_integer = mkProp_rational @Integer "(*) : Ratio Integer" (P.*) (*)
+
+prop_prelude_sub_rational_integer :: (PropertyName, Property)
+prop_prelude_sub_rational_integer = mkProp_rational @Integer "(-) : Ratio Integer" (P.-) (-)
+
+prop_prelude_div_rational_integer :: (PropertyName, Property)
+prop_prelude_div_rational_integer = mkProp_rational @Integer "(/) : Ratio Integer" (P./) (/)
+
+prop_prelude_add_rational_int8 :: (PropertyName, Property)
+prop_prelude_add_rational_int8 = mkProp_rational @Int8 "(+) : Ratio Int8" (P.+) (+)
+
+prop_prelude_mul_rational_int8 :: (PropertyName, Property)
+prop_prelude_mul_rational_int8 = mkProp_rational @Int8 "(*) : Ratio Int8" (P.*) (*)
+
+prop_prelude_sub_rational_int8 :: (PropertyName, Property)
+prop_prelude_sub_rational_int8 = mkProp_rational @Int8 "(-) : Ratio Int8" (P.-) (-)
+
+prop_prelude_div_rational_int8 :: (PropertyName, Property)
+prop_prelude_div_rational_int8 = mkProp_rational @Int8 "(/) : Ratio Int8" (P./) (/)
+
+prop_prelude_add_rational_int16 :: (PropertyName, Property)
+prop_prelude_add_rational_int16 = mkProp_rational @Int16 "(+) : Ratio Int16" (P.+) (+)
+
+prop_prelude_mul_rational_int16 :: (PropertyName, Property)
+prop_prelude_mul_rational_int16 = mkProp_rational @Int16 "(*) : Ratio Int16" (P.*) (*)
+
+prop_prelude_sub_rational_int16 :: (PropertyName, Property)
+prop_prelude_sub_rational_int16 = mkProp_rational @Int16 "(-) : Ratio Int16" (P.-) (-)
+
+prop_prelude_div_rational_int16 :: (PropertyName, Property)
+prop_prelude_div_rational_int16 = mkProp_rational @Int16 "(/) : Ratio Int16" (P./) (/)
+
+prop_prelude_add_rational_int32 :: (PropertyName, Property)
+prop_prelude_add_rational_int32 = mkProp_rational @Int32 "(+) : Ratio Int32" (P.+) (+)
+
+prop_prelude_mul_rational_int32 :: (PropertyName, Property)
+prop_prelude_mul_rational_int32 = mkProp_rational @Int32 "(*) : Ratio Int32" (P.*) (*)
+
+prop_prelude_sub_rational_int32 :: (PropertyName, Property)
+prop_prelude_sub_rational_int32 = mkProp_rational @Int32 "(-) : Ratio Int32" (P.-) (-)
+
+prop_prelude_div_rational_int32 :: (PropertyName, Property)
+prop_prelude_div_rational_int32 = mkProp_rational @Int32 "(/) : Ratio Int32" (P./) (/)
+
+prop_prelude_add_rational_int64 :: (PropertyName, Property)
+prop_prelude_add_rational_int64 = mkProp_rational @Int64 "(+) : Ratio Int64" (P.+) (+)
+
+prop_prelude_mul_rational_int64 :: (PropertyName, Property)
+prop_prelude_mul_rational_int64 = mkProp_rational @Int64 "(*) : Ratio Int64" (P.*) (*)
+
+prop_prelude_sub_rational_int64 :: (PropertyName, Property)
+prop_prelude_sub_rational_int64 = mkProp_rational @Int64 "(-) : Ratio Int64" (P.-) (-)
+
+prop_prelude_div_rational_int64 :: (PropertyName, Property)
+prop_prelude_div_rational_int64 = mkProp_rational @Int64 "(/) : Ratio Int64" (P./) (/)
+
 tests :: IO ()
 tests = do
   checkParallel'
@@ -138,6 +217,26 @@ tests = do
     , prop_prelude_sub_double
     , prop_prelude_mul_double
     , prop_prelude_div_double
+    , prop_prelude_add_rational_integer
+    , prop_prelude_sub_rational_integer
+    , prop_prelude_mul_rational_integer
+    , prop_prelude_div_rational_integer
+    , prop_prelude_add_rational_int8
+    , prop_prelude_sub_rational_int8
+    , prop_prelude_mul_rational_int8
+    , prop_prelude_div_rational_int8
+    , prop_prelude_add_rational_int16
+    , prop_prelude_sub_rational_int16
+    , prop_prelude_mul_rational_int16
+    , prop_prelude_div_rational_int16
+    , prop_prelude_add_rational_int32
+    , prop_prelude_sub_rational_int32
+    , prop_prelude_mul_rational_int32
+    , prop_prelude_div_rational_int32
+    , prop_prelude_add_rational_int64
+    , prop_prelude_sub_rational_int64
+    , prop_prelude_mul_rational_int64
+    , prop_prelude_div_rational_int64
     ]
   putStrLn "asdf"
   where
