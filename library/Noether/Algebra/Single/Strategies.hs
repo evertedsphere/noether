@@ -68,6 +68,36 @@ type instance CancellativeS Add Int = CancellativeNum
 type instance GroupS        Add Int = DeriveGroup_Monoid_Cancellative      Add Int
 type instance AbelianGroupS Add Int = DeriveAbelianGroup_Commutative_Group Add Int
 
+-- Integer
+
+type instance MagmaS       (_ :: BinaryNumeric) Integer = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) Integer = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) Integer = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) Integer = DeriveSemigroup_Magma          op Integer
+type instance MonoidS     (op :: BinaryNumeric) Integer = DeriveMonoid_Semigroup_Neutral op Integer
+
+type instance CancellativeS Add Integer = CancellativeNum
+type instance GroupS        Add Integer = DeriveGroup_Monoid_Cancellative      Add Integer
+type instance AbelianGroupS Add Integer = DeriveAbelianGroup_Commutative_Group Add Integer
+
+-- Float
+
+type instance MagmaS       (_ :: BinaryNumeric) Float = MagmaNum
+type instance NeutralS     (_ :: BinaryNumeric) Float = NeutralNum
+type instance CommutativeS (_ :: BinaryNumeric) Float = CommutativeNum
+
+type instance SemigroupS  (op :: BinaryNumeric) Float = DeriveSemigroup_Magma          op Float
+type instance MonoidS     (op :: BinaryNumeric) Float = DeriveMonoid_Semigroup_Neutral op Float
+
+type instance CancellativeS Add Float = CancellativeNum
+type instance CancellativeS Mul Float = CancellativeFractional
+
+type instance GroupS        (op :: BinaryNumeric) Float = DeriveGroup_Monoid_Cancellative      op Float
+type instance AbelianGroupS (op :: BinaryNumeric) Float = DeriveAbelianGroup_Commutative_Group op Float
+
+-- Double
+
 type instance MagmaS       (_ :: BinaryNumeric) Double = MagmaNum
 type instance NeutralS     (_ :: BinaryNumeric) Double = NeutralNum
 type instance CommutativeS (_ :: BinaryNumeric) Double = CommutativeNum
