@@ -99,7 +99,8 @@ data ComplexLift
 type instance MagmaS        (op :: BinaryNumeric) (Complex a) = MagmaNum
 type instance NeutralS      (op :: BinaryNumeric) (Complex a) = NeutralNum
 type instance CommutativeS  (op :: BinaryNumeric) (Complex a) = CommutativeNum
-type instance CancellativeS (op :: BinaryNumeric) (Complex a) = CancellativeNum
+type instance CancellativeS Add (Complex a) = CancellativeNum
+type instance CancellativeS Mul (Complex a) = CancellativeFractional
 
 type instance SemigroupS  (op :: BinaryNumeric) (Complex a) = DeriveSemigroup_Magma          op (Complex a)
 type instance MonoidS     (op :: BinaryNumeric) (Complex a) = DeriveMonoid_Semigroup_Neutral op (Complex a)
