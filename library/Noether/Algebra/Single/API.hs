@@ -1,8 +1,15 @@
-{-# LANGUAGE RebindableSyntax #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE RankNTypes          #-}
+{-# LANGUAGE RebindableSyntax    #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeInType          #-}
 
 module Noether.Algebra.Single.API where
 
+import           Noether.Lemmata.Prelude
 import           Noether.Lemmata.TypeFu
+import           Prelude                             ((==))
 
 import           Noether.Algebra.Single.Cancellative
 import           Noether.Algebra.Single.Group
