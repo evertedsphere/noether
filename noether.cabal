@@ -134,7 +134,7 @@ test-suite noether-test-suite
     , noether
     , hedgehog
   other-modules:
-      Algebra
+      Noether.Test.Algebra
   default-language: Haskell2010
 
 benchmark noether-benchmarks

@@ -4,7 +4,7 @@ import qualified Hedgehog.Range as Range
 
 -- import           Algebra
 -- import           EllipticCurve
--- import           Lemmata        hiding (negate, one, zero, (*), (+), (-), (/))
+import           Lemmata        hiding (negate, one, zero, (*), (+), (-), (/))
 
 import Noether.Test.Algebra
 
