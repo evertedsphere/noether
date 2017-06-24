@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 module Noether.Algebra.Actions.Acts where
 
 import           Data.Complex
@@ -19,5 +20,5 @@ class ActsK (lr :: Side) (op :: k) a b (s :: ActsE) where
 type family ActsS (lr :: Side) (op :: k) (a :: Type) (b :: Type) = (r :: ActsE)
 
 instance MagmaK op a zm => ActsK lr op a a (Acts_Magma zm) where
-  actK opP _ _ = binaryOpK opP (Proxy :: Proxy zm)
+  actK opP _ _ = binaryOpK opP (Proxy @zm)
 

@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 module Noether.Algebra.Single.Neutral where
 
 import qualified Prelude                 as P
@@ -29,7 +30,7 @@ instance NeutralK Or P.Bool NeutralPrim where
   neutralK _ _ = False
 
 instance (KnownSymbol sym, NeutralK op a s) => NeutralK op a (NeutralNamed sym s) where
-  neutralK opP _ = neutralK opP (Proxy :: Proxy s)
+  neutralK opP _ = neutralK opP (Proxy @s)
 
 type family NeutralS (op :: k) (a :: Type) = (r :: NeutralE)
 type Neutral op a = NeutralK op a (NeutralS op a)

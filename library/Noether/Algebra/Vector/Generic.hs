@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE TypeApplications    #-}
 module Noether.Algebra.Vector.Generic where
 
 import qualified Data.Vector.Generic      as G
@@ -16,7 +17,7 @@ gBinaryOpK
   => Proxy op -> z a -> z a -> z a
 gBinaryOpK o x y = coerce (G.zipWith binop (coerce x :: v a) (coerce y :: v a))
     where
-      binop = binaryOpK o (Proxy :: Proxy s)
+      binop = binaryOpK o (Proxy @s)
 
 gCancelK
   :: forall v a s op z.
@@ -24,7 +25,7 @@ gCancelK
   => Proxy op -> z a -> z a
 gCancelK o x = coerce (G.map cancelK' (coerce x :: v a))
     where
-      cancelK' = cancelK o (Proxy :: Proxy s)
+      cancelK' = cancelK o (Proxy @s)
 
 gActK
   :: forall v a b s lr op z.
@@ -32,7 +33,7 @@ gActK
   => Proxy op -> a -> z b -> z b
 gActK o a x = coerce (G.map (actK' a) (coerce x :: v b))
     where
-      actK' = actK o (Proxy :: Proxy s) (Proxy :: Proxy lr)
+      actK' = actK o (Proxy @s) (Proxy @lr)
 
 gNeutralK
   :: forall n v a s op b.
@@ -40,6 +41,6 @@ gNeutralK
   => Proxy op -> b n a
 gNeutralK o = coerce (G.replicate count neutralValue :: v a)
     where
-      count = P.fromIntegral (natVal (Proxy :: Proxy n))
-      neutralValue = neutralK o (Proxy :: Proxy s)
+      count = P.fromIntegral (natVal (Proxy @n))
+      neutralValue = neutralK o (Proxy @s)
 

@@ -32,11 +32,11 @@ type BiActs op a b = (LeftActs op a b, RightActs op a b)
 
 leftActK
   :: forall op s a b. ActsK 'L op a b s => a -> b -> b
-leftActK = actK (Proxy :: Proxy op) (Proxy :: Proxy s) (Proxy :: Proxy 'L)
+leftActK = actK (Proxy @op) (Proxy @s) (Proxy @'L)
 
 rightActK
   :: forall op s a b. ActsK 'R op a b s => a -> b -> b
-rightActK = actK (Proxy :: Proxy op) (Proxy :: Proxy s) (Proxy :: Proxy 'R)
+rightActK = actK (Proxy @op) (Proxy @s) (Proxy @'R)
 
 leftAct :: forall op a b. LeftActs op a b => a -> b -> b
 leftAct = leftActK @op @(ActsS 'L op a b)

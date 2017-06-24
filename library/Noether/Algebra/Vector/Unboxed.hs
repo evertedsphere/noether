@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 module Noether.Algebra.Vector.Unboxed where
 
 import qualified Prelude                     as P
@@ -25,7 +26,7 @@ instance (U.Unbox v, MagmaK op v s) =>
          MagmaK op (UVector n v) (MagmaTagged UVectorLift s) where
   binaryOpK o _ (UVector x) (UVector y) = UVector (U.zipWith binop x y)
     where
-      binop = binaryOpK o (Proxy :: Proxy s)
+      binop = binaryOpK o (Proxy @s)
 
 {-| Neutral elements for addition and multiplication. -}
 
@@ -33,8 +34,8 @@ instance (U.Unbox v, KnownNat n, NeutralK op v s) =>
          NeutralK op (UVector n v) (NeutralTagged UVectorLift s) where
   neutralK o _ = UVector (U.replicate count neutralValue)
     where
-      count = P.fromIntegral (natVal (Proxy :: Proxy n))
-      neutralValue = neutralK o (Proxy :: Proxy s)
+      count = P.fromIntegral (natVal (Proxy @n))
+      neutralValue = neutralK o (Proxy @s)
 
 {-| Pointwise negation and inversion.
 
@@ -49,7 +50,7 @@ instance (U.Unbox v, KnownNat n, CancellativeK op v s) =>
          CancellativeK op (UVector n v) (CancellativeTagged UVectorLift s) where
   cancelK o _ (UVector vs) = UVector (U.map cancelK' vs)
     where
-      cancelK' = cancelK o (Proxy :: Proxy s)
+      cancelK' = cancelK o (Proxy @s)
 
 {-| Actions of a on b extend to actions of a on 'UVector n b'. -}
 
@@ -57,7 +58,7 @@ instance (U.Unbox b, KnownNat n, ActsK lr op a b s) =>
          ActsK lr op a (UVector n b) (ActsTagged UVectorLift s) where
   actK o _ lr a (UVector bs) = UVector (U.map (actK' a) bs)
     where
-      actK' = actK o (Proxy :: Proxy s) lr
+      actK' = actK o (Proxy @s) lr
 
 {- Instances of the "basic types". Everything else can be derived from these.
    We're simply choosing the strategies we defined above, using the Derive*

@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 module Noether.Algebra.Single.Magma where
 
 import qualified Prelude                 as P
@@ -29,11 +30,11 @@ instance MagmaK Or P.Bool MagmaPrim where
   binaryOpK _ _ = (P.||)
 
 instance MagmaK op a s => MagmaK op a (MagmaNamed sym s) where
-  binaryOpK o _ = binaryOpK o (Proxy :: Proxy (MagmaNamed sym s))
+  binaryOpK o _ = binaryOpK o (Proxy @(MagmaNamed sym s))
 
 instance MagmaK op a s => MagmaK op (i -> a) (MagmaTagged FunctionLift s) where
   binaryOpK o _ f g = \x -> f x `binop` g x
-    where binop = binaryOpK o (Proxy :: Proxy s)
+    where binop = binaryOpK o (Proxy @s)
 
 type Magma op a = MagmaK op a (MagmaS op a)
 

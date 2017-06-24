@@ -3,6 +3,7 @@
 {-# LANGUAGE RankNTypes          #-}
 {-# LANGUAGE RebindableSyntax    #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeInType          #-}
 
 module Noether.Algebra.Single.API where
@@ -24,13 +25,13 @@ import           Noether.Algebra.Single.Synonyms
 import           Noether.Algebra.Tags
 
 cancel :: forall op a. Cancellative op a => Proxy op -> a -> a
-cancel p = cancelK p (Proxy :: Proxy (CancellativeS op a))
+cancel p = cancelK p (Proxy @(CancellativeS op a))
 
 binaryOp :: forall op a. Magma op a => Proxy op -> a -> a -> a
-binaryOp p = binaryOpK p (Proxy :: Proxy (MagmaS op a))
+binaryOp p = binaryOpK p (Proxy @(MagmaS op a))
 
 neutral :: forall op a. Neutral op a => Proxy op -> a
-neutral p = neutralK p (Proxy :: Proxy (NeutralS op a))
+neutral p = neutralK p (Proxy @(NeutralS op a))
 
 zero :: Neutral Add a => a
 zero = neutral AddP

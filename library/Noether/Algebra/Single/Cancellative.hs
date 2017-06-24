@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 module Noether.Algebra.Single.Cancellative where
 
 import qualified Prelude                 as P
@@ -23,13 +24,13 @@ instance P.Fractional a => CancellativeK Mul a CancellativeFractional where
 
 instance (KnownSymbol sym, CancellativeK op a s) =>
          CancellativeK op a (CancellativeNamed sym s) where
-  cancelK opP _ = cancelK opP (Proxy :: Proxy s)
+  cancelK opP _ = cancelK opP (Proxy @s)
 
 instance CancellativeK op a s =>
          CancellativeK op (i -> a) (CancellativeTagged FunctionLift s) where
   cancelK o _ f = cancelK' . f
     where
-      cancelK' = cancelK o (Proxy :: Proxy s)
+      cancelK' = cancelK o (Proxy @s)
 
 type Cancellative op a = CancellativeK op a (CancellativeS op a)
 
