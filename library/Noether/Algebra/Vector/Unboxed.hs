@@ -1,5 +1,11 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeApplications #-}
-module Noether.Algebra.Vector.Unboxed where
+module Noether.Algebra.Vector.Unboxed
+  (
+    UVector(..)
+  -- * Lifted operations
+  , actKUnbox
+  ) where
 
 import qualified Prelude                     as P
 
@@ -37,14 +43,17 @@ instance (U.Unbox v, KnownNat n, NeutralK op v s) =>
       count = P.fromIntegral (natVal (Proxy @n))
       neutralValue = neutralK o (Proxy @s)
 
-{-| Pointwise negation and inversion.
+{- $zerodivisors
 
-    Note that v^n has (a lot of) nontrivial zerodivisors even if v does not.
-    The zerodivisors are all elements with a zero(divisor) in some coordinate,
-    e.g. (1,0) and (0,1) are zerodivisors in R^2.
+    With respect to group structures defined pointwise, note that v^n has (a lot
+    of) nontrivial zerodivisors even if v does not. The zerodivisors are all
+    elements with a zero(divisor) in some coordinate, e.g. (1,0) and (0,1) are
+    zerodivisors in R^2.
 
     (This corresponds to the idea that the Spec of a product ring is disconnected!)
 -}
+
+-- | Pointwise negation and inversion.
 
 instance (U.Unbox v, KnownNat n, CancellativeK op v s) =>
          CancellativeK op (UVector n v) (CancellativeTagged UVectorLift s) where
@@ -52,17 +61,23 @@ instance (U.Unbox v, KnownNat n, CancellativeK op v s) =>
     where
       cancelK' = cancelK o (Proxy @s)
 
-{-| Actions of a on b extend to actions of a on 'UVector n b'. -}
+-- | Actions of a on b extend to actions of a on 'UVector' @n b@.
+actKUnbox
+  :: forall s lr op a b n.
+    (U.Unbox b, KnownNat n, ActsK lr op a b s)
+  => Proxy op -> Proxy s -> Proxy lr -> a -> UVector n b -> UVector n b
+actKUnbox o _ lr a (UVector bs) = UVector (U.map (actK' a) bs)
+  where
+    actK' = actK o (Proxy @s) lr
 
 instance (U.Unbox b, KnownNat n, ActsK lr op a b s) =>
          ActsK lr op a (UVector n b) (ActsTagged UVectorLift s) where
-  actK o _ lr a (UVector bs) = UVector (U.map (actK' a) bs)
-    where
-      actK' = actK o (Proxy @s) lr
+  actK op _ = actKUnbox op (Proxy @s)
 
 {- Instances of the "basic types". Everything else can be derived from these.
-   We're simply choosing the strategies we defined above, using the Derive*
-   synonyms to ease typing.
+
+   We're simply choosing the strategies we defined earlier, using the Derive*
+   synonyms to ease typing. 
 -}
 
 type instance MagmaS        (op :: BinaryNumeric) (UVector n a) = DeriveMagma_Tagged        UVectorLift op a
