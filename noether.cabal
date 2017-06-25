@@ -3,7 +3,7 @@
 -- see: https://github.com/sol/hpack
 
 name:           noether
-version:        0.0.0
+version:        0.0.1
 synopsis:       Math in Haskell.
 description:    TODO
 category:       Math

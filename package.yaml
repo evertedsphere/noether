@@ -1,6 +1,6 @@
 name: noether
 synopsis: Math in Haskell.
-version: '0.0.0'
+version: '0.0.1'
 
 maintainer: Soham Chowdhury
 github: mrkgnao/noether
