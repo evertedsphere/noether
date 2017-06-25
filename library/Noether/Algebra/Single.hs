@@ -1,3 +1,6 @@
+{-| FULLPOLYMORPHIC™ algebraic structures supporting a single operation.
+
+-}
 module Noether.Algebra.Single
   (
   -- * Semigroup identities

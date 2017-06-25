@@ -24,12 +24,15 @@ import           Noether.Algebra.Single.Strategies
 import           Noether.Algebra.Single.Synonyms
 import           Noether.Algebra.Tags
 
+-- | A polymorphic binary operation that uses a proxy for disambiguation.
 binaryOp :: forall op a. Magma op a => Proxy op -> a -> a -> a
 binaryOp p = binaryOpK p (Proxy @(MagmaS op a))
 
+-- | A polymorphic cancel operation that uses a proxy for disambiguation.
 cancel :: forall op a. Cancellative op a => Proxy op -> a -> a
 cancel p = cancelK p (Proxy @(CancellativeS op a))
 
+-- | A polymorphic neutral element that uses a proxy for disambiguation.
 neutral :: forall op a. Neutral op a => Proxy op -> a
 neutral p = neutralK p (Proxy @(NeutralS op a))
 
