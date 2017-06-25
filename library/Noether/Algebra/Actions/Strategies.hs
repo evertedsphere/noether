@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 module Noether.Algebra.Actions.Strategies where
 
 import           Noether.Algebra.Single
@@ -45,14 +44,17 @@ type DeriveActorLinearActs_LeftDistributivity lr p m a =
 type DeriveActeeLinearActs_RightDistributivity lr p m a =
   DeriveActeeLinearActs_Acts_Semigroup lr m a p a
 
--- Forgive me.
+type instance ActsS lr (op :: BinaryNumeric) Double Double = DeriveActs_Magma op Double
+type instance CompatibleS lr (op :: BinaryNumeric) op Double Double = DeriveCompatible_Associativity lr op Double
+type instance ActorLinearS lr Mul Add Double Add Double = DeriveActorLinearActs_LeftDistributivity lr Add Mul Double
+type instance ActeeLinearS lr Mul Double Add Double = DeriveActeeLinearActs_RightDistributivity lr Add Mul Double
 
-#define self_action(ty) \
-type instance ActsS lr (op :: BinaryNumeric) (ty) (ty) = DeriveActs_Magma op (ty); \
-type instance CompatibleS lr (op :: BinaryNumeric) op (ty) (ty) = DeriveCompatible_Associativity lr op (ty); \
-type instance ActorLinearS lr Mul Add (ty) Add (ty) = DeriveActorLinearActs_LeftDistributivity lr Add Mul (ty); \
-type instance ActeeLinearS lr Mul (ty) Add (ty) = DeriveActeeLinearActs_RightDistributivity lr Add Mul (ty)
+type instance ActsS lr (op :: BinaryNumeric) Rational Rational = DeriveActs_Magma op Rational
+type instance CompatibleS lr (op :: BinaryNumeric) op Rational Rational = DeriveCompatible_Associativity lr op Rational
+type instance ActorLinearS lr Mul Add Rational Add Rational = DeriveActorLinearActs_LeftDistributivity lr Add Mul Rational
+type instance ActeeLinearS lr Mul Rational Add Rational = DeriveActeeLinearActs_RightDistributivity lr Add Mul Rational
 
-self_action(Double)
-self_action(Rational)
-self_action(Complex Double)
+type instance ActsS lr (op :: BinaryNumeric) (Complex Double) (Complex Double) = DeriveActs_Magma op (Complex Double)
+type instance CompatibleS lr (op :: BinaryNumeric) op (Complex Double) (Complex Double) = DeriveCompatible_Associativity lr op (Complex Double)
+type instance ActorLinearS lr Mul Add (Complex Double) Add (Complex Double) = DeriveActorLinearActs_LeftDistributivity lr Add Mul (Complex Double)
+type instance ActeeLinearS lr Mul (Complex Double) Add (Complex Double) = DeriveActeeLinearActs_RightDistributivity lr Add Mul (Complex Double)
