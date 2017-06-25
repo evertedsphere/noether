@@ -1,6 +1,23 @@
 module Noether.Algebra.Single
-  ( module Noether.Algebra.Single.API
-  -- $structures
+  (
+  -- * Semigroup identities
+    zero
+  , one
+  -- * Magma operations
+  , (+)
+  , (*)
+  -- * Group operations
+  , (-)
+  , (/)
+  -- * Logical functions
+  , (&&)
+  , (||)
+  -- * Internal functions
+  , cancel
+  , reciprocal
+
+  -- * Algebraic structures
+
   , module Noether.Algebra.Single.Cancellative
   , module Noether.Algebra.Single.Commutative
   , module Noether.Algebra.Single.Neutral
@@ -9,8 +26,13 @@ module Noether.Algebra.Single
   , module Noether.Algebra.Single.Semigroup
   , module Noether.Algebra.Single.Group
   , module Noether.Algebra.Single.AbelianGroup
-  -- $strategies
+
+  -- * Strategies
+
   , module Noether.Algebra.Single.Strategies
+
+  -- * Convenient type synonyms
+
   , module Noether.Algebra.Single.Synonyms
   ) where
 
