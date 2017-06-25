@@ -78,6 +78,7 @@ library
       Noether.Algebra.Linear
       Noether.Algebra.Linear.API
       Noether.Algebra.Linear.Module
+      Noether.Algebra.Linear.Naperian
       Noether.Algebra.Linear.Strategies
       Noether.Algebra.Multiple
       Noether.Algebra.Multiple.Ring

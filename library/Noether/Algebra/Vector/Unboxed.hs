@@ -4,7 +4,7 @@ module Noether.Algebra.Vector.Unboxed
   (
     UVector(..)
   -- * Lifted operations
-  , actKUnbox
+  , actK_UVector
   ) where
 
 import qualified Prelude                     as P
@@ -20,7 +20,7 @@ import           Noether.Algebra.Vector.Tags
 
 import qualified Data.Vector.Unboxed         as U
 
-{-| UVector n v ≅ v^n for 'Unbox' types 'v'. -}
+{-| 'UVector' n v ≅ v^n for 'U.Unbox' types 'v'. -}
 
 newtype UVector (n :: Nat) v =
   UVector (U.Vector v)
@@ -62,22 +62,22 @@ instance (U.Unbox v, KnownNat n, CancellativeK op v s) =>
       cancelK' = cancelK o (Proxy @s)
 
 -- | Actions of a on b extend to actions of a on 'UVector' @n b@.
-actKUnbox
+actK_UVector
   :: forall s lr op a b n.
     (U.Unbox b, KnownNat n, ActsK lr op a b s)
   => Proxy op -> Proxy s -> Proxy lr -> a -> UVector n b -> UVector n b
-actKUnbox o _ lr a (UVector bs) = UVector (U.map (actK' a) bs)
+actK_UVector o _ lr a (UVector bs) = UVector (U.map (actK' a) bs)
   where
     actK' = actK o (Proxy @s) lr
 
 instance (U.Unbox b, KnownNat n, ActsK lr op a b s) =>
          ActsK lr op a (UVector n b) (ActsTagged UVectorLift s) where
-  actK op _ = actKUnbox op (Proxy @s)
+  actK op _ = actK_UVector op (Proxy @s)
 
 {- Instances of the "basic types". Everything else can be derived from these.
 
    We're simply choosing the strategies we defined earlier, using the Derive*
-   synonyms to ease typing. 
+   synonyms to ease typing.
 -}
 
 type instance MagmaS        (op :: BinaryNumeric) (UVector n a) = DeriveMagma_Tagged        UVectorLift op a
