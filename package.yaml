@@ -54,8 +54,8 @@ library:
   - pretty-show
   - vector
 
-  - reflection
-  - template-haskell
+    #- reflection
+    #- template-haskell
   source-dirs:
   - library
 

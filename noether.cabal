@@ -47,8 +47,6 @@ library
     , safe
     , pretty-show
     , vector
-    , reflection
-    , template-haskell
   exposed-modules:
       Lemmata
       Lemmata.Applicative
