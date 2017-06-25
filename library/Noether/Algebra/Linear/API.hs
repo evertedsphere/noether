@@ -1,5 +1,15 @@
 {-# LANGUAGE TypeApplications #-}
-module Noether.Algebra.Linear.API where
+module Noether.Algebra.Linear.API
+  (
+  -- * Basic actions
+    (%<)
+  , (>%)
+  -- * Using specialized actions
+  , (%<~)
+  , (~>%)
+  -- * Utility functions
+  , lerp
+  ) where
 
 import           Noether.Lemmata.Prelude
 import           Noether.Lemmata.TypeFu
@@ -22,13 +32,25 @@ r %< v = leftAct @Mul r v
 (>%) :: RightActs 'Mul r v => v -> r -> v
 v >% r = rightAct @Mul r v
 
--- | Locally use the self-action induced by the multiplicative magma structure
--- of the ring, whatever structure the user may have chosen to use globally.
+-- | Locally use the left self-action induced by the multiplicative magma
+-- structure of the ring, whatever structure the user may have chosen to use
+-- globally.
+--
+-- prop> a %<~ b = a * b
+(%<~) :: forall r. Ring Add Mul r => r -> r -> r
+a %<~ b = leftActK @Mul @(DeriveActs_Magma Mul r) a b
+
+-- | Locally use the right self-action induced by the multiplicative magma
+-- structure of the ring, whatever structure the user may have chosen to use
+-- globally.
+--
+-- prop> b ~>% a = a * b
 (~>%) :: forall r. Ring Add Mul r => r -> r -> r
-a ~>% b = rightActK @Mul @(DeriveActs_Magma Mul r) a b
+b ~>% a = rightActK @Mul @(DeriveActs_Magma Mul r) b a
 
 -- | Linear interpolation.
--- > lerp λ v w = λv + (1 - λ)w
+--
+-- prop> lerp λ v w = λv + (1 - λ)w
 
 lerp ::
   ( Neutral 'Mul r
