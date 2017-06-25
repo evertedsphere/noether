@@ -72,7 +72,6 @@ infixl 7 *
 (*) :: Magma Mul a => a -> a -> a
 (*) = binaryOp MulP
 
-
 infixl 6 -
 
 -- | Subtraction for cancellative additive magmas
