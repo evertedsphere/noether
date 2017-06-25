@@ -11,6 +11,7 @@ homepage:       https://github.com/mrkgnao/noether#readme
 bug-reports:    https://github.com/mrkgnao/noether/issues
 maintainer:     Soham Chowdhury
 license:        MIT
+license-file:   LICENSE.md
 build-type:     Simple
 cabal-version:  >= 1.10
 
@@ -28,10 +29,10 @@ source-repository head
 library
   hs-source-dirs:
       library
-  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeFamilyDependencies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
+  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
   ghc-options: -fwarn-implicit-prelude -fno-warn-unticked-promoted-constructors
   build-depends:
-      base
+      base <= 5.1.0.0
     , array
     , ghc-prim
     , async
@@ -64,6 +65,7 @@ library
       Lemmata.Semiring
       Lemmata.Show
       Lemmata.Unsafe
+      Noether.Algebra
       Noether.Algebra.Actions
       Noether.Algebra.Actions.Acts
       Noether.Algebra.Actions.API
@@ -113,7 +115,7 @@ executable noether
   main-is: Main.hs
   hs-source-dirs:
       executable
-  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeFamilyDependencies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
+  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
   ghc-options: -fwarn-implicit-prelude -fno-warn-unticked-promoted-constructors -rtsopts -threaded -with-rtsopts=-N
   build-depends:
       base
@@ -125,7 +127,7 @@ test-suite noether-test-suite
   main-is: Main.hs
   hs-source-dirs:
       test-suite
-  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeFamilyDependencies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
+  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
   ghc-options: -fwarn-implicit-prelude -fno-warn-unticked-promoted-constructors -rtsopts -threaded -with-rtsopts=-N
   build-depends:
       base
@@ -140,7 +142,7 @@ benchmark noether-benchmarks
   main-is: Main.hs
   hs-source-dirs:
       benchmark
-  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeFamilyDependencies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
+  default-extensions: ConstraintKinds DataKinds PatternSynonyms EmptyDataDecls FlexibleContexts FlexibleInstances GADTs LiberalTypeSynonyms MultiParamTypeClasses NoImplicitPrelude OverloadedStrings PolyKinds RankNTypes ScopedTypeVariables TypeFamilies TypeInType TypeOperators TypeSynonymInstances UndecidableInstances UndecidableSuperClasses
   ghc-options: -fwarn-implicit-prelude -fno-warn-unticked-promoted-constructors -rtsopts -threaded -with-rtsopts=-N
   build-depends:
       base
