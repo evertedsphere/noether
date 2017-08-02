@@ -1,4 +1,4 @@
-resolver: lts-8.19
+resolver: nightly-2017-07-31
 
 packages:
   - location: .
@@ -8,7 +8,5 @@ packages:
       - hedgehog
 
 extra-deps: []
-
 flags: {}
-
 extra-package-dbs: []

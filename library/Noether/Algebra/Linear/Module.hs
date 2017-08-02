@@ -66,9 +66,9 @@ type RightModuleC op p m r a v = RightModuleK op p m r a v (RightModuleS op p m 
 
 instance ( RingK p m r zr
          , AbelianGroupK a v zag
-         , ActorLinearK R m p r a v zor
-         , ActeeLinearK R m r a v zee
-         , CompatibleK R op m r v zrc
+         , ActorLinearK 'R m p r a v zor
+         , ActeeLinearK 'R m r a v zee
+         , CompatibleK 'R op m r v zrc
          ) => RightModuleK op p m r a v
            (RightModule_Ring_AbelianGroup_Linear_Compatible zr zag zor zee zrc)
 
@@ -76,6 +76,6 @@ type RightModule op p m r a v =
   ( RightModuleC op p m r a v
   , Ring p m r
   , AbelianGroup a v
-  , LinearActsOn R m p r a v
+  , LinearActsOn 'R m p r a v
   , RightCompatible op m r v
   )

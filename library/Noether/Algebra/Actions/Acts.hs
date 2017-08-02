@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE TypeApplications #-}
 module Noether.Algebra.Actions.Acts where
 
@@ -9,10 +10,13 @@ import           Noether.Lemmata.TypeFu
 import           Noether.Algebra.Single
 import           Noether.Algebra.Tags
 
+import           GHC.Generics
+
 data ActsE
   = Acts_Magma MagmaE
   | ActsNamed Symbol ActsE
   | ActsTagged Type ActsE
+  deriving (Generic)
 
 class ActsK (lr :: Side) (op :: k) a b (s :: ActsE) where
   actK :: Proxy op -> Proxy s -> Proxy lr -> a -> b -> b

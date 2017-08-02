@@ -48,6 +48,7 @@ library
     , safe
     , pretty-show
     , vector
+    , profunctors
   exposed-modules:
       Lemmata
       Lemmata.Applicative
@@ -77,9 +78,11 @@ library
       Noether.Algebra.Inference
       Noether.Algebra.Linear
       Noether.Algebra.Linear.API
+      Noether.Algebra.Linear.Hyper
       Noether.Algebra.Linear.Module
       Noether.Algebra.Linear.Naperian
       Noether.Algebra.Linear.Strategies
+      Noether.Algebra.Linear.Vector
       Noether.Algebra.Multiple
       Noether.Algebra.Multiple.Ring
       Noether.Algebra.Multiple.Semiring

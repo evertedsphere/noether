@@ -53,6 +53,7 @@ library:
   - safe
   - pretty-show
   - vector
+  - profunctors
 
     #- reflection
     #- template-haskell

@@ -9,6 +9,7 @@ import           Noether.Algebra.Tags
 import           Noether.Algebra.Actions.Acts
 import           Noether.Algebra.Actions.Compatible
 import           Noether.Algebra.Actions.Linearity
+import           Noether.Algebra.Actions.GroupActions
 
 import           Noether.Algebra.Single
 
@@ -20,15 +21,22 @@ type Compatible lr op act a b
     , Acts lr act a b)
 
 type LeftCompatible act ao a b = Compatible L act ao a b
-type RightCompatible act ao a b = Compatible R act ao a b
+type RightCompatible act ao a b = Compatible 'R act ao a b
 
 type Acts lr op a b = ActsK lr op a b (ActsS lr op a b)
 
 type LeftActs  op a b = Acts L op a b
-type RightActs op a b = Acts R op a b
+type RightActs op a b = Acts 'R op a b
 
 type BiActs op a b = (LeftActs op a b, RightActs op a b)
 
+type GSet lr op act g b
+  = ( GSetC lr op g b
+    , Compatible lr op act g b
+    , Group op g)
+
+type LeftGSet  op act g b = GSet L op act g b
+type RightGSet op act g b = GSet 'R op act g b
 
 leftActK
   :: forall op s a b. ActsK 'L op a b s => a -> b -> b
@@ -59,7 +67,10 @@ type LinearActsOn lr act ao a bo b
     , Semigroup ao a
     , Semigroup bo b)
 
-type LinearActs act ao a bo b = (LinearActsOn L act ao a bo b, LinearActsOn R act ao a bo b)
-
 type LeftLinear act ao a bo b = LinearActsOn L act ao a bo b
-type RightLinear act ao a bo b = LinearActsOn R act ao a bo b
+type RightLinear act ao a bo b = LinearActsOn 'R act ao a bo b
+
+type LinearActs act ao a bo b
+  = ( LeftLinear act ao a bo b
+    , RightLinear act ao a bo b)
+

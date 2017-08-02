@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE TypeApplications #-}
 module Noether.Algebra.Single.Magma where
 
@@ -6,13 +7,15 @@ import qualified Prelude                 as P
 import           Noether.Lemmata.Prelude
 import           Noether.Lemmata.TypeFu
 
+import           GHC.Generics
 import           Noether.Algebra.Tags
 
 data MagmaE
   = MagmaPrim
   | MagmaNum
-  | MagmaNamed Symbol MagmaE
-  | MagmaTagged Type MagmaE
+  | MagmaNamed { magmaName :: Symbol, namedMagmaEvidence :: MagmaE }
+  | MagmaTagged { magmaTag :: Type, taggedMagmaEvidence :: MagmaE }
+  deriving (Generic)
 
 class MagmaK (op :: k) a (s :: MagmaE) where
   binaryOpK :: Proxy op -> Proxy s -> a -> a -> a
