@@ -1,6 +1,6 @@
 # Noether
 
-FULLPOLYMORPHIC™ number theory / abstract algebra in Haskell.
+maximally polymorphic number theory / abstract algebra in haskell
 
 The part I'm working on at present develops a highly polymorphic numeric hierarchy. Unlike almost every other project (including the great `subhask`, which is by far the biggest inspiration for this project), all typeclasses representing algebraic structures are "tagged" with the operations that the base type supports. The intention is to have, without newtyping, things like automatically specified *L*-vector space instances for any *K*-vector space with *K / L* a (nice) field extension.
 
